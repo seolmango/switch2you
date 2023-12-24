@@ -1,3 +1,5 @@
 require('./main.css')
 
-console.log("불러와짐")
+import { io } from 'socket.io-client';
+
+const socket = io();
