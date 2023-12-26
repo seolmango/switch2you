@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
     socket.on('exit room', () => {
         result = player.exitRoom();
         if (result === 'no join room') {
-            socket.emit(error);
+            socket.emit(result);
             return false;
         } else io.to(result.socketId).emit('owner change');
         
