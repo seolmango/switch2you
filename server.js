@@ -19,7 +19,7 @@ http.listen(port, function () {
     console.log(`server on!: http://localhost:${port}`);
 });
 
-io.on('connection', function (socket) {
+io.on('connection', (socket) => {
 
     const player = new Player(); // 접속한 플레이어(세션) 마다 생성
     if (player) { // 서버가 꽉찼다면
@@ -28,6 +28,13 @@ io.on('connection', function (socket) {
     }
     player.socketId = socket.id;
     io.to(socket.id).emit("connected", player.id);
+    console.log('user connected: ', player.socketId);
+
+
+    socket.on('disconnect', function () {
+        socket.disconnect();
+        console.log('user disconnected: ', player.socketId);
+    });
 
     /**
     let PlayerRoomId = 0;
