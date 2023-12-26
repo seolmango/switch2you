@@ -6,9 +6,8 @@ import { checkTouch} from "./tools/checkTouch";
 import { Color_list} from "../data/color_list";
 
 titleScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
-    Background_ctx.clearRect(0,0,1920,1080);
+    titleScreen.redrawBackground(Background_ctx);
     UI_ctx.clearRect(0,0,1920,1080);
-    Background_ctx.drawImage(image.title_logo, 618, 0, 684, 300);
     titleScreen.checkUIList = [];
 };
 
@@ -18,6 +17,11 @@ titleScreen.draw = function (Background_ctx, UI_ctx, Screen) {
 
 titleScreen.check = function (userMouse, userKeyboard, checkUIList) {
 
+};
+
+titleScreen.redrawBackground = function (Background_ctx) {
+    Background_ctx.clearRect(0,0,1920,1080);
+    Background_ctx.drawImage(image.title_logo, 618, 0, 684, 300);
 };
 
 export { titleScreen };

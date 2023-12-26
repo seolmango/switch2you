@@ -41,6 +41,33 @@ window.onload = function () {
     socket = io();
     Screen.currentScreen = titleScreen;
     Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+    canvasResize();
 }
 
+window.addEventListener('resize', function() {
+    canvasResize();
+})
+
 // Socket Event Listeners
+
+// functions
+function canvasResize() {
+    if (window.innerWidth * 9 < window.innerHeight * 16) {
+        Screen.scale = window.innerWidth / 1920 * 0.9;
+    } else {
+        Screen.scale = window.innerHeight / 1080 * 0.9;
+    }
+    Background_canvas.width = 1920 * Screen.scale;
+    Background_canvas.height = 1080 * Screen.scale;
+    UI_canvas.width = 1920 * Screen.scale;
+    UI_canvas.height = 1080 * Screen.scale;
+    Background_canvas.style.top = '50%';
+    Background_canvas.style.left = '50%';
+    Background_canvas.style.transform = 'translate(-50%, -50%)';
+    UI_canvas.style.top = '50%';
+    UI_canvas.style.left = '50%';
+    UI_canvas.style.transform = 'translate(-50%, -50%)';
+    Background_ctx.scale(Screen.scale, Screen.scale);
+    UI_ctx.scale(Screen.scale, Screen.scale);
+    Screen.currentScreen.redrawBackground(Background_ctx);
+}

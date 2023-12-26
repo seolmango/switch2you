@@ -1,7 +1,7 @@
 canvas {
     display: block;
-    margin: none;
-    padding: none;
+    margin: 0 auto;
+    padding: 0;
     border: none;
     position: absolute;
     top: 50%;
