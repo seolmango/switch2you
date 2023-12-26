@@ -14,7 +14,7 @@ class Player {
 
     constructor() {
         if (Player.MaxCount <= Player.Count) return false;
-        this._id = Player._Id++;
+        this._id = Player.#_Id++;
         Player.Instances[this.id] = this;
         this.socketId;
     }

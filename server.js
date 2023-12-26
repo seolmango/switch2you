@@ -28,12 +28,12 @@ io.on('connection', (socket) => {
     }
     player.socketId = socket.id;
     io.to(socket.id).emit("connected", player.id);
-    console.log('user connected: ', player.socketId);
+    console.log('user connected: ', player.socketId, player.id);
 
 
     socket.on('disconnect', function () {
         socket.disconnect();
-        console.log('user disconnected: ', player.socketId);
+        console.log('user disconnected: ', player.socketId, player.id);
     });
 
     /**
