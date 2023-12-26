@@ -1,3 +1,7 @@
 require('./main.css')
 
-console.log("불러와짐")
+
+socket.on('connected', function (PlayerId) {
+    const PlayerId = PlayerId;
+    console.log(PlayerId);
+});
