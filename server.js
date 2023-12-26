@@ -1,27 +1,29 @@
-const express = require('express');
-const app = express();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-const path = require('path');
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+import * as Config from './server/config.json' assert { type: 'json' };
+import Player from './server/Player.js';
+import Room from './server/Room.js';
 
 
 // 설정 불러오기
-const Config = require('./server/config.json');
-const Player = require('./server/Player.js');
-const Room = require('./server/Room.js');
 Player.MaxCount = Config.playerMaxNum;
 Room.MaxCount = Config.roomMaxNum;
 
 
 // 서버 실행
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer);
+const port = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, 'dist')));
 
-const port = process.env.PORT || 3000;
-http.listen(port, function () {
-    console.log(`server on!: http://localhost:${port}`);
-});
 
-
+// 소켓 코드
 io.on('connection', (socket) => {
 
     // Player(세션) 추가
@@ -33,9 +35,6 @@ io.on('connection', (socket) => {
     player.socketId = socket.id;
     socket.emit('connected', player.id); // 연결 응답 신호 전송
     console.log('user connected: ', player.socketId, player.id);
-
-    // 필요 변수
-    let room;
 
 
     // Player 연결 끊김
@@ -271,3 +270,6 @@ io.on('connection', (socket) => {
     */
 
 });
+
+
+httpServer.listen(port);

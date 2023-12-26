@@ -1,4 +1,4 @@
-class Player {
+export default class Player {
     static MaxCount = 0;
     static #_Count = 0;
     static #_Id = 1;
@@ -67,5 +67,3 @@ class Player {
         return ownerChange;
     }
 }
-
-module.exports = Player;
