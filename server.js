@@ -12,7 +12,7 @@ Player.MaxCount = Config.playerMaxNum;
 
 
 // 서버 실행
-app.use(express.static(path.join(__dirname, "src")));
+app.use(express.static(path.join(__dirname, "dist")));
 
 const port = process.env.PORT || 3000;
 http.listen(port, function () {

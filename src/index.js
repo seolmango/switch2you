@@ -1,7 +1,9 @@
 require('./main.css')
 
 
+const Client = {};
+
 socket.on('connected', function (PlayerId) {
-    const PlayerId = PlayerId;
-    console.log(PlayerId);
+    Client.Id = PlayerId;
+    console.log(Client.Id);
 });
