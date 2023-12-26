@@ -6,13 +6,15 @@ const path = require('path');
 
 
 // 설정 불러오기
-const Config = require("./server/config.json");
-const Player = require("./server/Player.js");
+const Config = require('./server/config.json');
+const Player = require('./server/Player.js');
+const Room = require('./server/Room.js');
 Player.MaxCount = Config.playerMaxNum;
+Room.MaxCount = Config.roomMaxNum;
 
 
 // 서버 실행
-app.use(express.static(path.join(__dirname, "dist")));
+app.use(express.static(path.join(__dirname, 'dist')));
 
 const port = process.env.PORT || 3000;
 http.listen(port, function () {
@@ -21,20 +23,46 @@ http.listen(port, function () {
 
 io.on('connection', (socket) => {
 
+    // Player(세션) 추가
     const player = new Player(); // 접속한 플레이어(세션) 마다 생성
     if (!player) { // 서버가 꽉찼다면
-        io.to(socket.id).emit("serverFull");
+        io.to(socket.id).emit("server full");
         socket.disconnect();
     }
     player.socketId = socket.id;
-    io.to(socket.id).emit("connected", player.id);
+    socket.emit('connected', player.id); // 연결 응답 신호 전송
     console.log('user connected: ', player.socketId, player.id);
 
+    // 필요 변수
+    let room;
 
-    socket.on('disconnect', function () {
+
+    // Player 연결 끊김
+    socket.on('disconnect', () => {
         socket.disconnect();
         console.log('user disconnected: ', player.socketId, player.id);
     });
+
+
+    // 권한/랜덤매칭/방이름 등등 더 작업해야함
+    socket.on('create room', (playerName) => {
+        room = new Room();
+        player.name = playerName;
+        room.players.push(player);
+        socket.emit("room created", room.id);
+    })
+
+    socket.on('join room', (roomId, playerName) => {
+        player.name = playerName;
+        Room.Instances[roomId].players.push(player);
+    })
+
+    socket.on('delete room', (roomId) => {
+        Room.Instances[roomId].delete();
+    })
+
+
+    // Room 생성
 
     /**
     let PlayerRoomId = 0;
