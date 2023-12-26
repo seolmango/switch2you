@@ -26,6 +26,8 @@ Screen.currentScreen.checkUIList = [];
 Screen.popupAlert = {};
 Screen.popupAlert.data = [];
 Screen.popupAlert.draw = function () {};
+Screen.X0real = 0;
+Screen.Y0real = 0;
 let socket = {};
 const Settings = {};
 const InGameData = {};
@@ -46,6 +48,15 @@ window.onload = function () {
 
 window.addEventListener('resize', function() {
     canvasResize();
+})
+
+UI_canvas.addEventListener('mousemove', function(e) {
+    Screen.userMouse.x = (e.offsetX / Screen.scale) - Screen.X0real;
+    Screen.userMouse.y = (e.offsetY / Screen.scale) - Screen.Y0real;
+})
+
+UI_canvas.addEventListener('click', function(e) {
+    Screen.userMouse.click = true;
 })
 
 // Socket Event Listeners
