@@ -8,11 +8,11 @@ const socket = io();
 const Client = {};
 
 
-socket.on('connected', function (PlayerId) {
+socket.on('connected', (PlayerId) => {
     Client.Id = PlayerId;
     console.log(Client.Id);
 });
 
-socket.on('disconnect', function () {
+socket.on('disconnect', () => {
     console.log('disconnected');
 });
