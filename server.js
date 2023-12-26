@@ -22,7 +22,7 @@ http.listen(port, function () {
 io.on('connection', (socket) => {
 
     const player = new Player(); // 접속한 플레이어(세션) 마다 생성
-    if (player) { // 서버가 꽉찼다면
+    if (!player) { // 서버가 꽉찼다면
         io.to(socket.id).emit("serverFull");
         socket.disconnect();
     }
