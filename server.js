@@ -21,6 +21,7 @@ http.listen(port, function () {
     console.log(`server on!: http://localhost:${port}`);
 });
 
+
 io.on('connection', (socket) => {
 
     // Player(세션) 추가
@@ -39,26 +40,75 @@ io.on('connection', (socket) => {
 
     // Player 연결 끊김
     socket.on('disconnect', () => {
+        player.delete();
         socket.disconnect();
         console.log('user disconnected: ', player.socketId, player.id);
     });
 
 
-    // 권한/랜덤매칭/방이름 등등 더 작업해야함
+    // 방 생성
     socket.on('create room', (playerName) => {
+        if (player.room) {
+            socket.emit('already join room');
+            return false;
+        }
+
         room = new Room();
+        player.joinRoom(room);
         player.name = playerName;
-        room.players.push(player);
-        socket.emit("room created", room.id);
+        player.getOwner();
+        socket.emit('room created', room.id);
     })
 
-    socket.on('join room', (roomId, playerName) => {
+
+    // 방 참가
+    socket.on('join room', (playerName, roomId, password) => {
+        error = player.joinRoom(Room.Instances[roomId]);
+        if (error) {
+            socket.emit(error);
+            return false;
+        }
         player.name = playerName;
-        Room.Instances[roomId].players.push(player);
+        socket.emit('room joined', room.id);
     })
 
-    socket.on('delete room', (roomId) => {
-        Room.Instances[roomId].delete();
+
+    // 랜덤 방 매칭
+    socket.on('join random room', (playerName) => {
+        if (player.room) {
+            socket.emit('already join room');
+            return false;
+        }
+
+        // 공개 빈 방 탐색
+        for (room of Room.Instances) {
+            if (!room.public || room.players.length > 8) continue;
+            player.join(room);
+            player.name = playerName;
+            socket.emit('room joined', room.id);
+            break;
+        }
+
+        // 없다면 방 생성
+        if (!player.room) {
+            room = new Room();
+            player.joinRoom(room);
+            player.name = playerName;
+            player.getOwner();
+            socket.emit('room created', room.id);
+        }
+    })
+
+
+    // 방 퇴장
+    socket.on('exit room', () => {
+        result = player.exitRoom();
+        if (result === 'no join room') {
+            socket.emit(error);
+            return false;
+        } else io.to(result.socketId).emit('owner change');
+        
+        socket.emit('room exited');
     })
 
 

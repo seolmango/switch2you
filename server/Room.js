@@ -1,7 +1,7 @@
 class Room {
     static MaxCount = 0;
     static #_Count = 0;
-    static #_Id = 0;
+    static #_Id = 1;
     static Instances = {};
 
     static get Count() {
@@ -19,7 +19,10 @@ class Room {
         Room.Instances[this.id] = this;
         Room.#_Count++;
 
-        this.players = [];
+        this.public = true; // 공개방인가? 공개방은 퀵매칭 포함됨.
+        this.password = false; // 비공개방일시 방 비밀번호
+        this.players = []; // 참가한 유저 객체들
+        this.owner; // 방장 유저 객체
     }
 
     get id() {
