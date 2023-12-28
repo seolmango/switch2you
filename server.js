@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-import * as Config from './server/config.json' assert { type: 'json' };
+import Config from './server/config.js';
 import Player from './server/Player.js';
 import Room from './server/Room.js';
 
