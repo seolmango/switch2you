@@ -12,7 +12,7 @@ export default class Room {
         return Room._Id;
     }
 
-    constructor() {
+    constructor(owner) {
         // Room 객체 기초 설정
         if (Room.MaxCount <= Room.Count) return false;
         this._id = Room.#_Id++;
@@ -21,8 +21,11 @@ export default class Room {
 
         this.public = true; // 공개방인가? 공개방은 퀵매칭 포함됨.
         this.password = false; // 비공개방일시 방 비밀번호
-        this.players = []; // 참가한 유저 객체들
-        this.owner; // 방장 유저 객체
+        this.playing = false; // 게임중인가? 게임중인방은 퀵매칭에서 제외됨.
+        this.players = [owner]; // 참가한 유저 객체들
+        this.owner = owner; // 방장인 플레이어 객체. 이 프로퍼티가 굳이 왜 필요하나 싶지만, 방에 owner는 1명 뿐이라는 특이성 때문에 필요함.
+        owner.room = this;
+        owner.role = 'owner';
     }
 
     get id() {
@@ -31,6 +34,6 @@ export default class Room {
 
     delete() {
         delete Room.Instances[this.id];
-        Player.#_Count--;
+        Room.#_Count--;
     }
 }

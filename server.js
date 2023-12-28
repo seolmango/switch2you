@@ -23,6 +23,16 @@ const port = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, 'dist')));
 
 
+/**
+ * Player객체 배열을 받고, 공유에 필요한 데이터들만 뽑아 반환합니다.
+ * @param {Player[]} players 
+ * @returns 
+ */
+function getPlayerInfo(players) {
+    return players.map((player) => {return {'id': player.id, 'name': player.name, 'role': player.role}});
+}
+
+
 // 소켓 코드
 io.on('connection', (socket) => {
 
@@ -39,6 +49,10 @@ io.on('connection', (socket) => {
 
     // Player 연결 끊김
     socket.on('disconnect', () => {
+        const room = player.room;
+        const result = player.leaveRoom();
+        if (result !== 'no join room' && result) io.to(room.id).emit('owner change', room.owner.id);
+        if (room.players.length > 0) io.to(room.id).emit('player leaved', player.id);
         player.delete();
         socket.disconnect();
         console.log('user disconnected: ', player.socketId, player.id);
@@ -46,29 +60,30 @@ io.on('connection', (socket) => {
 
 
     // 방 생성
-    socket.on('create room', (playerName) => {
-        if (player.room) {
+    socket.on('create room', (playerName) => { // 1. 방 참가 이벤트가 들어오면
+        if (player.room) { // 2. 모든 조건을 확인 후 확정이 나면
             socket.emit('already join room');
             return false;
         }
 
-        room = new Room();
-        player.joinRoom(room);
-        player.name = playerName;
-        player.getOwner();
-        socket.emit('room created', room.id);
+        player.update(playerName); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
+        new Room(player);
+        socket.join(player.room.id); // 4. room 관련 처리하고 소켓신호 보내기
+        socket.emit('room joined', getPlayerInfo(player.room.players));
     })
 
 
     // 방 참가
     socket.on('join room', (playerName, roomId, password) => {
-        error = player.joinRoom(Room.Instances[roomId]);
-        if (error) {
-            socket.emit(error);
+        const result = player.joinRoom(Room.Instances[roomId], password);
+        if (result) {
+            socket.emit(result);
             return false;
         }
-        player.name = playerName;
-        socket.emit('room joined', room.id);
+        player.update(playerName);
+        io.to(player.room.id).emit('player joined', getPlayerInfo(player));
+        socket.join(player.room.id);
+        socket.emit('room joined', getPlayerInfo(player.room.players));
     })
 
 
@@ -80,158 +95,69 @@ io.on('connection', (socket) => {
         }
 
         // 공개 빈 방 탐색
-        for (room of Room.Instances) {
-            if (!room.public || room.players.length > 8) continue;
-            player.join(room);
-            player.name = playerName;
-            socket.emit('room joined', room.id);
+        for (const room of Room.Instances) {
+            if (!room.public || room.players.length > 8 || room.playing) continue; // 비공개거나, 꽉찾거나, 게임중이면 건너뛰기
+            player.update(playerName);
+            player.joinRoom(room);
+            io.to(player.room.id).emit('player joined', getPlayerInfo(player));
+            socket.join(room.id);
+            io.to(room.id).emit('join room', player.id, room.id);
             break;
         }
 
         // 없다면 방 생성
         if (!player.room) {
-            room = new Room();
-            player.joinRoom(room);
-            player.name = playerName;
-            player.getOwner();
-            socket.emit('room created', room.id);
+            player.update(playerName);
+            const room = new Room(player);
+            socket.join(room.id);
+            socket.emit('room joined', getPlayerInfo(room.players));
         }
     })
 
 
     // 방 퇴장
-    socket.on('exit room', () => {
-        result = player.exitRoom();
+    socket.on('leave room', () => {
+        if (!player.room) {
+            socket.emit('no join room');
+            return false;
+        }
+        const room = player.room;
+        const result = player.leaveRoom();
         if (result === 'no join room') {
+            socket.emit('no join room');
+            return false;
+        }
+
+        socket.emit('room leaved');
+        socket.leave(room.id);
+        if (result) io.to(room.id).emit('owner changed', room.owner.id); // 방장이 바뀌었다면
+        if (room.players.length > 0) io.to(room.id).emit('player leaved', player.id);
+    })
+
+
+    // 방장 이전. targetId는 방장이 이전될 플레이어의 id.
+    socket.on('change owner', (targetId) => {
+        const target = Player.Instances[targetId]; // target이 없는경우에도 no permission
+        const result = player.giveOwner(target);
+        if (result) {
             socket.emit(result);
             return false;
-        } else io.to(result.socketId).emit('owner change');
-        
-        socket.emit('room exited');
+        }
+        io.to(player.room.id).emit('owner changed', targetId);
     })
 
 
-    // Room 생성
+    // 강제 퇴장
+    socket.on('forced leave room', (targetId) => {
+        const target = Player.Instances[targetId]; // target이 없는경우에도 no permission
+        if (player.role !== 'owner' || player.room !== target.room) socket.emit('no permission');
+        target.leaveRoom();
+        io.to(player.room.id).emit('player leaved', targetId);
+    })
+
 
     /**
-    let PlayerRoomId = 0;
-    let PlayerRoomNum;
-    let PlayerName;
-
-    socket.on('join room', function (PlayerData) {
-        PlayerName = PlayerData.name;
-        Player.Names[PlayerId] = PlayerName;
-        if (PlayerData.roomId === "auto") {
-            if (!PlayerData.newRoom) { // 자동매치인데 방이 존재하지 않거나 덜 찬 방이 존재하지 않는지 확인
-                let mostRoomId = 0;
-                for(i = 1; i < RoomMaxNum; i++){ // 참가하기에 적합한 방 찾기
-                    if(Room.PlayerCounts[i] < 8 & Room.States[i] !== 0 & Room.States[i] !== 4 & Room.Password[i] === 0 & Room.PlayerCounts[i] > Room.PlayerCounts[mostRoomId]){
-                        mostRoomId = i;
-                    }
-                }
-                if(mostRoomId !== 0){
-                    PlayerData.roomId = mostRoomId;
-                }
-                if(PlayerData.roomId === "auto"){ // 자동참가 할 수 있는 방이 없을때
-                    PlayerData.newRoom = true;
-                }
-            }
-        } else { // 선택매치
-            let reason = -1;
-            if (Room.PlayerCounts[PlayerData.roomId] === 0) { // 입력한 방이 존재하지않는경우
-                reason = 0;
-            } else if (Room.PlayerCounts[PlayerData.roomId] === 8) { // 입력한 방이 꽉찬경우
-                reason = 1;
-            } else if (Room.Password[PlayerData.roomId] !== PlayerData.password) { // 비밀번호 맞는지 확인. 없는건 둘다 0이기 때문에 조건 하나만 둬도 된다.
-                reason = 2;
-            }
-            if(reason !== -1){
-                io.to(socket.id).emit('no room', reason);
-                return;
-            }
-        }
-        let PlayingRoom = 0;
-        if (PlayerData.newRoom) {
-            if (Room.Count >= RoomMaxNum) { // 서버 방 생성 꽉참
-                io.to(socket.id).emit('no room', 3);
-                return;
-            }
-            Room.Count++
-            PlayerRoomId = Room.States.indexOf(0);
-            RoomMg.makeRoom(PlayerId, PlayerRoomId, PlayerData.password);
-        } else {
-            PlayerRoomId = PlayerData.roomId;
-            RoomMg.joinRoom(PlayerId, PlayerRoomId);
-            if(Room.States[PlayerData.roomId] === 3){
-                PlayingRoom = 1;
-            }
-        }
-        PlayerRoomNum = Player.RoomNums[PlayerId];
-        io.to(socket.id).emit('join room', PlayerRoomId, Room.PlayerIds[PlayerRoomId], Room.PlayerCounts[PlayerRoomId], Room.PlayerNames[PlayerRoomId], Room.OwnerIds[PlayerRoomId], Room.MapId[PlayerRoomId], PlayingRoom);
-        if(PlayingRoom === 1){ io.to(socket.id).emit('start game', Room.PlayerLiveStates[PlayerRoomId], Room.LiveCounts[PlayerRoomId], Room.PlayerXs[PlayerRoomId], Room.PlayerYs[PlayerRoomId], Room.PlayerSightRanges[PlayerRoomId], Room.TaggerIds[PlayerRoomId], Room.Map[PlayerRoomId]) }
-        io.to(PlayerRoomId).emit('user join', PlayerId, PlayerName, PlayerRoomNum);
-        socket.join(PlayerRoomId);
-    })
-
-    socket.on('exit room', function () {
-        socket.leave(PlayerRoomId);
-        if (Room.PlayerCounts[PlayerRoomId] < 2) { // 나간사람이 마지막 사람일 경우
-            RoomMg.deleteRoom(PlayerRoomId);
-            Player.Rooms[PlayerId] = 0;
-        } else {
-            RoomMg.exitRoom(PlayerId, PlayerRoomId);
-            if (Room.OwnerIds[PlayerRoomId] === PlayerId) { // 나간사람이 방장인 경우
-                Room.OwnerIds[PlayerRoomId] = Room.PlayerIds[PlayerRoomId].filter(id => id !== 0)[0];
-                io.to(PlayerRoomId).emit('pass owner', Room.OwnerIds[PlayerRoomId]);
-            }
-            io.to(PlayerRoomId).emit('user exit', PlayerId);
-        }
-        PlayerRoomId = 0;
-    })
-
-    socket.on('pass owner', function (OwnerId) {
-        Room.OwnerIds[PlayerRoomId] = OwnerId;
-        io.to(PlayerRoomId).emit('pass owner', OwnerId);
-    })
-
-    socket.on('kick user', function (KickId) {
-        RoomMg.exitRoom(KickId, PlayerRoomId);
-        io.to(PlayerRoomId).emit('user exit', KickId);
-        io.to(Player.SocketIds[KickId]).emit('kicked');
-    })
-
-    socket.on('kicked ok', function () { // kick user는 방장의 소켓이므로 킥 당한 사람으로부터 신호를 받는 작업이 필요함.
-        socket.leave(PlayerRoomId);
-        PlayerRoomId = 0;
-    })
-
-    socket.on('disconnect', function () {
-        if (PlayerRoomId !== 0) {
-            if (Room.PlayerCounts[PlayerRoomId] < 2) { // 나간사람이 마지막 사람일 경우
-                RoomMg.deleteRoom(PlayerRoomId);
-            } else {
-                RoomMg.exitRoom(PlayerId, PlayerRoomId);
-                if (Room.States[PlayerRoomId] === 3) { // 만약 게임중인 방이라면
-                    if (Room.LiveCounts[PlayerRoomId] <= 2) { // 나가면 생존자가 2명만 남아서 이기는 경우
-                        io.to(PlayerRoomId).emit('game over', [0,1,2,3,4,5,6,7].filter(index => Room.PlayerLiveStates[PlayerRoomId][index] === 1));
-                        RoomMg.EndGame(PlayerRoomId);
-                    } else if (Room.TaggerIds[PlayerRoomId] === PlayerId) { // 나간사람이 술래인 경우
-                        const LiveRunners = [0,1,2,3,4,5,6,7].filter(index => Room.PlayerLiveStates[PlayerRoomId][index] === 1);
-                        Room.TaggerIds[PlayerRoomId] = Room.PlayerIds[PlayerRoomId][LiveRunners[tool.getRandomNum(0, LiveRunners.length)]];
-                        Room.TaggerChangeTime[PlayerRoomId] = Date.now();
-                        io.to(PlayerRoomId).emit('change tagger', Room.TaggerIds[PlayerRoomId]);
-                    }
-                }
-                if (Room.OwnerIds[PlayerRoomId] === PlayerId) { // 나간사람이 방장인 경우
-                    Room.OwnerIds[PlayerRoomId] = Room.PlayerIds[PlayerRoomId].filter(id => id !== 0)[tool.getRandomNum(0, Room.PlayerCounts[PlayerRoomId])];
-                    io.to(PlayerRoomId).emit('pass owner', Room.OwnerIds[PlayerRoomId]);
-                }
-                io.to(PlayerRoomId).emit('user exit', PlayerId);
-            }
-        }
-        Player.States[PlayerId] = 0;
-        Player.SocketIds[PlayerId] = undefined;
-    })
+    
 
     socket.on('map change', function (value) {
         Room.MapId[PlayerRoomId] = (Room.MapId[PlayerRoomId] + value + MapData.typeCount) % MapData.typeCount;
