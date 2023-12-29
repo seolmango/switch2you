@@ -4,8 +4,8 @@ require('./main.css');
 // js load
 import { io } from 'socket.io-client';
 import {titleScreen} from "./Screens/title-screen";
-import {connectingSocketScreen} from "./Screens/connecting-socket-screen";
 import {agreementSoundScreen} from "./Screens/agreement-sound-screen";
+import {tooManyUserScreen} from "./Screens/too-many-user-screen";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -63,10 +63,16 @@ UI_canvas.addEventListener('click', function(e) {
 window.addEventListener("doSocketConnect", function () {
     Screen.socket = io();
 
-    Screen.socket.on('connected', function () {
+    Screen.socket.on('connected', function (ClientId) {
+        Screen.ClientId = ClientId;
         Screen.currentScreen = titleScreen;
         Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
     });
+
+    Screen.socket.on('server full', function () {
+        Screen.currentScreen = tooManyUserScreen;
+        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+    })
 });
 
 // functions
