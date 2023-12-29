@@ -4,6 +4,7 @@ require('./main.css');
 // js load
 import { io } from 'socket.io-client';
 import {titleScreen} from "./Screens/title-screen";
+import {connectingSocketScreen} from "./Screens/connecting-socket-screen";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -41,7 +42,7 @@ setInterval( function () {
 
 window.onload = function () {
     socket = io();
-    Screen.currentScreen = titleScreen;
+    Screen.currentScreen = connectingSocketScreen;
     Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
     canvasResize();
 }
