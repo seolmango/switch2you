@@ -1,13 +1,13 @@
-import express from 'express';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
-import path from 'path';
-import { fileURLToPath } from 'url';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const express = require('express');
+const path = require('path');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
-import Config from './server/config.js';
-import Player from './server/Player.js';
-import Room from './server/Room.js';
+
+const Config = require('./server/config.json');
+const Player = require('./server/Player.js');
+const Room = require('./server/Room.js');
 
 
 // 설정 불러오기
@@ -15,12 +15,11 @@ Player.MaxCount = Config.playerMaxNum;
 Room.MaxCount = Config.roomMaxNum;
 
 
-// 서버 실행
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer);
 const port = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, 'dist')));
+http.listen(port, function (){
+    console.log('listening on : http://localhost:' + port);
+});
 
 
 /**
@@ -50,9 +49,11 @@ io.on('connection', (socket) => {
     // Player 연결 끊김
     socket.on('disconnect', () => {
         const room = player.room;
-        const result = player.leaveRoom();
-        if (result !== 'no join room' && result) io.to(room.id).emit('owner change', room.owner.id);
-        if (room.players.length > 0) io.to(room.id).emit('player leaved', player.id);
+        if (room){
+            const result = player.leaveRoom();
+            if (result !== 'no join room' && result) io.to(room.id).emit('owner change', room.owner.id);
+            if (room.players.length > 0) io.to(room.id).emit('player leaved', player.id);
+        }
         player.delete();
         socket.disconnect();
         console.log('user disconnected: ', player.socketId, player.id);
@@ -196,6 +197,3 @@ io.on('connection', (socket) => {
     */
 
 });
-
-
-httpServer.listen(port);

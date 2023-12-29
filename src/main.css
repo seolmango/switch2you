@@ -1,3 +1,17 @@
-body{
-    background-color: aqua;
+canvas {
+    display: block;
+    margin: 0 auto;
+    padding: 0;
+    border: 5px black solid;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@font-face {
+    font-family: 'GmarketSansMedium';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
 }
