@@ -1,4 +1,4 @@
-export default class Room {
+class Room {
     static MaxCount = 0;
     static #_Count = 0;
     static #_Id = 1;
@@ -37,3 +37,5 @@ export default class Room {
         Room.#_Count--;
     }
 }
+
+module.exports = Room;
