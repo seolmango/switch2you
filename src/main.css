@@ -2,7 +2,7 @@ canvas {
     display: block;
     margin: 0 auto;
     padding: 0;
-    border: none;
+    border: 5px black solid;
     position: absolute;
     top: 50%;
     left: 50%;
