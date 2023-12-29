@@ -9,6 +9,18 @@ canvas {
     transform: translate(-50%, -50%);
 }
 
+#background {
+    z-index: -1;
+}
+
+#ui {
+    z-index: 1;
+}
+
+#popup {
+    z-index: 0;
+}
+
 @font-face {
     font-family: 'GmarketSansMedium';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
