@@ -57,6 +57,9 @@ const Color_list = {
     'barrier_rgb': [253, 145, 145],
     'block_hex': '#C1C1C1',
     'block_rgb': [193, 193, 193],
+    'text_default_hex': '#414141',
+    'text_default_rgb': [65, 65, 65],
+    'text_onmouse_hex': '#FFFFFF'
 };
 
 export { Color_list };

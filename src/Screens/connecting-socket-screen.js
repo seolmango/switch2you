@@ -3,11 +3,13 @@ import {Color_list} from "../data/color_list";
 import {drawText} from "./tools/drawText";
 import {drawRoundBox} from "./tools/drawRoundBox";
 import {drawCircle} from "./tools/drawCircle";
+import { io } from 'socket.io-client';
 
 connectingSocketScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     connectingSocketScreen.redrawBackground(Background_ctx);
     UI_ctx.clearRect(0,0,1920,1080);
     connectingSocketScreen.checkUIList = [];
+    window.dispatchEvent(new CustomEvent("doSocketConnect"));
 };
 
 connectingSocketScreen.draw = function (Background_ctx, UI_ctx, Screen) {

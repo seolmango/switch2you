@@ -5,6 +5,7 @@ require('./main.css');
 import { io } from 'socket.io-client';
 import {titleScreen} from "./Screens/title-screen";
 import {connectingSocketScreen} from "./Screens/connecting-socket-screen";
+import {agreementSoundScreen} from "./Screens/agreement-sound-screen";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -29,9 +30,6 @@ Screen.popupAlert.data = [];
 Screen.popupAlert.draw = function () {};
 Screen.X0real = 0;
 Screen.Y0real = 0;
-let socket = {};
-const Settings = {};
-const InGameData = {};
 
 // Set Screen Rendering Loop
 setInterval( function () {
@@ -41,12 +39,13 @@ setInterval( function () {
 }, (1000 / 30));
 
 window.onload = function () {
-    socket = io();
-    Screen.currentScreen = connectingSocketScreen;
+    Screen.currentScreen = agreementSoundScreen;
     Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
     canvasResize();
 }
 
+
+// Event Listeners
 window.addEventListener('resize', function() {
     canvasResize();
 })
@@ -61,6 +60,14 @@ UI_canvas.addEventListener('click', function(e) {
 })
 
 // Socket Event Listeners
+window.addEventListener("doSocketConnect", function () {
+    Screen.socket = io();
+
+    Screen.socket.on('connected', function () {
+        Screen.currentScreen = titleScreen;
+        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+    });
+});
 
 // functions
 function canvasResize() {
