@@ -23,12 +23,24 @@ http.listen(port, function (){
 
 
 /**
- * Player객체 배열을 받고, 공유에 필요한 데이터들만 뽑아 반환합니다.
+ * Player객체 또는 배열을 받고, 공유에 필요한 데이터들만 뽑아 반환합니다.
  * @param {Player[]} players 
  * @returns 
  */
 function getPlayerInfo(players) {
-    return players.map((player) => {return {'id': player.id, 'name': player.name, 'role': player.role}});
+    const infoFilter = (player) => { return {'id': player.id, 'name': player.name, 'role': player.role} }
+    if (Array.isArray(players))
+        return players.map(infoFilter);
+    else
+        return infoFilter(players);
+}
+
+function getRoomInfo(rooms) {
+    const infoFilter = (room) => {return {'id': room.id, 'name': room.name, 'ownerName': room.owner.name, 'password': room.password ? true : false, 'playerCount': room.players.length, 'playing': room.playing}}
+    if (Array.isArray(rooms))
+        return rooms.map(infoFilter);
+    else
+        return infoFilter(rooms);
 }
 
 
@@ -61,16 +73,19 @@ io.on('connection', (socket) => {
 
 
     // 방 생성
-    socket.on('create room', (playerName) => { // 1. 방 참가 이벤트가 들어오면
+    socket.on('create room', (playerName, roomName, public, password) => { // 1. 방 참가 이벤트가 들어오면
         if (player.room) { // 2. 모든 조건을 확인 후 확정이 나면
             socket.emit('already join room');
+            return false;
+        } else if (!public && !password) {
+            socket.emit('must have password');
             return false;
         }
 
         player.update(playerName); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
-        new Room(player);
-        socket.join(player.room.id); // 4. room 관련 처리하고 소켓신호 보내기
-        socket.emit('room joined', getPlayerInfo(player.room.players));
+        const room = new Room(player, roomName, public, password);
+        socket.join(room.id); // 4. room 관련 처리하고 소켓신호 보내기
+        socket.emit('room joined', getRoomInfo(room), getPlayerInfo(player.room.players));
     })
 
 
@@ -84,7 +99,7 @@ io.on('connection', (socket) => {
         player.update(playerName);
         io.to(player.room.id).emit('player joined', getPlayerInfo(player));
         socket.join(player.room.id);
-        socket.emit('room joined', getPlayerInfo(player.room.players));
+        socket.emit('room joined', getRoomInfo(player.room), getPlayerInfo(player.room.players));
     })
 
 
@@ -100,9 +115,9 @@ io.on('connection', (socket) => {
             if (!room.public || room.players.length > 8 || room.playing) continue; // 비공개거나, 꽉찾거나, 게임중이면 건너뛰기
             player.update(playerName);
             player.joinRoom(room);
-            io.to(player.room.id).emit('player joined', getPlayerInfo(player));
+            io.to(room.id).emit('player joined', getPlayerInfo(player));
             socket.join(room.id);
-            io.to(room.id).emit('join room', player.id, room.id);
+            socket.emit('room joined', getRoomInfo(player.room), getPlayerInfo(player.room.players));
             break;
         }
 
@@ -111,7 +126,7 @@ io.on('connection', (socket) => {
             player.update(playerName);
             const room = new Room(player);
             socket.join(room.id);
-            socket.emit('room joined', getPlayerInfo(room.players));
+            socket.emit('room joined', getRoomInfo(player.room), getPlayerInfo(player.room.players));
         }
     })
 
@@ -133,6 +148,21 @@ io.on('connection', (socket) => {
         socket.leave(room.id);
         if (result) io.to(room.id).emit('owner changed', room.owner.id); // 방장이 바뀌었다면
         if (room.players.length > 0) io.to(room.id).emit('player leaved', player.id);
+    })
+
+
+    // 방 목록
+    socket.on('get room list', (page) => {
+        if (player.room) {
+            socket.emit('already join room');
+            return false;
+        }
+
+        const showNum = 4; // test용. page당 보여지는 방의 개수
+        const roomList = Object.values(Room.publics);
+        let maxIndex = page * 4;
+        if (page * 4 > roomList.length) maxIndex = roomList.length;
+        socket.emit('room list', Math.ceil(roomList.length / showNum), getRoomInfo(Object.values(Room.publics).slice(page * 4 - 4, maxIndex)));
     })
 
 
