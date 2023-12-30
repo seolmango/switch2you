@@ -84,7 +84,7 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     joinRoomWithIdScreen.nickname_input.show(Screen.activatedHtmlElement);
     joinRoomWithIdScreen.nickname_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
     joinRoomWithIdScreen.room_id_input = new textInputElement('join_room_id_input', 1360, 646, 700, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
-        if(value.length > 0 && value.length < 16){
+        if(value.length === 8){
             return true;
         }else{
             return false;

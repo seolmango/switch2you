@@ -104,7 +104,7 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     makeNewRoomScreen.roomname_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
     makeNewRoomScreen.password_input = new textInputElement('make_room_password_input', 1380, 748, 670, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
         if(makeNewRoomScreen.password_checkbox.get_value()){
-            if(value.length > 0 && value.length < 10){
+            if(value.length > 0 && value.length < 11){
                 return true;
             }else{
                 return false;
