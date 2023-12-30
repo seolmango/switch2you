@@ -47,6 +47,7 @@ Screen.alert.draw = function() {
         }
     }
 };
+Screen.activatedHtmlElement = [];
 
 // Set Screen Rendering Loop
 setInterval( function () {
@@ -65,6 +66,9 @@ window.onload = function () {
 // Event Listeners
 window.addEventListener('resize', function() {
     canvasResize();
+    for(let i = 0; i < Screen.activatedHtmlElement.length; i++){
+        Screen.activatedHtmlElement[i].resize();
+    }
 })
 
 UI_canvas.addEventListener('mousemove', function(e) {

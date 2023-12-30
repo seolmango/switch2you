@@ -23,3 +23,16 @@ canvas {
     font-weight: normal;
     font-style: normal;
 }
+
+input[type="text"], input[type="password"] {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    position: absolute;
+    text-align: center;
+    display: none;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    outline: none;
+}
