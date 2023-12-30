@@ -6,6 +6,7 @@ import {checkTouch} from "./tools/checkTouch";
 import {titleScreen} from "./title-screen";
 import {drawLine} from "./tools/drawLine";
 import {makeNewRoomScreen} from "./make-new-room-screen";
+import {joinRoomWithIdScreen} from "./join-room-with-id-screen";
 
 let refresh_1 = `rgba(${Color_list.button_red_1_rgb[0]}, ${Color_list.button_red_1_rgb[1]}, ${Color_list.button_red_1_rgb[2]}, 0.5)`;
 let refresh_2 = `rgba(${Color_list.button_red_2_rgb[0]}, ${Color_list.button_red_2_rgb[1]}, ${Color_list.button_red_2_rgb[2]}, 0.5)`;
@@ -72,7 +73,8 @@ viewServerListScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 720,
         height: 120,
         clicked: function () {
-            console.log("view-server-list-screen-join-room-id")
+            Screen.currentScreen = joinRoomWithIdScreen;
+            Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         },
         clickable: 0
     });
