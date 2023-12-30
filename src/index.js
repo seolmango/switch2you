@@ -27,22 +27,15 @@ Screen.scale = 1;
 Screen.currentScreen = {};
 Screen.currentScreen.draw = function () {};
 Screen.currentScreen.checkUIList = [];
-Screen.popupAlert = {};
-Screen.popupAlert.data = undefined;
-Screen.popupAlert.draw = function () {
-    if(Screen.popupAlert.data){
-        Popup_canvas.style.zIndex = 2;
-    }else{
-        Popup_canvas.style.zIndex = 0;
-    }
-};
 Screen.X0real = 0;
 Screen.Y0real = 0;
 
 // Set Screen Rendering Loop
 setInterval( function () {
     Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
-    Screen.popupAlert.draw(Popup_ctx, Screen.popupAlert.data);
+    if(Screen.currentScreen.popup.need){
+        Screen.currentScreen.popup.draw(Popup_ctx, Screen);
+    }
     Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
 }, (1000 / 30));
 

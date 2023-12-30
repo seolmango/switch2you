@@ -121,4 +121,7 @@ viewServerListScreen.check = function (userMouse, userKeyboard, checkUIList) {
     }
 };
 
+viewServerListScreen.popup = {};
+viewServerListScreen.popup.need = false;
+
 export {viewServerListScreen};
