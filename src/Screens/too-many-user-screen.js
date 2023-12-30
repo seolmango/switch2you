@@ -27,7 +27,4 @@ tooManyUserScreen.redrawBackground = function (Background_ctx) {
 tooManyUserScreen.check = function (userMouse, userKeyboard, checkUIList) {
 };
 
-tooManyUserScreen.popup = {};
-tooManyUserScreen.popup.need = false;
-
 export {tooManyUserScreen};

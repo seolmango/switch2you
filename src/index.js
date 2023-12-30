@@ -12,8 +12,6 @@ const Background_canvas = document.getElementById('background');
 const Background_ctx = Background_canvas.getContext('2d');
 const UI_canvas = document.getElementById('ui');
 const UI_ctx = UI_canvas.getContext('2d');
-const Popup_canvas = document.getElementById('popup');
-const Popup_ctx = Popup_canvas.getContext('2d');
 
 // Set Data
 const Screen = {};
@@ -21,6 +19,7 @@ Screen.userMouse = {
     x: 0,
     y: 0,
     click: false,
+    popup: false
 };
 Screen.userKeyboard = new Array(100).fill(false);
 Screen.scale = 1;
@@ -33,9 +32,6 @@ Screen.Y0real = 0;
 // Set Screen Rendering Loop
 setInterval( function () {
     Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
-    if(Screen.currentScreen.popup.need){
-        Screen.currentScreen.popup.draw(Popup_ctx, Screen);
-    }
     Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
 }, (1000 / 30));
 
@@ -54,10 +50,12 @@ window.addEventListener('resize', function() {
 UI_canvas.addEventListener('mousemove', function(e) {
     Screen.userMouse.x = (e.offsetX / Screen.scale) - Screen.X0real;
     Screen.userMouse.y = (e.offsetY / Screen.scale) - Screen.Y0real;
+    Screen.userMouse.popup = false;
 })
 
 UI_canvas.addEventListener('click', function(e) {
     Screen.userMouse.click = true;
+    Screen.userMouse.popup = false;
 })
 
 // Socket Event Listeners
@@ -87,19 +85,13 @@ function canvasResize() {
     Background_canvas.height = 1080 * Screen.scale;
     UI_canvas.width = 1920 * Screen.scale;
     UI_canvas.height = 1080 * Screen.scale;
-    Popup_canvas.width = 1920 * Screen.scale;
-    Popup_canvas.height = 1080 * Screen.scale;
     Background_canvas.style.top = '50%';
     Background_canvas.style.left = '50%';
     Background_canvas.style.transform = 'translate(-50%, -50%)';
     UI_canvas.style.top = '50%';
     UI_canvas.style.left = '50%';
     UI_canvas.style.transform = 'translate(-50%, -50%)';
-    Popup_canvas.style.top = '50%';
-    Popup_canvas.style.left = '50%';
-    Popup_canvas.style.transform = 'translate(-50%, -50%)';
     Background_ctx.scale(Screen.scale, Screen.scale);
     UI_ctx.scale(Screen.scale, Screen.scale);
-    Popup_ctx.scale(Screen.scale, Screen.scale);
     Screen.currentScreen.redrawBackground(Background_ctx);
 }

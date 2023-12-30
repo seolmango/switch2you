@@ -102,7 +102,4 @@ titleScreen.redrawBackground = function (Background_ctx) {
     Background_ctx.drawImage(image.title_logo, 447, 30, 1026, 450);
 };
 
-titleScreen.popup = {};
-titleScreen.popup.need = false;
-
 export { titleScreen };
