@@ -5,6 +5,7 @@ import {Color_list} from "../data/color_list";
 import {checkTouch} from "./tools/checkTouch";
 import {titleScreen} from "./title-screen";
 import {drawLine} from "./tools/drawLine";
+import {makeNewRoomScreen} from "./make-new-room-screen";
 
 let refresh_1 = `rgba(${Color_list.button_red_1_rgb[0]}, ${Color_list.button_red_1_rgb[1]}, ${Color_list.button_red_1_rgb[2]}, 0.5)`;
 let refresh_2 = `rgba(${Color_list.button_red_2_rgb[0]}, ${Color_list.button_red_2_rgb[1]}, ${Color_list.button_red_2_rgb[2]}, 0.5)`;
@@ -33,7 +34,22 @@ viewServerListScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 320,
         height: 96,
         clicked: function () {
-            console.log("view-server-list-screen-refresh");
+            if(Screen.currentScreen.checkUIList[1].clickable !== 0){
+                let alreadyExist = false;
+                for(let i=0; i<Screen.alert.data.length; i++){
+                    if(Screen.alert.data[i].tag === 'refreshcooldown') {
+                        alreadyExist = true;
+                        Screen.alert.data[i].time = 150;
+                    }
+                }
+                if(!alreadyExist) {
+                    Screen.alert.data.push({
+                        tag: 'refreshcooldown',
+                        text: 'Please wait',
+                        time: 150
+                    });
+                }
+            }
         },
         clickable: 300
     });
@@ -44,7 +60,8 @@ viewServerListScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 720,
         height: 120,
         clicked: function () {
-            console.log("view-server-list-screen-make-new-room")
+            Screen.currentScreen = makeNewRoomScreen;
+            Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         },
         clickable: 0
     });
@@ -108,7 +125,7 @@ viewServerListScreen.redrawBackground = function (Background_ctx) {
 viewServerListScreen.check = function (userMouse, userKeyboard, checkUIList) {
     if(userMouse.click === true) {
         for (let i = 0; i < checkUIList.length; i++) {
-            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height) && checkUIList[i].clickable === 0) {
+            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height)) {
                 checkUIList[i].clicked();
             }
         }

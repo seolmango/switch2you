@@ -1,4 +1,6 @@
 // css load
+import {drawRoundBox} from "./Screens/tools/drawRoundBox";
+
 require('./main.css');
 
 // js load
@@ -6,6 +8,8 @@ import { io } from 'socket.io-client';
 import {titleScreen} from "./Screens/title-screen";
 import {agreementSoundScreen} from "./Screens/agreement-sound-screen";
 import {tooManyUserScreen} from "./Screens/too-many-user-screen";
+import {Color_list} from "./data/color_list";
+import {drawText} from "./Screens/tools/drawText";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -28,10 +32,26 @@ Screen.currentScreen.draw = function () {};
 Screen.currentScreen.checkUIList = [];
 Screen.X0real = 0;
 Screen.Y0real = 0;
+Screen.alert = {};
+Screen.alert.data = [];
+Screen.alert.draw = function() {
+    for(let i=0; i<Screen.alert.data.length; i++){
+        let color_alpha = (Screen.alert.data[i].time === -1) ? 0.8 : Math.min(0.8, (Screen.alert.data[i].time / 30) * 0.8);
+        drawRoundBox(UI_ctx, 960, (i*150) + 200, 1600, 120, `rgba(${Color_list.button_gray_1_rgb[0]}, ${Color_list.button_gray_1_rgb[1]}, ${Color_list.button_gray_1_rgb[2]}, ${color_alpha})`, `rgba(${Color_list.button_gray_2_rgb[0]}, ${Color_list.button_gray_2_rgb[1]}, ${Color_list.button_gray_2_rgb[2]}, ${color_alpha})`, 10, 25);
+        drawText(UI_ctx, 960, (i*150) + 200, 60, 0, `rgba(${Color_list.text_default_rgb[0]}, ${Color_list.text_default_rgb[1]}, ${Color_list.text_default_rgb[2]}, ${color_alpha})`, undefined, undefined, Screen.alert.data[i].text, "center", "GmarketSansMedium");
+        if(Screen.alert.data[i].time > 0){
+            Screen.alert.data[i].time--;
+        }
+        if(Screen.alert.data[i].time === 0){
+            Screen.alert.data.splice(i, 1);
+        }
+    }
+};
 
 // Set Screen Rendering Loop
 setInterval( function () {
     Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
+    Screen.alert.draw();
     Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
 }, (1000 / 30));
 
