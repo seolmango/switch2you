@@ -5,6 +5,7 @@ import { drawText } from "./tools/drawText";
 import { checkTouch} from "./tools/checkTouch";
 import { Color_list} from "../data/color_list";
 import { viewServerListScreen } from "./view-server-list-screen";
+import {creditScreen} from "./credit-screen";
 
 titleScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     titleScreen.redrawBackground(Background_ctx);
@@ -48,7 +49,8 @@ titleScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 120,
         height: 120,
         clicked: function () {
-            console.log("copy-title")
+            Screen.currentScreen = creditScreen;
+            Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         }
     });
 };
