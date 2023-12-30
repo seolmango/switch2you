@@ -37,8 +37,8 @@ Screen.alert.data = [];
 Screen.alert.draw = function() {
     for(let i=0; i<Screen.alert.data.length; i++){
         let color_alpha = (Screen.alert.data[i].time === -1) ? 0.8 : Math.min(0.8, (Screen.alert.data[i].time / 30) * 0.8);
-        drawRoundBox(UI_ctx, 960, (i*150) + 200, 1600, 120, `rgba(${Color_list.button_gray_1_rgb[0]}, ${Color_list.button_gray_1_rgb[1]}, ${Color_list.button_gray_1_rgb[2]}, ${color_alpha})`, `rgba(${Color_list.button_gray_2_rgb[0]}, ${Color_list.button_gray_2_rgb[1]}, ${Color_list.button_gray_2_rgb[2]}, ${color_alpha})`, 10, 25);
-        drawText(UI_ctx, 960, (i*150) + 200, 60, 0, `rgba(${Color_list.text_default_rgb[0]}, ${Color_list.text_default_rgb[1]}, ${Color_list.text_default_rgb[2]}, ${color_alpha})`, undefined, undefined, Screen.alert.data[i].text, "center", "GmarketSansMedium");
+        drawRoundBox(UI_ctx, 960, (i*150) + 70, 1600, 120, `rgba(${Color_list.button_gray_2_rgb[0]}, ${Color_list.button_gray_2_rgb[1]}, ${Color_list.button_gray_2_rgb[2]}, ${color_alpha})`, `rgba(${Color_list.button_gray_3_rgb[0]}, ${Color_list.button_gray_3_rgb[1]}, ${Color_list.button_gray_3_rgb[2]}, ${color_alpha})`, 10, 25);
+        drawText(UI_ctx, 960, (i*150) + 70, 60, 0, `rgba(${Color_list.text_onmouse_rgb[0]}, ${Color_list.text_onmouse_rgb[1]}, ${Color_list.text_onmouse_rgb[2]}, ${color_alpha})`, undefined, undefined, Screen.alert.data[i].text, "center", "GmarketSansMedium");
         if(Screen.alert.data[i].time > 0){
             Screen.alert.data[i].time--;
         }
@@ -66,9 +66,6 @@ window.onload = function () {
 // Event Listeners
 window.addEventListener('resize', function() {
     canvasResize();
-    for(let i = 0; i < Screen.activatedHtmlElement.length; i++){
-        Screen.activatedHtmlElement[i].resize();
-    }
 })
 
 UI_canvas.addEventListener('mousemove', function(e) {
@@ -118,4 +115,7 @@ function canvasResize() {
     Background_ctx.scale(Screen.scale, Screen.scale);
     UI_ctx.scale(Screen.scale, Screen.scale);
     Screen.currentScreen.redrawBackground(Background_ctx);
+    for(let i = 0; i < Screen.activatedHtmlElement.length; i++){
+        Screen.activatedHtmlElement[i].resize(Screen.scale, window.innerWidth, window.innerHeight);
+    }
 }
