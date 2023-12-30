@@ -5,6 +5,8 @@ import {drawText} from "./tools/drawText";
 import {drawRoundBox} from "./tools/drawRoundBox";
 import {Color_list} from "../data/color_list";
 import {viewServerListScreen} from "./view-server-list-screen";
+import {textInputElement} from "./tools/textInputElement";
+import {checkboxElement} from "./tools/checkboxElement";
 
 let make_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let make_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
@@ -22,6 +24,11 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 96,
         clicked: function () {
             Screen.currentScreen = viewServerListScreen;
+            makeNewRoomScreen.nickname_input.hide(Screen.activatedHtmlElement);
+            makeNewRoomScreen.roomname_input.hide(Screen.activatedHtmlElement);
+            makeNewRoomScreen.password_input.hide(Screen.activatedHtmlElement);
+            makeNewRoomScreen.visibility_checkbox.hide(Screen.activatedHtmlElement);
+            makeNewRoomScreen.password_checkbox.hide(Screen.activatedHtmlElement);
             Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         },
         clickable: 0
@@ -60,10 +67,60 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 120,
         clicked: function () {
             Screen.currentScreen = viewServerListScreen;
+            makeNewRoomScreen.nickname_input.hide(Screen.activatedHtmlElement);
+            makeNewRoomScreen.roomname_input.hide(Screen.activatedHtmlElement);
+            makeNewRoomScreen.password_input.hide(Screen.activatedHtmlElement);
+            makeNewRoomScreen.visibility_checkbox.hide(Screen.activatedHtmlElement);
+            makeNewRoomScreen.password_checkbox.hide(Screen.activatedHtmlElement);
             Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         },
         clickable: 0
     })
+    makeNewRoomScreen.nickname_input = new textInputElement('user_name_input', 1360, 292, 700, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
+        if(value.length > 0 && value.length < 16){
+            return true;
+        }else{
+            return false;
+        }
+    });
+    makeNewRoomScreen.nickname_input.show(Screen.activatedHtmlElement);
+    makeNewRoomScreen.nickname_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    makeNewRoomScreen.roomname_input = new textInputElement('room_name_input', 1360, 444, 700, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
+        if(value.length > 0 && value.length < 20){
+            return true;
+        }else{
+            return false;
+        }
+    });
+    makeNewRoomScreen.roomname_input.show(Screen.activatedHtmlElement);
+    makeNewRoomScreen.roomname_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    makeNewRoomScreen.password_input = new textInputElement('make_room_password_input', 1380, 748, 670, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
+        if(makeNewRoomScreen.password_checkbox.get_value()){
+            if(value.length > 0 && value.length < 10){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return true;
+        }
+    });
+    makeNewRoomScreen.password_input.show(Screen.activatedHtmlElement);
+    makeNewRoomScreen.password_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    makeNewRoomScreen.password_input.lock();
+    makeNewRoomScreen.visibility_checkbox = new checkboxElement('make_room_visibility_checkbox', 775, 580, 80, 80, Color_list.button_gray_1_hex, function () {});
+    makeNewRoomScreen.visibility_checkbox.show(Screen.activatedHtmlElement);
+    makeNewRoomScreen.visibility_checkbox.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    makeNewRoomScreen.password_checkbox = new checkboxElement('make_room_password_checkbox', 1500, 580, 80, 80, Color_list.button_gray_1_hex, function () {
+        if(makeNewRoomScreen.password_checkbox.get_value()){
+            makeNewRoomScreen.password_input.unlock();
+        }else{
+            makeNewRoomScreen.password_input.lock();
+            makeNewRoomScreen.password_input.set_value("");
+        }
+    });
+    makeNewRoomScreen.password_checkbox.show(Screen.activatedHtmlElement);
+    makeNewRoomScreen.password_checkbox.resize(Screen.scale, window.innerWidth, window.innerHeight);
 };
 
 makeNewRoomScreen.draw = function (Background_ctx, UI_ctx, Screen) {
@@ -100,6 +157,11 @@ makeNewRoomScreen.redrawBackground = function (Background_ctx) {
     Background_ctx.clearRect(0,0,1920,1080);
     drawText(Background_ctx, 960, 72, 80, 0, Color_list.text_default_hex, undefined, undefined, "Make New Room", "center", "GmarketSansMedium");
     drawRoundBox(Background_ctx, 960, 520, 1600, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 50);
+    drawText(Background_ctx, 200, 292, 80, 0, Color_list.text_default_hex, undefined, undefined, "Your Nickname >", "left", "GmarketSansMedium");
+    drawText(Background_ctx, 200, 444, 80, 0, Color_list.text_default_hex, undefined, undefined, "Room Name >", "left", "GmarketSansMedium");
+    drawText(Background_ctx, 200, 596, 80, 0, Color_list.text_default_hex, undefined, undefined, "Visibility >", "left", "GmarketSansMedium");
+    drawText(Background_ctx, 1000, 596, 80, 0, Color_list.text_default_hex, undefined, undefined, "Lock > ", "left", "GmarketSansMedium");
+    drawText(Background_ctx, 200, 748, 80, 0, Color_list.text_default_hex, undefined, undefined, "Room Password >", "left", "GmarketSansMedium");
 };
 
 makeNewRoomScreen.check = function (userMouse, userKeyboard, checkUIList) {
@@ -115,6 +177,11 @@ makeNewRoomScreen.check = function (userMouse, userKeyboard, checkUIList) {
         if(checkUIList[i].clickable > 0){
             checkUIList[i].clickable--;
         }
+    }
+    if(makeNewRoomScreen.nickname_input.check(makeNewRoomScreen.nickname_input.get_value()) && makeNewRoomScreen.roomname_input.check(makeNewRoomScreen.roomname_input.get_value()) && makeNewRoomScreen.password_input.check(makeNewRoomScreen.password_input.get_value())) {
+        checkUIList[1].clickable = 0;
+    }else{
+        checkUIList[1].clickable = -1;
     }
 }
 
