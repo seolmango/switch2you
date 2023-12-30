@@ -1,5 +1,4 @@
 import {checkTouch} from "./tools/checkTouch";
-
 const makeNewRoomScreen = {};
 import {drawText} from "./tools/drawText";
 import {drawRoundBox} from "./tools/drawRoundBox";
@@ -7,6 +6,7 @@ import {Color_list} from "../data/color_list";
 import {viewServerListScreen} from "./view-server-list-screen";
 import {textInputElement} from "./tools/textInputElement";
 import {checkboxElement} from "./tools/checkboxElement";
+import {joiningRoomScreen} from "./joining-room-screen";
 
 let make_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let make_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
@@ -55,6 +55,14 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                         time: 150
                     });
                 }
+            }else{
+                makeNewRoomScreen.nickname_input.hide(Screen.activatedHtmlElement);
+                makeNewRoomScreen.roomname_input.hide(Screen.activatedHtmlElement);
+                makeNewRoomScreen.password_input.hide(Screen.activatedHtmlElement);
+                makeNewRoomScreen.visibility_checkbox.hide(Screen.activatedHtmlElement);
+                makeNewRoomScreen.password_checkbox.hide(Screen.activatedHtmlElement);
+                Screen.currentScreen = joiningRoomScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
             }
         },
         clickable: -1
