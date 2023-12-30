@@ -41,13 +41,30 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                 for(let i=0; i<Screen.alert.data.length; i++){
                     if(Screen.alert.data[i].tag === 'yetfinishform') {
                         alreadyExist = true;
+                        let alert_text = '';
+                        if(!joinRoomWithIdScreen.nickname_input.check(joinRoomWithIdScreen.nickname_input.get_value())){
+                            alert_text = 'nickname must be 1~15 characters';
+                        }else if(!joinRoomWithIdScreen.room_id_input.check(joinRoomWithIdScreen.room_id_input.get_value())){
+                            alert_text = 'room id must be 8 characters';
+                        }else{
+                            alert_text = 'Something went wrong with your client';
+                        }
                         Screen.alert.data[i].time = 150;
+                        Screen.alert.data[i].text = alert_text;
                     }
                 }
                 if(!alreadyExist) {
+                    let alert_text = '';
+                    if(!joinRoomWithIdScreen.nickname_input.check(joinRoomWithIdScreen.nickname_input.get_value())){
+                        alert_text = 'nickname must be 1~15 characters';
+                    }else if(!joinRoomWithIdScreen.room_id_input.check(joinRoomWithIdScreen.room_id_input.get_value())){
+                        alert_text = 'room id must be 8 characters';
+                    }else{
+                        alert_text = 'Something went wrong with your client';
+                    }
                     Screen.alert.data.push({
                         tag: 'yetfinishform',
-                        text: 'Please finish the form',
+                        text: alert_text,
                         time: 150
                     });
                 }

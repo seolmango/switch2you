@@ -45,13 +45,34 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                 for(let i=0; i<Screen.alert.data.length; i++){
                     if(Screen.alert.data[i].tag === 'yetfinishform') {
                         alreadyExist = true;
+                        let alert_text = '';
+                        if(!makeNewRoomScreen.nickname_input.check(makeNewRoomScreen.nickname_input.get_value())){
+                            alert_text = 'nickname must be 1~15 characters';
+                        }else if(!makeNewRoomScreen.roomname_input.check(makeNewRoomScreen.roomname_input.get_value())){
+                            alert_text = 'room name must be 1~20 characters';
+                        }else if(makeNewRoomScreen.password_checkbox.get_value() && !makeNewRoomScreen.password_input.check(makeNewRoomScreen.password_input.get_value())){
+                            alert_text = 'password must be 1~10 characters';
+                        }else{
+                            alert_text = 'Something went wrong with your client';
+                        }
                         Screen.alert.data[i].time = 150;
+                        Screen.alert.data[i].text = alert_text;
                     }
                 }
                 if(!alreadyExist) {
+                    let alert_text = '';
+                    if(!makeNewRoomScreen.nickname_input.check(makeNewRoomScreen.nickname_input.get_value())){
+                        alert_text = 'nickname must be 1~15 characters';
+                    }else if(!makeNewRoomScreen.roomname_input.check(makeNewRoomScreen.roomname_input.get_value())){
+                        alert_text = 'room name must be 1~20 characters';
+                    }else if(makeNewRoomScreen.password_checkbox.get_value() && !makeNewRoomScreen.password_input.check(makeNewRoomScreen.password_input.get_value())){
+                        alert_text = 'password must be 1~10 characters';
+                    }else{
+                        alert_text = 'Something went wrong with your client';
+                    }
                     Screen.alert.data.push({
                         tag: 'yetfinishform',
-                        text: 'Please finish the form.',
+                        text: alert_text,
                         time: 150
                     });
                 }
