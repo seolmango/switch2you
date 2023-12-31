@@ -40,7 +40,7 @@ creditScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 720,
         height: 120,
         clicked: function () {
-            window.open('https://soundcloud.com/hraver/switchover', 'switch2you-soundtrack');
+            window.open('https://soundcloud.com/hraverals/switchover', 'switch2you-soundtrack');
         }
     });
     creditScreen.checkUIList.push({
@@ -70,7 +70,7 @@ creditScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 500,
         height: 760,
         clicked: function () {
-            window.open('https://soundcloud.com/hraver', 'H-soundcloud');
+            window.open('https://soundcloud.com/hraverals', 'H-soundcloud');
         }
     });
 }
