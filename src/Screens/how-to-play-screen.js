@@ -137,25 +137,59 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     }else{
         drawRoundBox(UI_ctx, 410-howToPlayScreen.dragScreen_delta-(250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1))), 520, 500, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
     }
+    if(activate === 1){
+        drawText(UI_ctx, 410-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "1. Basic Rule", "center", "GmarketSansMedium");
+        drawText(UI_ctx, 410-howToPlayScreen.dragScreen_delta - 410, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "One of the players in 'swITch'\nbecomes a tagger. The other \nplayers become runners. The\ntagger can be distinguished\nby looking at the border.", "left", "GmarketSansMedium");
+        drawCircle(UI_ctx, 410-howToPlayScreen.dragScreen_delta - 150, 750, 50, Color_list.player_1_inside_hex, Color_list.player_1_outside_hex, 20);
+        drawText(UI_ctx, 410-howToPlayScreen.dragScreen_delta - 150, 850, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "Runner", "center", "GmarketSansMedium");
+        drawCircle(UI_ctx, 410-howToPlayScreen.dragScreen_delta + 150, 750, 50, Color_list.player_5_inside_hex, Color_list.player_tagger_outside_hex, 20);
+        drawText(UI_ctx, 410-howToPlayScreen.dragScreen_delta + 150, 850, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "Tagger", "center", "GmarketSansMedium");
+    }else{
+        drawText(UI_ctx, 520, -(410-howToPlayScreen.dragScreen_delta-(250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1)))),80, 90, Color_list.text_default_hex, undefined, undefined, "1. Basic Rule", "center", "GmarketSansMedium");
+    }
     if(activate >= 1.5 && activate < 2.5){
         drawRoundBox(UI_ctx, 960-howToPlayScreen.dragScreen_delta, 520, 1000-(1000 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1)), 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
     }else{
         drawRoundBox(UI_ctx, 960-howToPlayScreen.dragScreen_delta-(250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1))) * ((activate > 2) ? 1 : -1), 520, 500, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
+    }
+    if(activate === 2){
+        drawText(UI_ctx, 960-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "2. Goal", "center", "GmarketSansMedium");
+        drawText(UI_ctx, 960-howToPlayScreen.dragScreen_delta - 410, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "When the tagger tags runner,\nthe runner is out. The game\ncontinues until the tagger and\none runner, again, two\nplayers are left.", "left", "GmarketSansMedium");
+    }else{
+        drawText(UI_ctx, 520, -(960-howToPlayScreen.dragScreen_delta-((250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1)))*((activate > 2) ? 1 : -1))),80, 90, Color_list.text_default_hex, undefined, undefined, "2. Goal", "center", "GmarketSansMedium");
     }
     if(activate >= 2.5 && activate < 3.5){
         drawRoundBox(UI_ctx, 1510-howToPlayScreen.dragScreen_delta, 520, 1000-(1000 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1)), 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
     }else{
         drawRoundBox(UI_ctx, 1510-howToPlayScreen.dragScreen_delta-(250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1))) * ((activate > 3) ? 1 : -1), 520, 500, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
     }
+    if(activate === 3){
+        drawText(UI_ctx, 1510-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "3. Skill-switch", "center", "GmarketSansMedium");
+        drawText(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - 420, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "On the verge of being tagged?\nWhen your distance from\nthe tagger is close enough, tap\nanother player's number to\nchange the tagger.", "left", "GmarketSansMedium");
+    }else{
+        drawText(UI_ctx, 520, -(1510-howToPlayScreen.dragScreen_delta-((250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1)))*((activate > 3) ? 1 : -1))),80, 90, Color_list.text_default_hex, undefined, undefined, "3. Skill-switch", "center", "GmarketSansMedium");
+    }
     if(activate >= 3.5 && activate < 4.5){
         drawRoundBox(UI_ctx, 2060-howToPlayScreen.dragScreen_delta, 520, 1000-(1000 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1)), 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
     }else{
         drawRoundBox(UI_ctx, 2060-howToPlayScreen.dragScreen_delta-(250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1))) * ((activate > 4) ? 1 : -1), 520, 500, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
     }
+    if(activate === 4){
+        drawText(UI_ctx, 2060-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "4. Skill-dash", "center", "GmarketSansMedium");
+        drawText(UI_ctx, 2060-howToPlayScreen.dragScreen_delta - 420, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "Is it moving too slowly? Then\npress the space bar and\nrush quickly! All other players\ncan see footsteps that\nyou made a long time ago!", "left", "GmarketSansMedium")
+    }else{
+        drawText(UI_ctx, 520, -(2060-howToPlayScreen.dragScreen_delta-((250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1)))*((activate > 4) ? 1 : -1))),80, 90, Color_list.text_default_hex, undefined, undefined, "4. Skill-dash", "center", "GmarketSansMedium");
+    }
     if(activate >= 4.5 && activate <= 5){
         drawRoundBox(UI_ctx, 2610-howToPlayScreen.dragScreen_delta, 520, 1000-(1000 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1)), 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
     }else{
         drawRoundBox(UI_ctx, 2610-howToPlayScreen.dragScreen_delta+(250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1))), 520, 500, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
+    }
+    if(activate === 5){
+        drawText(UI_ctx, 2610-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "5. Skill-teleport", "center", "GmarketSansMedium");
+        drawText(UI_ctx, 2610-howToPlayScreen.dragScreen_delta - 410, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "Is dash skill too slow? Then\ntry changing the dash skill\nto teleport. The distance is\nshort than dash, but it\ncan go over the wall.", "left", "GmarketSansMedium");
+    }else{
+        drawText(UI_ctx, 520, -(2610-howToPlayScreen.dragScreen_delta+((250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1))))),80, 90, Color_list.text_default_hex, undefined, undefined, "5. Skill-teleport", "center", "GmarketSansMedium");
     }
 };
 
