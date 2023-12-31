@@ -23,7 +23,7 @@ Screen.userMouse = {
     x: 0,
     y: 0,
     click: false,
-    popup: false
+    press: false,
 };
 Screen.userKeyboard = new Array(100).fill(false);
 Screen.scale = 1;
@@ -71,12 +71,22 @@ window.addEventListener('resize', function() {
 UI_canvas.addEventListener('mousemove', function(e) {
     Screen.userMouse.x = (e.offsetX / Screen.scale) - Screen.X0real;
     Screen.userMouse.y = (e.offsetY / Screen.scale) - Screen.Y0real;
-    Screen.userMouse.popup = false;
 })
 
 UI_canvas.addEventListener('click', function(e) {
     Screen.userMouse.click = true;
-    Screen.userMouse.popup = false;
+})
+
+UI_canvas.addEventListener('mousedown', function(e) {
+    Screen.userMouse.press = true;
+})
+
+UI_canvas.addEventListener('mouseup', function(e) {
+    Screen.userMouse.press = false;
+})
+
+UI_canvas.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
 })
 
 // Socket Event Listeners
