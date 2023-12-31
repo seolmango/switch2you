@@ -85,6 +85,10 @@ UI_canvas.addEventListener('mouseup', function(e) {
     Screen.userMouse.press = false;
 })
 
+UI_canvas.addEventListener('mouseleave', function(e) {
+    Screen.userMouse.press = false;
+})
+
 UI_canvas.addEventListener('contextmenu', function(e) {
     e.preventDefault();
 })

@@ -6,6 +6,7 @@ import { checkTouch} from "./tools/checkTouch";
 import { Color_list} from "../data/color_list";
 import { viewServerListScreen } from "./view-server-list-screen";
 import {creditScreen} from "./credit-screen";
+import {howToPlayScreen} from "./how-to-play-screen";
 
 titleScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     titleScreen.redrawBackground(Background_ctx);
@@ -39,7 +40,8 @@ titleScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 120,
         height: 120,
         clicked: function () {
-            console.log("help-title")
+            Screen.currentScreen = howToPlayScreen;
+            Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         }
     });
     titleScreen.checkUIList.push({
