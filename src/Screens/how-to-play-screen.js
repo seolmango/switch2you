@@ -8,6 +8,34 @@ import {Color_list} from "../data/color_list"
 
 import {titleScreen} from "./title-screen";
 
+let red_1 = `rgba(${Color_list.button_red_1_rgb[0]}, ${Color_list.button_red_1_rgb[1]}, ${Color_list.button_red_1_rgb[2]}, 0.5)`;
+let red_2 = `rgba(${Color_list.button_red_2_rgb[0]}, ${Color_list.button_red_2_rgb[1]}, ${Color_list.button_red_2_rgb[2]}, 0.5)`;
+let red_text = `rgba(${Color_list.text_default_rgb[0]}, ${Color_list.text_default_rgb[1]}, ${Color_list.text_default_rgb[2]}, 0.5)`;
+
+function getActivate(delta = howToPlayScreen.dragScreen_delta) {
+    let activate = 0;
+    if(delta >= -550 && delta <= -350){
+        activate = 1
+    }else if(delta > -350 && delta < -200){
+        activate = 1 + (delta + 350) / 150
+    }else if(delta >= -200 && delta <= 200){
+        activate = 2
+    }else if(delta > 200 && delta < 350){
+        activate = 2 + (delta - 200) / 150
+    }else if(delta >= 350 && delta <= 750){
+        activate = 3
+    }else if(delta > 750 && delta < 900){
+        activate = 3 + (delta - 750) / 150
+    }else if(delta >= 900 && delta <= 1300){
+        activate = 4
+    }else if(delta > 1300 && delta < 1450){
+        activate = 4 + (delta - 1300) / 150
+    }else if(delta >= 1450 && delta <= 1650){
+        activate = 5
+    }
+    return activate;
+}
+
 howToPlayScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     howToPlayScreen.redrawBackground(Background_ctx);
     UI_ctx.clearRect(0,0,1920,1080);
@@ -23,10 +51,44 @@ howToPlayScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
             Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         }
     });
+    howToPlayScreen.checkUIList.push({
+        tag: 'how-to-play-screen-pre-page',
+        center_x: 650,
+        center_y: 990,
+        width: 96,
+        height: 96,
+        clicked: function () {
+            let activate = getActivate((howToPlayScreen.dragScreen_delta_queue_going === null) ? howToPlayScreen.dragScreen_delta : howToPlayScreen.dragScreen_delta_queue_going);
+            activate = Math.max(1, Math.floor(activate-1));
+            let need_delta = (-550 + (550 * (activate-1))) - ((howToPlayScreen.dragScreen_delta_queue_going === null) ? howToPlayScreen.dragScreen_delta : howToPlayScreen.dragScreen_delta_queue_going);
+            for(let i=0; i<20; i++){
+                howToPlayScreen.dragScreen_delta_queue.push(need_delta/20);
+            }
+            howToPlayScreen.dragScreen_delta_queue_going = (-550 + (550 * (activate-1)));
+        }
+    });
+    howToPlayScreen.checkUIList.push({
+        tag: 'how-to-play-screen-next-page',
+        center_x: 1270,
+        center_y: 990,
+        width: 96,
+        height: 96,
+        clicked: function () {
+            let activate = getActivate((howToPlayScreen.dragScreen_delta_queue_going === null) ? howToPlayScreen.dragScreen_delta : howToPlayScreen.dragScreen_delta_queue_going);
+            activate = Math.min(5, Math.ceil(activate+1));
+            let need_delta = (-550 + (550 * (activate-1))) - ((howToPlayScreen.dragScreen_delta_queue_going === null) ? howToPlayScreen.dragScreen_delta : howToPlayScreen.dragScreen_delta_queue_going);
+            for(let i=0; i<20; i++){
+                howToPlayScreen.dragScreen_delta_queue.push(need_delta/20);
+            }
+            howToPlayScreen.dragScreen_delta_queue_going = (-550 + (550 * (activate-1)));
+        }
+    });
     howToPlayScreen.dragScreen_delta = -550;
     howToPlayScreen.dragScreen_delta_before = -550;
     howToPlayScreen.dragScreen_start_x = 0;
     howToPlayScreen.dragScreen_start = false;
+    howToPlayScreen.dragScreen_delta_queue = [];
+    howToPlayScreen.dragScreen_delta_queue_going = null;
 };
 
 howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
@@ -38,50 +100,30 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
         drawRoundBox(UI_ctx, 180,72, 240, 96, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
         drawText(UI_ctx, 180,72, 60, 0, Color_list.text_default_hex, undefined, undefined, "Back", "center", "GmarketSansMedium");
     }
-    /*if(checkTouch(Screen.userMouse.x + howToPlayScreen.dragScreen_delta, Screen.userMouse.y, 410, 520, 500, 760)) {
-        drawRoundBox(UI_ctx, 410-howToPlayScreen.dragScreen_delta, 520, 500*1.05, 760*1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10*1.05, 25*1.05);
+    let activate = getActivate();
+    if(activate === 1){
+        drawRoundBox(UI_ctx, 650,990, 96, 96, red_1, red_2, 10, 25);
+        drawText(UI_ctx, 650,990, 60, 0, red_text, undefined, undefined, "<", "center", "GmarketSansMedium");
     }else{
-        drawRoundBox(UI_ctx, 410-howToPlayScreen.dragScreen_delta, 520, 500, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 650, 990, 96, 96)){
+            drawRoundBox(UI_ctx, 650,990, 96*1.05, 96*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
+            drawText(UI_ctx, 650,990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "<", "center", "GmarketSansMedium");
+        }else{
+            drawRoundBox(UI_ctx, 650,990, 96, 96, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+            drawText(UI_ctx, 650,990, 60, 0, Color_list.text_default_hex, undefined, undefined, "<", "center", "GmarketSansMedium");
+        }
     }
-    if(checkTouch(Screen.userMouse.x + howToPlayScreen.dragScreen_delta, Screen.userMouse.y, 960, 520, 500, 760)) {
-        drawRoundBox(UI_ctx, 960-howToPlayScreen.dragScreen_delta, 520, 500*1.05, 760*1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10*1.05, 25*1.05);
+    if(activate === 5){
+        drawRoundBox(UI_ctx, 1270,990, 96, 96, red_1, red_2, 10, 25);
+        drawText(UI_ctx, 1270,990, 60, 0, red_text, undefined, undefined, ">", "center", "GmarketSansMedium");
     }else{
-        drawRoundBox(UI_ctx, 960-howToPlayScreen.dragScreen_delta, 520, 500, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
-    }
-    if(checkTouch(Screen.userMouse.x + howToPlayScreen.dragScreen_delta, Screen.userMouse.y, 1510, 520, 500, 760)) {
-        drawRoundBox(UI_ctx, 1510-howToPlayScreen.dragScreen_delta, 520, 500*1.05, 760*1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10*1.05, 25*1.05);
-    }else{
-        drawRoundBox(UI_ctx, 1510-howToPlayScreen.dragScreen_delta, 520, 500, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
-    }
-    if(checkTouch(Screen.userMouse.x + howToPlayScreen.dragScreen_delta, Screen.userMouse.y, 2060, 520, 500, 760)) {
-        drawRoundBox(UI_ctx, 2060-howToPlayScreen.dragScreen_delta, 520, 500*1.05, 760*1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10*1.05, 25*1.05);
-    }else{
-        drawRoundBox(UI_ctx, 2060-howToPlayScreen.dragScreen_delta, 520, 500, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
-    }
-    if(checkTouch(Screen.userMouse.x + howToPlayScreen.dragScreen_delta, Screen.userMouse.y, 2610, 520, 500, 760)) {
-        drawRoundBox(UI_ctx, 2610-howToPlayScreen.dragScreen_delta, 520, 500*1.05, 760*1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10*1.05, 25*1.05);
-    }else{
-        drawRoundBox(UI_ctx, 2610-howToPlayScreen.dragScreen_delta, 520, 500, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
-    }*/
-    let activate = 0;
-    if(howToPlayScreen.dragScreen_delta >= -550 && howToPlayScreen.dragScreen_delta <= -350){
-        activate = 1
-    }else if(howToPlayScreen.dragScreen_delta > -350 && howToPlayScreen.dragScreen_delta < -200){
-        activate = 1 + (howToPlayScreen.dragScreen_delta + 350) / 150
-    }else if(howToPlayScreen.dragScreen_delta >= -200 && howToPlayScreen.dragScreen_delta <= 200){
-        activate = 2
-    }else if(howToPlayScreen.dragScreen_delta > 200 && howToPlayScreen.dragScreen_delta < 350){
-        activate = 2 + (howToPlayScreen.dragScreen_delta - 200) / 150
-    }else if(howToPlayScreen.dragScreen_delta >= 350 && howToPlayScreen.dragScreen_delta <= 750){
-        activate = 3
-    }else if(howToPlayScreen.dragScreen_delta > 750 && howToPlayScreen.dragScreen_delta < 900){
-        activate = 3 + (howToPlayScreen.dragScreen_delta - 750) / 150
-    }else if(howToPlayScreen.dragScreen_delta >= 900 && howToPlayScreen.dragScreen_delta <= 1300){
-        activate = 4
-    }else if(howToPlayScreen.dragScreen_delta > 1300 && howToPlayScreen.dragScreen_delta < 1450){
-        activate = 4 + (howToPlayScreen.dragScreen_delta - 1300) / 150
-    }else if(howToPlayScreen.dragScreen_delta >= 1450 && howToPlayScreen.dragScreen_delta <= 1650){
-        activate = 5
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1270, 990, 96, 96)) {
+            drawRoundBox(UI_ctx, 1270, 990, 96 * 1.05, 96 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
+            drawText(UI_ctx, 1270, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
+        }else{
+            drawRoundBox(UI_ctx, 1270, 990, 96, 96, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+            drawText(UI_ctx, 1270, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
+        }
     }
     for(let i=1; i<=5; i++){
         if(i === activate){
@@ -143,6 +185,13 @@ howToPlayScreen.check = function (userMouse, userKeyboard, checkUIList) {
         }
     }else{
         howToPlayScreen.dragScreen_start = false;
+    }
+    if(howToPlayScreen.dragScreen_delta_queue.length > 0){
+        howToPlayScreen.dragScreen_delta += howToPlayScreen.dragScreen_delta_queue[0];
+        howToPlayScreen.dragScreen_delta = Math.min(Math.max(howToPlayScreen.dragScreen_delta, -550), 1650);
+        howToPlayScreen.dragScreen_delta_queue.splice(0, 1);
+    }else{
+        howToPlayScreen.dragScreen_delta_queue_going = null;
     }
 };
 
