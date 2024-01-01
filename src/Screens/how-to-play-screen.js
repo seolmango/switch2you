@@ -214,7 +214,7 @@ howToPlayScreen.check = function (userMouse, userKeyboard, checkUIList) {
                 howToPlayScreen.dragScreen_start_x = userMouse.x;
                 howToPlayScreen.dragScreen_start = true;
             }else{
-                howToPlayScreen.dragScreen_delta = Math.min(Math.max(howToPlayScreen.dragScreen_delta_before - ((userMouse.x - howToPlayScreen.dragScreen_start_x) * (1+(Math.abs(userMouse.x - howToPlayScreen.dragScreen_start_x)/200))), -550), 1650);
+                howToPlayScreen.dragScreen_delta = Math.min(Math.max(howToPlayScreen.dragScreen_delta_before - ((userMouse.x - howToPlayScreen.dragScreen_start_x) * (0.2+(Math.abs(userMouse.x - howToPlayScreen.dragScreen_start_x)/500))), -550), 1650);
             }
         }
     }else{
