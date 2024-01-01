@@ -48,6 +48,11 @@ Screen.alert.draw = function() {
     }
 };
 Screen.activatedHtmlElement = [];
+Screen.Settings = {
+    Sound: {
+        BGM: 100,
+    },
+}
 
 // Set Screen Rendering Loop
 window.onload = function () {
