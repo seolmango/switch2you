@@ -69,8 +69,8 @@ window.addEventListener('resize', function() {
 })
 
 UI_canvas.addEventListener('mousemove', function(e) {
-    Screen.userMouse.x = (e.offsetX / Screen.scale) - Screen.X0real;
-    Screen.userMouse.y = (e.offsetY / Screen.scale) - Screen.Y0real;
+    Screen.userMouse.x = (e.offsetX / Screen.scale);
+    Screen.userMouse.y = (e.offsetY / Screen.scale);
 })
 
 UI_canvas.addEventListener('click', function(e) {
@@ -91,6 +91,21 @@ UI_canvas.addEventListener('mouseleave', function(e) {
 
 UI_canvas.addEventListener('contextmenu', function(e) {
     e.preventDefault();
+})
+
+UI_canvas.addEventListener('touchstart', function(e) {
+    Screen.userMouse.x = (e.touches[0].clientX - Screen.X0real) / Screen.scale;
+    Screen.userMouse.y = (e.touches[0].clientY - Screen.Y0real) / Screen.scale;
+    Screen.userMouse.press = true;
+})
+
+UI_canvas.addEventListener('touchmove', function(e) {
+    Screen.userMouse.x = (e.touches[0].clientX - Screen.X0real) / Screen.scale;
+    Screen.userMouse.y = (e.touches[0].clientY - Screen.Y0real) / Screen.scale;
+})
+
+UI_canvas.addEventListener('touchend', function(e) {
+    Screen.userMouse.press = false;
 })
 
 // Socket Event Listeners
@@ -132,4 +147,6 @@ function canvasResize() {
     for(let i = 0; i < Screen.activatedHtmlElement.length; i++){
         Screen.activatedHtmlElement[i].resize(Screen.scale, window.innerWidth, window.innerHeight);
     }
+    Screen.X0real = (window.innerWidth - (1920 * Screen.scale)) / 2;
+    Screen.Y0real = (window.innerHeight - (1080 * Screen.scale)) / 2;
 }
