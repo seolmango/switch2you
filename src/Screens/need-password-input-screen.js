@@ -1,5 +1,3 @@
-import {makeNewRoomScreen} from "./make-new-room-screen";
-
 const needPasswordInputScreen = {};
 import {drawText} from "./tools/drawText";
 import {drawRoundBox} from "./tools/drawRoundBox";
