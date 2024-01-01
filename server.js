@@ -159,10 +159,10 @@ io.on('connection', (socket) => {
         }
 
         const showNum = 4; // test용. page당 보여지는 방의 개수
-        const roomList = Object.values(Room.publics);
+        const roomList = Object.values(Room.Publics);
         let maxIndex = page * 4;
         if (page * 4 > roomList.length) maxIndex = roomList.length;
-        socket.emit('room list', Math.ceil(roomList.length / showNum), getRoomInfo(Object.values(Room.publics).slice(page * 4 - 4, maxIndex)));
+        socket.emit('room list', Math.ceil(roomList.length / showNum), getRoomInfo(Object.values(Room.Publics).slice(page * 4 - 4, maxIndex)));
     })
 
 

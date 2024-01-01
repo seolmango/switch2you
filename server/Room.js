@@ -1,25 +1,30 @@
 class Room {
     static MaxCount = 0;
     static #_Count = 0;
-    static #_Id = 1;
-    static Instances = {};
-    static publics = {};
+    static #_Instances = {};
+    static #_Publics = {};
 
     static get Count() {
-        return Room._Count;
+        return Room.#_Count;
     }
 
-    static get Id() {
-        return Room._Id;
+    static get Instances() {
+        return Room.#_Instances;
+    }
+
+    static get Publics() {
+        return Room.#_Publics;
     }
 
     constructor(owner, roomName = false, public_ = true, password = false) {
         // Room 객체 기초 설정
         if (Room.MaxCount <= Room.Count) return false;
-        this._id = Room.#_Id++;
-        Room.Instances[this.id] = this;
+        do {
+            this._id = randomString(8); // 방 id. 중복되지 않음. 경우의 수가 64^8이라 중복검사를 이 방법으로 하는게 좋음.
+        } while (Room.JoinIds[this.id]);
+        Room.#_Instances[this.id] = this;
         Room.#_Count++;
-        if (public_) Room.publics[this.id] = this; // 공개방 딕셔너리 (리스트로 할시 장단점있음)
+        if (public_) Room.#_Publics[this.id] = this; // 공개방 딕셔너리 (리스트로 할시 장단점있음)
 
         this.public = public_; // 공개방인가? 공개방은 퀵매칭 포함됨.
         this.password = password; // 방 비밀번호
@@ -37,10 +42,21 @@ class Room {
     }
 
     delete() {
-        if (this.public) delete Room.publics[this.id];
-        delete Room.Instances[this.id];
+        if (this.public) delete Room.#_Publics[this.id];
+        delete Room.#_Instances[this.id];
         Room.#_Count--;
     }
+}
+
+function randomNumber(min, max) {
+    return Math.floor((Math.random) * (max - min)) + min;
+}
+
+function randomString(length) {
+    value = ''
+    for (let i = 0; i < length; i++)
+        value = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_'[randomNumber(0, 64)];
+    return value;
 }
 
 module.exports = Room;
