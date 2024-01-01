@@ -8,6 +8,37 @@
     <meta name='keywords' content='io,game,swITch,tagger'>
 </head>
 <body>
+    <script>
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        const BGM_Player = {};
+        function onYouTubeIframeAPIReady() {
+            BGM_Player.Youtube_player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: 'x8Xf47Bl0Hc',
+                playerVars: {
+                    loop: 1,
+                    playlist: 'x8Xf47Bl0Hc',
+                    autoplay: 1,
+                    mute: 0,
+                },
+            });
+        }
+        BGM_Player.play = function(){
+            BGM_Player.Youtube_player.playVideo();
+        }
+
+        BGM_Player.pause = function(){
+            BGM_Player.Youtube_player.pauseVideo();
+        }
+
+        BGM_Player.setVolume = function(volume){
+            BGM_Player.Youtube_player.setVolume(volume);
+        }
+    </script>
     <div id="main-container">
         <canvas id="background" width="1920" height="1080"></canvas>
         <canvas id="ui" width="1920" height="1080"></canvas>
@@ -18,6 +49,11 @@
         <input type="text" id="join_room_id_input" placeholder="Enter the room id">
         <input type="checkbox" id="make_room_visibility_checkbox" checked>
         <input type="checkbox" id="make_room_password_checkbox">
+    </div>
+    <div id="bgm-container">
+        <div id="player">
+
+        </div>
     </div>
     <noscript>
         <div style="text-align: center; margin-top: 50px;">

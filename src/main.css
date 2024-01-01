@@ -41,3 +41,7 @@ input[type="checkbox"] {
     display: none;
     position: absolute;
 }
+
+#bgm-container{
+    display: none;
+}
