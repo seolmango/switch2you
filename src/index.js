@@ -50,16 +50,15 @@ Screen.alert.draw = function() {
 Screen.activatedHtmlElement = [];
 
 // Set Screen Rendering Loop
-setInterval( function () {
-    Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
-    Screen.alert.draw();
-    Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
-}, (1000 / 30));
-
 window.onload = function () {
     Screen.currentScreen = agreementSoundScreen;
     Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
     canvasResize();
+    setInterval( function () {
+        Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
+        Screen.alert.draw();
+        Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
+    }, (1000 / 30));
 }
 
 
