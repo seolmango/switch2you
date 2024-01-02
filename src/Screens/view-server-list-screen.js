@@ -56,9 +56,9 @@ viewServerListScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     });
     viewServerListScreen.checkUIList.push({
         tag: "view-server-list-screen-make-new-room",
-        center_x: 480,
+        center_x: 320,
         center_y: 990,
-        width: 720,
+        width: 600,
         height: 120,
         clicked: function () {
             Screen.currentScreen = makeNewRoomScreen;
@@ -67,10 +67,21 @@ viewServerListScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         clickable: 0
     });
     viewServerListScreen.checkUIList.push({
-        tag: "view-server-list-screen-join-room-id",
-        center_x: 1440,
+        tag: "view-server-list-screen-quick-join",
+        center_x: 960,
         center_y: 990,
-        width: 720,
+        width: 600,
+        height: 120,
+        clicked: function () {
+
+        },
+        clickable: 0
+    })
+    viewServerListScreen.checkUIList.push({
+        tag: "view-server-list-screen-join-room-id",
+        center_x: 1600,
+        center_y: 990,
+        width: 600,
         height: 120,
         clicked: function () {
             Screen.currentScreen = joinRoomWithIdScreen;
@@ -89,19 +100,26 @@ viewServerListScreen.draw = function (Background_ctx, UI_ctx, Screen) {
         drawRoundBox(UI_ctx, 180, 72, 240, 96, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
         drawText(UI_ctx, 180, 72, 60, 0, Color_list.text_default_hex, undefined, undefined, "Back", "center", "GmarketSansMedium");
     }
-    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 480, 990, 720, 120)){
-        drawRoundBox(UI_ctx, 480, 990, 720*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
-        drawText(UI_ctx, 480, 990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Make New Room", "center", "GmarketSansMedium");
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 320, 990, 600, 120)){
+        drawRoundBox(UI_ctx, 320, 990, 600*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
+        drawText(UI_ctx, 320, 990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Make New Room", "center", "GmarketSansMedium");
     }else{
-        drawRoundBox(UI_ctx, 480, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
-        drawText(UI_ctx, 480, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Make New Room", "center", "GmarketSansMedium");
+        drawRoundBox(UI_ctx, 320, 990, 600, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+        drawText(UI_ctx, 320, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Make New Room", "center", "GmarketSansMedium");
     }
-    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120)){
-        drawRoundBox(UI_ctx, 1440, 990, 720*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
-        drawText(UI_ctx, 1440, 990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Join Room with ID", "center", "GmarketSansMedium");
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 600, 120)){
+        drawRoundBox(UI_ctx, 960, 990, 600*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
+        drawText(UI_ctx, 960, 990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Quick Join", "center", "GmarketSansMedium");
     }else{
-        drawRoundBox(UI_ctx, 1440, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
-        drawText(UI_ctx, 1440, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Join Room with ID", "center", "GmarketSansMedium");
+        drawRoundBox(UI_ctx, 960, 990, 600, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+        drawText(UI_ctx, 960, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Quick Join", "center", "GmarketSansMedium");
+    }
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1600, 990, 600, 120)){
+        drawRoundBox(UI_ctx, 1600, 990, 600*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
+        drawText(UI_ctx, 1600, 990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Join Room with ID", "center", "GmarketSansMedium");
+    }else{
+        drawRoundBox(UI_ctx, 1600, 990, 600, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+        drawText(UI_ctx, 1600, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Join Room with ID", "center", "GmarketSansMedium");
     }
     if(viewServerListScreen.checkUIList[1].clickable > 0){
         drawRoundBox(UI_ctx, 1700, 72, 320, 96, refresh_1, refresh_2, 10, 25);
