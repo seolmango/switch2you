@@ -16,7 +16,7 @@ Room.MaxCount = Config.roomMaxNum;
 
 
 const port = process.env.PORT || 3000;
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'test')));
 http.listen(port, function (){
     console.log('listening on : http://localhost:' + port);
 });
@@ -36,11 +36,26 @@ function getPlayerInfo(players) {
 }
 
 function getRoomInfo(rooms) {
-    const infoFilter = (room) => {return {'id': room.id, 'name': room.name, 'ownerName': room.owner.name, 'password': room.password ? true : false, 'playerCount': room.players.length, 'playing': room.playing}}
+    const infoFilter = (room) => {return {'id': room.id, 'name': room.name, 'ownerName': room.owner.name, 'passwordExist': room.password ? true : false, 'playerCount': room.players.length, 'playing': room.playing}}
     if (Array.isArray(rooms))
         return rooms.map(infoFilter);
     else
         return infoFilter(rooms);
+}
+
+function checkData(...args) {
+    for (const element of args) {
+        let ok = false;
+        for (let i = 1; i < element.length; i++)
+            if (element[i] === 'int') {
+                if (Number.isInteger(element[0])) ok = true;
+            } else if (element[i] === 'number' || element[i] === 'string' || element[i] === 'boolean') {
+                if (typeof element[0] === element[i]) ok = true;
+            } else
+                if (element[0] === element[i]) ok = true;
+        if (!ok) return false;
+    };
+    return true;
 }
 
 
@@ -74,11 +89,11 @@ io.on('connection', (socket) => {
 
     // 방 생성
     socket.on('create room', (playerName, roomName, public, password) => { // 1. 방 참가 이벤트가 들어오면
-        if (player.room) { // 2. 모든 조건을 확인 후 확정이 나면
-            socket.emit('already join room');
+        if (!checkData([playerName, 'string'], [roomName, 'string'], [public, 'boolean'], [password, 'string', false])) {
+            socket.emit('wrong data');
             return false;
-        } else if (!public && !password) {
-            socket.emit('must have password');
+        } else if (player.room) { // 2. 모든 조건을 확인 후 확정이 나면
+            socket.emit('already join room');
             return false;
         }
 
@@ -86,11 +101,20 @@ io.on('connection', (socket) => {
         const room = new Room(player, roomName, public, password);
         socket.join(room.id); // 4. room 관련 처리하고 소켓신호 보내기
         socket.emit('room joined', getRoomInfo(room), getPlayerInfo(player.room.players));
+        console.log(Room.Instances);
     })
 
 
     // 방 참가
     socket.on('join room', (playerName, roomId, password) => {
+        if (!checkData([playerName, 'string'], [roomId, 'int'], [roomId, 'roomId'])) {
+            socket.emit('wrong data');
+            return false;
+        } else if (!Room.Instances[roomId]) {
+            socket.emit('no room');
+            return false;
+        }
+
         const result = player.joinRoom(Room.Instances[roomId], password);
         if (result) {
             socket.emit(result);
@@ -100,6 +124,7 @@ io.on('connection', (socket) => {
         io.to(player.room.id).emit('player joined', getPlayerInfo(player));
         socket.join(player.room.id);
         socket.emit('room joined', getRoomInfo(player.room), getPlayerInfo(player.room.players));
+        console.log(Room.Instances);
     })
 
 

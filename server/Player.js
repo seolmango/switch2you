@@ -41,9 +41,10 @@ class Player {
     // 방 참가
     joinRoom(room, password = false) {
         if (this.room) return 'already join room';
-        if (room.player.length > 8) return 'room full';
+        if (room.players.length > 8) return 'room full';
         if (room.password !== password) return 'wrong password';
 
+        this.role = 'user';
         this.room = room;
         room.players.push(this);
     }
@@ -62,7 +63,7 @@ class Player {
         
         delete this.room.players[this.id];
         let ownerChange = false; // 추가 emit을 위해 필요함
-        if (this.room.player.length < 1) Room.delete(); // 참가 인원 없을시 방 삭제
+        if (this.room.players.length < 1) Room.delete(); // 참가 인원 없을시 방 삭제
         else if (this.role === 'owner') { // 나간 플레이어가 방장이라면 방장 이전
             this.giveOwner(this.room.players[0]); // 가장 먼저 들어온사람이 방장
             ownerChange = true;

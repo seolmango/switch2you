@@ -21,7 +21,7 @@ class Room {
         if (Room.MaxCount <= Room.Count) return false;
         do {
             this._id = randomString(8); // 방 id. 중복되지 않음. 경우의 수가 64^8이라 중복검사를 이 방법으로 하는게 좋음.
-        } while (Room.JoinIds[this.id]);
+        } while (Room.Instances[this.id]);
         Room.#_Instances[this.id] = this;
         Room.#_Count++;
         if (public_) Room.#_Publics[this.id] = this; // 공개방 딕셔너리 (리스트로 할시 장단점있음)
@@ -49,13 +49,13 @@ class Room {
 }
 
 function randomNumber(min, max) {
-    return Math.floor((Math.random) * (max - min)) + min;
+    return Math.floor((Math.random()) * (max - min)) + min;
 }
 
 function randomString(length) {
     value = ''
     for (let i = 0; i < length; i++)
-        value = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_'[randomNumber(0, 64)];
+        value += '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_'[randomNumber(0, 64)];
     return value;
 }
 
