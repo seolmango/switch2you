@@ -50,16 +50,6 @@ class Player {
         room.players.push(this);
     }
 
-    // 플레이어에게 방장 이전
-    giveOwner(target) {
-        if (!this.room) return 'no join room';
-        if (!target) return 'no player';
-        if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
-        this.role = 'user';
-        target.role = 'owner';
-        this.room.owner = target;
-    }
-
     // 방 퇴장
     leaveRoom() {
         if (!this.room) return 'no join room';
@@ -75,6 +65,24 @@ class Player {
         this.name = null;
         this.role = null;
         return ownerChange;
+    }
+
+    // 다른 플레이어에게 방장 이전
+    giveOwner(target) {
+        if (!this.room) return 'no join room';
+        if (!target || this === target) return 'wrong player';
+        if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
+        this.role = 'user';
+        target.role = 'owner';
+        this.room.owner = target;
+    }
+
+    // 다른 플레이어 강제 퇴장시키기
+    kickPlayer(target) {
+        if (!this.room) return 'no join room';
+        if (!target || this === target) return 'wrong player';
+        if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
+        target.leaveRoom();
     }
 }
 

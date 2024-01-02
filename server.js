@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
         socket.disconnect();
     }
     socket.emit('connected', player.id); // 연결 응답 신호 전송
-    console.log('user connected: ', player.socketId, player.id);
+    console.log('player connected: ', player.socketId, player.id);
 
 
     // Player 연결 끊김
@@ -82,8 +82,23 @@ io.on('connection', (socket) => {
         }
         player.delete();
         socket.disconnect();
-        console.log('user disconnected: ', player.socketId, player.id);
+        console.log('player disconnected: ', player.socketId, player.id);
     });
+
+
+    // 방 목록
+    socket.on('get room list', (page, callback) => {
+        if (!checkData([page, 'int'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        }
+
+        const showNum = 4; // test용. page당 보여지는 방의 개수
+        const roomList = Object.values(Room.Publics);
+        let maxIndex = page * 4;
+        if (page * 4 > roomList.length) maxIndex = roomList.length;
+        callback({'status': 200, 'maxPage': Math.ceil(roomList.length / showNum), 'roomInfos': getRoomInfo(Object.values(Room.Publics).slice(page * 4 - 4, maxIndex))});
+    })
 
 
     // 방 생성
@@ -116,8 +131,8 @@ io.on('connection', (socket) => {
             return;
         }
         player.update(playerName);
-        io.to(player.room.id).emit('player joined', getPlayerInfo(player));
         socket.join(player.room.id);
+        socket.to(player.room.id).emit('player joined', getPlayerInfo(player));
         callback({'status': 200, 'roomInfo': getRoomInfo(player.room), 'playerInfos': getPlayerInfo(player.room.players)});
     })
 
@@ -167,23 +182,8 @@ io.on('connection', (socket) => {
         }
         callback({'status': 200});
         socket.leave(room.id);
-        if (result) io.to(room.id).emit('owner changed', room.owner.id); // 방장이 바뀌었다면
-        if (room.players.length > 0) io.to(room.id).emit('player leaved', player.id); // 방에 사람이 남아 있다면
-    })
-
-
-    // 방 목록
-    socket.on('get room list', (page, callback) => {
-        if (!checkData([page, 'int'], [callback, 'function'])) {
-            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
-            return;
-        }
-
-        const showNum = 4; // test용. page당 보여지는 방의 개수
-        const roomList = Object.values(Room.Publics);
-        let maxIndex = page * 4;
-        if (page * 4 > roomList.length) maxIndex = roomList.length;
-        callback({'status': 200, 'maxPage': Math.ceil(roomList.length / showNum), 'roomInfos': getRoomInfo(Object.values(Room.Publics).slice(page * 4 - 4, maxIndex))});
+        if (result) socket.to(room.id).emit('owner changed', room.owner.id); // 방장이 바뀌었다면
+        if (room.players.length > 0) socket.to(room.id).emit('player leaved', player.id); // 방에 사람이 남아 있다면
     })
 
 
@@ -205,11 +205,22 @@ io.on('connection', (socket) => {
 
 
     // 강제 퇴장
-    socket.on('forced leave room', (targetId) => {
-        const target = Player.Instances[targetId]; // target이 없는경우에도 no permission
-        if (player.role !== 'owner' || player.room !== target.room) socket.emit('no permission');
-        target.leaveRoom();
+    socket.on('kick player', (targetId, callback) => {
+        if (!checkData([targetId, 'int'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        }
+
+        const target = Player.Instances[targetId];
+        const result = player.kickPlayer(target);
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
+        callback({'status': 200});
+        io.sockets.sockets.get(target.socketId).leave(player.room.id);
         io.to(player.room.id).emit('player leaved', targetId);
+        io.to(target.socketId).emit('you kicked');
     })
 
 
