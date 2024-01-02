@@ -48,6 +48,13 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                         console.log(callback.roomInfo);
                         console.log(callback.playerInfos);
                     }else{
+                        if(callback.message === 'wrong password'){
+                            Screen.alert.data.push({
+                                tag: 'wrong-password',
+                                text: 'wrong password',
+                                time: 150,
+                            })
+                        }
                         Screen.currentScreen = needPasswordInputScreen;
                         Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                     }
@@ -76,7 +83,7 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     })
     needPasswordInputScreen.password_input.show(Screen.activatedHtmlElement);
-    needPasswordInputScreen.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    needPasswordInputScreen.password_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
 }
 
 needPasswordInputScreen.draw = function (Background_ctx, UI_ctx, Screen) {

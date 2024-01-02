@@ -79,8 +79,18 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                         console.log(callback.roomInfo);
                         console.log(callback.playerInfos);
                     }else{
-                        Screen.currentScreen = needPasswordInputScreen;
-                        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+                        if(callback.message === 'wrong password') {
+                            Screen.currentScreen = needPasswordInputScreen;
+                            Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+                        }else{
+                            Screen.alert.data.push({
+                                tag: 'notexistroom',
+                                text: 'room not exist',
+                                time: 150,
+                            })
+                            Screen.currentScreen = viewServerListScreen;
+                            Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+                        }
                     }
                 });
             }
