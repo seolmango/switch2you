@@ -88,7 +88,7 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                                 text: 'room not exist',
                                 time: 150,
                             })
-                            Screen.currentScreen = viewServerListScreen;
+                            Screen.currentScreen = joinRoomWithIdScreen;
                             Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                         }
                     }
