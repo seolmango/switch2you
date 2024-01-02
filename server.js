@@ -16,7 +16,7 @@ Room.MaxCount = Config.roomMaxNum;
 
 
 const port = process.env.PORT || 3000;
-app.use(express.static(path.join(__dirname, 'test')));
+app.use(express.static(path.join(__dirname, 'dist')));
 http.listen(port, function (){
     console.log('listening on : http://localhost:' + port);
 });
@@ -102,7 +102,7 @@ io.on('connection', (socket) => {
         }
         let maxIndex = page * 4;
         if (page * 4 > roomList.length) maxIndex = roomList.length;
-        callback({'status': 200, 'maxPage': maxPage, 'roomInfos': getRoomInfo(Object.values(Room.Publics).slice(page * 4 - 4, maxIndex))});
+        callback({'status': 200, 'maxPage': maxPage, 'roomInfos': getRoomInfo(roomList.slice(page * 4 - 4, maxIndex))});
     })
 
 
@@ -143,23 +143,23 @@ io.on('connection', (socket) => {
 
 
     // 랜덤 방 매칭
-    socket.on('join random room', (playerName) => {
-        if (!checkData([playerName, 'string'], [roomId, 'int'], [password, 'string', false])) {
-            socket.emit('wrong data');
-            return false;
-        } else if (player.room) {
-            socket.emit('already join room');
-            return false;
+    socket.on('join random room', (playerName, callback) => {
+        if (!checkData([playerName, 'string'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        } else if (player.room) { // 서버 최적화 때문에 사전에 검사
+            callback({'status': 400, 'message': 'already join room'});
+            return;
         }
 
         // 공개 빈 방 탐색
-        for (const room of Room.Instances) {
-            if (!room.public || room.players.length > 8 || room.playing) continue; // 비공개거나, 꽉찾거나, 게임중이면 건너뛰기
+        for (const room of Object.values(Room.Publics)) {
+            if (room.password || room.players.length > 8 || room.playing) continue; // 비공개거나, 비밀번호가 있거나, 꽉찾거나, 게임중이면 건너뛰기
             player.update(playerName);
             player.joinRoom(room);
-            io.to(room.id).emit('player joined', getPlayerInfo(player));
             socket.join(room.id);
-            socket.emit('room joined', getRoomInfo(player.room), getPlayerInfo(player.room.players));
+            socket.to(room.id).emit('player joined', getPlayerInfo(player));
+            callback({'status': 200, 'roomInfo': getRoomInfo(player.room), 'playerInfos': getPlayerInfo(player.room.players)});
             break;
         }
 
@@ -168,7 +168,7 @@ io.on('connection', (socket) => {
             player.update(playerName);
             const room = new Room(player);
             socket.join(room.id);
-            socket.emit('room joined', getRoomInfo(player.room), getPlayerInfo(player.room.players));
+            callback({'status': 200, 'roomInfo': getRoomInfo(room)});
         }
     })
 
