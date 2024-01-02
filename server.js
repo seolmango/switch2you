@@ -63,12 +63,11 @@ function checkData(...args) {
 io.on('connection', (socket) => {
 
     // Player(세션) 추가
-    const player = new Player(); // 접속한 플레이어(세션) 마다 생성
+    const player = new Player(socket.id); // 접속한 플레이어(세션) 마다 생성
     if (!player) { // 서버가 꽉찼다면
         io.to(socket.id).emit("server full");
         socket.disconnect();
     }
-    player.socketId = socket.id;
     socket.emit('connected', player.id); // 연결 응답 신호 전송
     console.log('user connected: ', player.socketId, player.id);
 
@@ -78,7 +77,7 @@ io.on('connection', (socket) => {
         const room = player.room;
         if (room){
             const result = player.leaveRoom();
-            if (result !== 'no join room' && result) io.to(room.id).emit('owner change', room.owner.id);
+            if (result) io.to(room.id).emit('owner changed', room.owner.id);
             if (room.players.length > 0) io.to(room.id).emit('player leaved', player.id);
         }
         player.delete();
@@ -109,9 +108,6 @@ io.on('connection', (socket) => {
         if (!checkData([playerName, 'string'], [roomId, 'string'], [password, 'string', false], [callback, 'function'])) {
             if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
             return;
-        } else if (!Room.Instances[roomId]) {
-            callback({'status': 400, 'message': 'no room'});
-            return;
         }
 
         const result = player.joinRoom(Room.Instances[roomId], password);
@@ -131,8 +127,7 @@ io.on('connection', (socket) => {
         if (!checkData([playerName, 'string'], [roomId, 'int'], [password, 'string', false])) {
             socket.emit('wrong data');
             return false;
-        }
-        if (player.room) {
+        } else if (player.room) {
             socket.emit('already join room');
             return false;
         }
@@ -159,22 +154,21 @@ io.on('connection', (socket) => {
 
 
     // 방 퇴장
-    socket.on('leave room', () => {
-        if (!player.room) {
-            socket.emit('no join room');
-            return false;
+    socket.on('leave room', (callback) => {
+        if (typeof callback !== 'function') {
+            return;
         }
+
         const room = player.room;
         const result = player.leaveRoom();
         if (result === 'no join room') {
-            socket.emit('no join room');
-            return false;
+            callback({'status': 400, 'message': 'no join room'});
+            return;
         }
-
-        socket.emit('room leaved');
+        callback({'status': 200});
         socket.leave(room.id);
         if (result) io.to(room.id).emit('owner changed', room.owner.id); // 방장이 바뀌었다면
-        if (room.players.length > 0) io.to(room.id).emit('player leaved', player.id);
+        if (room.players.length > 0) io.to(room.id).emit('player leaved', player.id); // 방에 사람이 남아 있다면
     })
 
 
@@ -194,13 +188,18 @@ io.on('connection', (socket) => {
 
 
     // 방장 이전. targetId는 방장이 이전될 플레이어의 id.
-    socket.on('change owner', (targetId) => {
-        const target = Player.Instances[targetId]; // target이 없는경우에도 no permission
-        const result = player.giveOwner(target);
-        if (result) {
-            socket.emit(result);
-            return false;
+    socket.on('change owner', (targetId, callback) => {
+        if (!checkData([targetId, 'int'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
         }
+
+        const result = player.giveOwner(Player.Instances[targetId]);
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
+        callback({'status': 200});
         io.to(player.room.id).emit('owner changed', targetId);
     })
 
