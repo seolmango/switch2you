@@ -45,15 +45,15 @@ function getRoomInfo(rooms) {
 
 function checkData(...args) {
     for (const element of args) {
-        let ok = false;
+        let wrong = true;
         for (let i = 1; i < element.length; i++)
             if (element[i] === 'int') {
-                if (Number.isInteger(element[0])) ok = true;
-            } else if (element[i] === 'number' || element[i] === 'string' || element[i] === 'boolean') {
-                if (typeof element[0] === element[i]) ok = true;
+                if (Number.isInteger(element[0])) wrong = false;
+            } else if (element[i] === 'number' || element[i] === 'string' || element[i] === 'boolean' || element[i] === 'function') {
+                if (typeof element[0] === element[i]) wrong = false;
             } else
-                if (element[0] === element[i]) ok = true;
-        if (!ok) return false;
+                if (element[0] === element[i]) wrong = false;
+        if (wrong) return false;
     };
     return true;
 }
@@ -88,14 +88,14 @@ io.on('connection', (socket) => {
 
 
     // 방 생성
-    socket.on('create room', (playerName, roomName, public, password) => { // 1. 방 참가 이벤트가 들어오면
-        if (!checkData([playerName, 'string'], [roomName, 'string'], [public, 'boolean'], [password, 'string', false])) {
-            socket.emit('wrong data');
+    socket.on('create room', (playerName, roomName, public, password, callback) => { // 1. 방 참가 이벤트가 들어오면
+        if (!checkData([playerName, 'string'], [roomName, 'string'], [public, 'boolean'], [password, 'string', false], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
             return false;
-        } else if (player.room) { // 2. 모든 조건을 확인 후 확정이 나면
-            socket.emit('already join room');
+        } else if (player.room) {
+            callback({'status': 400, 'message': 'already join room'});
             return false;
-        }
+        } // 2. 모든 조건을 확인 후 확정이 나면
 
         player.update(playerName); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
         const room = new Room(player, roomName, public, password);
@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
 
     // 방 참가
     socket.on('join room', (playerName, roomId, password) => {
-        if (!checkData([playerName, 'string'], [roomId, 'int'], [roomId, 'roomId'])) {
+        if (!checkData([playerName, 'string'], [roomId, 'int'], [password, 'string', false])) {
             socket.emit('wrong data');
             return false;
         } else if (!Room.Instances[roomId]) {
@@ -130,6 +130,10 @@ io.on('connection', (socket) => {
 
     // 랜덤 방 매칭
     socket.on('join random room', (playerName) => {
+        if (!checkData([playerName, 'string'], [roomId, 'int'], [password, 'string', false])) {
+            socket.emit('wrong data');
+            return false;
+        }
         if (player.room) {
             socket.emit('already join room');
             return false;
