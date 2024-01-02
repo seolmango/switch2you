@@ -42,7 +42,8 @@ class Player {
         if (this.room) return 'already join room';
         if (!room) return 'no room';
         if (room.players.length > 8) return 'room full';
-        if (room.password !== password) return 'wrong password';
+        if (room.password && !password) return 'must have password';
+        if (room.password && room.password !== password) return 'wrong password';
 
         this.role = 'user';
         this.room = room;
