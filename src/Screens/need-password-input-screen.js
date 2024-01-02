@@ -5,6 +5,8 @@ import {checkTouch} from "./tools/checkTouch";
 import {Color_list} from "../data/color_list";
 import {textInputElement} from "./tools/textInputElement";
 import {viewServerListScreen} from "./view-server-list-screen";
+import {joiningRoomScreen} from "./joining-room-screen";
+import {joinRoomWithIdScreen} from "./join-room-with-id-screen";
 
 let blue_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let blue_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
@@ -37,6 +39,19 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                         });
                     }
                 }
+            }else{
+                needPasswordInputScreen.password_input.hide(Screen.activatedHtmlElement);
+                Screen.currentScreen = joiningRoomScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+                Screen.socket.emit('join room', joinRoomWithIdScreen.nickname_input.get_value(), joinRoomWithIdScreen.room_id_input.get_value(), needPasswordInputScreen.password_input.get_value(), (callback) => {
+                    if(callback.status === 200){
+                        console.log(callback.roomInfo);
+                        console.log(callback.playerInfos);
+                    }else{
+                        Screen.currentScreen = needPasswordInputScreen;
+                        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+                    }
+                });
             }
         },
         clickable: -1,
@@ -61,7 +76,7 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     })
     needPasswordInputScreen.password_input.show(Screen.activatedHtmlElement);
-    needPasswordInputScreen.resize(Screen.scale, winndow.innerWidth, window.innerHeight);
+    needPasswordInputScreen.resize(Screen.scale, window.innerWidth, window.innerHeight);
 }
 
 needPasswordInputScreen.draw = function (Background_ctx, UI_ctx, Screen) {
