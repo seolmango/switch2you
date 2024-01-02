@@ -65,7 +65,7 @@ io.on('connection', (socket) => {
     // Player(세션) 추가
     const player = new Player(socket.id); // 접속한 플레이어(세션) 마다 생성
     if (!player) { // 서버가 꽉찼다면
-        io.to(socket.id).emit("server full");
+        socket.emit("server full");
         socket.disconnect();
     }
     socket.emit('connected', player.id); // 연결 응답 신호 전송
