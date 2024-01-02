@@ -92,6 +92,9 @@ io.on('connection', (socket) => {
         if (!checkData([page, 'int'], [callback, 'function'])) {
             if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
             return;
+        } else if (page < 1) {
+            callback({'status': 400, 'message': 'wrong page'});
+            return;
         }
 
         const showNum = 4; // test용. page당 보여지는 방의 개수
