@@ -79,7 +79,7 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                         console.log(callback.roomInfo);
                         console.log(callback.playerInfos);
                     }else{
-                        if(callback.message === 'wrong password') {
+                        if(callback.message === 'must have password') {
                             Screen.currentScreen = needPasswordInputScreen;
                             Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                         }else{
