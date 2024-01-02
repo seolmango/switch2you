@@ -91,40 +91,38 @@ io.on('connection', (socket) => {
     socket.on('create room', (playerName, roomName, public, password, callback) => { // 1. 방 참가 이벤트가 들어오면
         if (!checkData([playerName, 'string'], [roomName, 'string'], [public, 'boolean'], [password, 'string', false], [callback, 'function'])) {
             if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
-            return false;
+            return; // 2-1. 데이터의 자료형 확인 후
         } else if (player.room) {
             callback({'status': 400, 'message': 'already join room'});
-            return false;
-        } // 2. 모든 조건을 확인 후 확정이 나면
+            return;
+        } // 2-2. 모든 조건을 확인 후 확정이 나면
 
         player.update(playerName); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
         const room = new Room(player, roomName, public, password);
         socket.join(room.id); // 4. room 관련 처리하고 소켓신호 보내기
-        socket.emit('room joined', getRoomInfo(room), getPlayerInfo(player.room.players));
-        console.log(Room.Instances);
+        callback({'status': 200, 'roomInfo': getRoomInfo(room)});
     })
 
 
     // 방 참가
-    socket.on('join room', (playerName, roomId, password) => {
-        if (!checkData([playerName, 'string'], [roomId, 'int'], [password, 'string', false])) {
-            socket.emit('wrong data');
-            return false;
+    socket.on('join room', (playerName, roomId, password, callback) => {
+        if (!checkData([playerName, 'string'], [roomId, 'string'], [password, 'string', false], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
         } else if (!Room.Instances[roomId]) {
-            socket.emit('no room');
-            return false;
+            callback({'status': 400, 'message': 'no room'});
+            return;
         }
 
         const result = player.joinRoom(Room.Instances[roomId], password);
         if (result) {
-            socket.emit(result);
-            return false;
+            callback({'status': 400, 'message': result});
+            return;
         }
         player.update(playerName);
         io.to(player.room.id).emit('player joined', getPlayerInfo(player));
         socket.join(player.room.id);
-        socket.emit('room joined', getRoomInfo(player.room), getPlayerInfo(player.room.players));
-        console.log(Room.Instances);
+        callback({'status': 200, 'roomInfo': getRoomInfo(player.room), 'playerInfos': getPlayerInfo(player.room.players)});
     })
 
 
@@ -181,17 +179,17 @@ io.on('connection', (socket) => {
 
 
     // 방 목록
-    socket.on('get room list', (page) => {
-        if (player.room) {
-            socket.emit('already join room');
-            return false;
+    socket.on('get room list', (page, callback) => {
+        if (!checkData([page, 'int'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
         }
 
         const showNum = 4; // test용. page당 보여지는 방의 개수
         const roomList = Object.values(Room.Publics);
         let maxIndex = page * 4;
         if (page * 4 > roomList.length) maxIndex = roomList.length;
-        socket.emit('room list', Math.ceil(roomList.length / showNum), getRoomInfo(Object.values(Room.Publics).slice(page * 4 - 4, maxIndex)));
+        callback({'status': 200, 'maxPage': Math.ceil(roomList.length / showNum), 'roomInfos': getRoomInfo(Object.values(Room.Publics).slice(page * 4 - 4, maxIndex))});
     })
 
 
