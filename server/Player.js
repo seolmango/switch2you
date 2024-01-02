@@ -14,7 +14,6 @@ class Player {
 
     constructor(socketId) {
         // Player 객체 기초 설정
-        if (Player.MaxCount <= Player.Count) return false;
         this._id = Player.#_Id++;
         Player.Instances[this.id] = this;
         Player.#_Count++;
@@ -52,7 +51,7 @@ class Player {
 
     // 방 퇴장
     leaveRoom() {
-        if (!this.room) return 'no join room';
+        if (!this.room) return 'must join room';
         
         this.room.players.splice(this.room.players.indexOf(this), 1);
         let ownerChange = false; // 추가 emit을 위해 필요함
@@ -69,7 +68,7 @@ class Player {
 
     // 다른 플레이어에게 방장 이전
     giveOwner(target) {
-        if (!this.room) return 'no join room';
+        if (!this.room) return 'must join room';
         if (!target || this === target) return 'wrong player';
         if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
         this.role = 'user';
@@ -79,7 +78,7 @@ class Player {
 
     // 다른 플레이어 강제 퇴장시키기
     kickPlayer(target) {
-        if (!this.room) return 'no join room';
+        if (!this.room) return 'must join room';
         if (!target || this === target) return 'wrong player';
         if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
         target.leaveRoom();

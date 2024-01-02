@@ -16,7 +16,7 @@ Room.MaxCount = Config.roomMaxNum;
 
 
 const port = process.env.PORT || 3000;
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'test')));
 http.listen(port, function (){
     console.log('listening on : http://localhost:' + port);
 });
@@ -63,11 +63,12 @@ function checkData(...args) {
 io.on('connection', (socket) => {
 
     // Player(세션) 추가
-    const player = new Player(socket.id); // 접속한 플레이어(세션) 마다 생성
-    if (!player) { // 서버가 꽉찼다면
+    if (Player.MaxCount <= Player.Count) { // 서버가 꽉찼다면
         socket.emit("server full");
         socket.disconnect();
+        return;
     }
+    const player = new Player(socket.id); // 접속한 플레이어(세션) 마다 생성
     socket.emit('connected', player.id); // 연결 응답 신호 전송
     console.log('player connected: ', player.socketId, player.id);
 
@@ -116,8 +117,12 @@ io.on('connection', (socket) => {
             return;
         } // 2-2. 모든 조건을 확인 후 확정이 나면
 
-        player.update(playerName); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
+        if (Room.MaxCount <= Room.Count) { // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
+            callback({'status': 400, 'message': 'server full'});
+            return;
+        }
         const room = new Room(player, roomName, public, password);
+        player.update(playerName);
         socket.join(room.id); // 4. room 관련 처리하고 소켓신호 보내기
         callback({'status': 200, 'roomInfo': getRoomInfo(room)});
     })
@@ -165,8 +170,12 @@ io.on('connection', (socket) => {
 
         // 없다면 방 생성
         if (!player.room) {
-            player.update(playerName);
+            if (!room) {
+                callback({'status': 400, 'message': 'server full'});
+                return;
+            }
             const room = new Room(player);
+            player.update(playerName);
             socket.join(room.id);
             callback({'status': 200, 'roomInfo': getRoomInfo(room)});
         }
@@ -181,8 +190,8 @@ io.on('connection', (socket) => {
 
         const room = player.room;
         const result = player.leaveRoom();
-        if (result === 'no join room') {
-            callback({'status': 400, 'message': 'no join room'});
+        if (result === 'must join room') {
+            callback({'status': 400, 'message': result});
             return;
         }
         callback({'status': 200});
