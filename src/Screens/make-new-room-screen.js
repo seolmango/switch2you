@@ -84,6 +84,27 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                 makeNewRoomScreen.password_checkbox.hide(Screen.activatedHtmlElement);
                 Screen.currentScreen = joiningRoomScreen;
                 Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+                Screen.socket.emit('create room', makeNewRoomScreen.nickname_input.get_value(), makeNewRoomScreen.roomname_input.get_value(), makeNewRoomScreen.visibility_checkbox.get_value(), (makeNewRoomScreen.password_checkbox.get_value()) ? makeNewRoomScreen.password_input.get_value() : false, (callback) => {
+                    if(callback.status === 200){
+                        console.log(callback.roomInfo);
+                    }else{
+                        if(callback.message === 'server full'){
+                            Screen.alert.data.push({
+                                tag: 'serverfull',
+                                text: 'Server is full',
+                                time: 150
+                            })
+                        }else{
+                            Screen.alert.data.push({
+                                tag: 'servererror',
+                                text: callback.message,
+                                time: 150
+                            })
+                        }
+                        Screen.currentScreen = viewServerListScreen;
+                        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+                    }
+                });
             }
         },
         clickable: -1
