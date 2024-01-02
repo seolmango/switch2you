@@ -95,9 +95,14 @@ io.on('connection', (socket) => {
 
         const showNum = 4; // test용. page당 보여지는 방의 개수
         const roomList = Object.values(Room.Publics);
+        const maxPage = Math.ceil(roomList.length / showNum);
+        if (page > maxPage) {
+            callback({'status': 400, 'message': 'no page'});
+            return;
+        }
         let maxIndex = page * 4;
         if (page * 4 > roomList.length) maxIndex = roomList.length;
-        callback({'status': 200, 'maxPage': Math.ceil(roomList.length / showNum), 'roomInfos': getRoomInfo(Object.values(Room.Publics).slice(page * 4 - 4, maxIndex))});
+        callback({'status': 200, 'maxPage': maxPage, 'roomInfos': getRoomInfo(Object.values(Room.Publics).slice(page * 4 - 4, maxIndex))});
     })
 
 
