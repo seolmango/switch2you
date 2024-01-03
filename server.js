@@ -124,8 +124,8 @@ io.on('connection', (socket) => {
             callback({'status': 400, 'message': 'server full'});
             return;
         }
-        const room = new Room(player, roomName, public, password); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
         player.update(playerName);
+        const room = new Room(player, roomName, public, password); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
         socket.join(room.id); // 4. room 관련 처리하고 소켓신호 보내기
         callback({'status': 200, 'roomInfo': getRoomInfo(room)});
     })
@@ -177,8 +177,8 @@ io.on('connection', (socket) => {
                 callback({'status': 400, 'message': 'server full'});
                 return;
             }
-            const room = new Room(player);
             player.update(playerName);
+            const room = new Room(player);
             socket.join(room.id);
             callback({'status': 200, 'roomInfo': getRoomInfo(room)});
         }
