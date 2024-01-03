@@ -49,7 +49,7 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                         if(!makeNewRoomScreen.nickname_input.check(makeNewRoomScreen.nickname_input.get_value())){
                             alert_text = 'nickname must be 1~15 characters';
                         }else if(!makeNewRoomScreen.roomname_input.check(makeNewRoomScreen.roomname_input.get_value())){
-                            alert_text = 'room name must be 1~20 characters';
+                            alert_text = 'room name must be 1~10 characters';
                         }else if(makeNewRoomScreen.password_checkbox.get_value() && !makeNewRoomScreen.password_input.check(makeNewRoomScreen.password_input.get_value())){
                             alert_text = 'password must be 1~10 characters';
                         }else{
@@ -128,7 +128,7 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     makeNewRoomScreen.nickname_input.show(Screen.activatedHtmlElement);
     makeNewRoomScreen.nickname_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
     makeNewRoomScreen.roomname_input = new textInputElement('room_name_input', 1360, 444, 700, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
-        if(value.length > 0 && value.length < 20){
+        if(value.length > 0 && value.length < 11){
             return true;
         }else{
             return false;
