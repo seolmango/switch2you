@@ -24,21 +24,7 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 120,
         clicked: function () {
             if(Screen.currentScreen.checkUIList[0].clickable === -1){
-                let alreadyExist = false;
-                for(let i = 0; i<Screen.alert.data.length; i++){
-                    if(Screen.alert.data[i].tag === 'yetfinishform'){
-                        alreadyExist = true;
-                        let alert_text = 'password must be 1~10 characters';
-                        Screen.alert.data[i].text = alert_text;
-                        Screen.alert.data[i].time = 150;
-                    }else{
-                        Screen.alert.data.push({
-                            tag: 'yetfinishform',
-                            text: 'password must be 1~10 characters',
-                            time: 150,
-                        });
-                    }
-                }
+                Screen.alert.add_Data('yetfromfinish', 'password must be 1~10 characters', 5)
             }else{
                 needPasswordInputScreen.password_input.hide(Screen.activatedHtmlElement);
                 Screen.currentScreen = joiningRoomScreen;
@@ -49,11 +35,7 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                         console.log(callback.playerInfos);
                     }else{
                         if(callback.message === 'wrong password'){
-                            Screen.alert.data.push({
-                                tag: 'wrong-password',
-                                text: 'wrong password',
-                                time: 150,
-                            })
+                            Screen.alert.add_Data('wrongpassword', 'Wrong Password', 5);
                         }
                         Screen.currentScreen = needPasswordInputScreen;
                         Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);

@@ -38,37 +38,15 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 120,
         clicked: function () {
             if(Screen.currentScreen.checkUIList[1].clickable === -1){
-                let alreadyExist = false;
-                for(let i=0; i<Screen.alert.data.length; i++){
-                    if(Screen.alert.data[i].tag === 'yetfinishform') {
-                        alreadyExist = true;
-                        let alert_text = '';
-                        if(!joinRoomWithIdScreen.nickname_input.check(joinRoomWithIdScreen.nickname_input.get_value())){
-                            alert_text = 'nickname must be 1~15 characters';
-                        }else if(!joinRoomWithIdScreen.room_id_input.check(joinRoomWithIdScreen.room_id_input.get_value())){
-                            alert_text = 'room id must be 8 characters';
-                        }else{
-                            alert_text = 'Something went wrong with your client';
-                        }
-                        Screen.alert.data[i].time = 150;
-                        Screen.alert.data[i].text = alert_text;
-                    }
+                let alert_text = '';
+                if(!joinRoomWithIdScreen.nickname_input.check(joinRoomWithIdScreen.nickname_input.get_value())){
+                    alert_text = 'nickname must be 1~15 characters';
+                }else if(!joinRoomWithIdScreen.room_id_input.check(joinRoomWithIdScreen.room_id_input.get_value())){
+                    alert_text = 'room id must be 8 characters';
+                }else{
+                    alert_text = 'Something went wrong with your client';
                 }
-                if(!alreadyExist) {
-                    let alert_text = '';
-                    if(!joinRoomWithIdScreen.nickname_input.check(joinRoomWithIdScreen.nickname_input.get_value())){
-                        alert_text = 'nickname must be 1~15 characters';
-                    }else if(!joinRoomWithIdScreen.room_id_input.check(joinRoomWithIdScreen.room_id_input.get_value())){
-                        alert_text = 'room id must be 8 characters';
-                    }else{
-                        alert_text = 'Something went wrong with your client';
-                    }
-                    Screen.alert.data.push({
-                        tag: 'yetfinishform',
-                        text: alert_text,
-                        time: 150
-                    });
-                }
+                Screen.alert.add_Data('yetfromfinish', alert_text, 5)
             }else{
                 joinRoomWithIdScreen.nickname_input.hide(Screen.activatedHtmlElement);
                 joinRoomWithIdScreen.room_id_input.hide(Screen.activatedHtmlElement);
@@ -83,11 +61,7 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                             Screen.currentScreen = needPasswordInputScreen;
                             Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                         }else{
-                            Screen.alert.data.push({
-                                tag: 'notexistroom',
-                                text: 'room not exist',
-                                time: 150,
-                            })
+                            Screen.alert.add_Data('notexistroom', 'Room not exist', 5);
                             Screen.currentScreen = joinRoomWithIdScreen;
                             Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                         }

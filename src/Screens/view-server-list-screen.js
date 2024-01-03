@@ -37,20 +37,7 @@ viewServerListScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 96,
         clicked: function () {
             if(Screen.currentScreen.checkUIList[1].clickable !== 0){
-                let alreadyExist = false;
-                for(let i=0; i<Screen.alert.data.length; i++){
-                    if(Screen.alert.data[i].tag === 'refreshcooldown') {
-                        alreadyExist = true;
-                        Screen.alert.data[i].time = 150;
-                    }
-                }
-                if(!alreadyExist) {
-                    Screen.alert.data.push({
-                        tag: 'refreshcooldown',
-                        text: 'Please wait',
-                        time: 150
-                    });
-                }
+                Screen.alert.add_Data('cooldown', 'try again after 10 seconds', 5);
             }
         },
         clickable: 300

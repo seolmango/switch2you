@@ -47,6 +47,24 @@ Screen.alert.draw = function() {
         }
     }
 };
+Screen.alert.add_Data = function (tag, text, time){
+    let alreadyExist = false;
+    for(let i=0; i<Screen.alert.data.length; i++){
+        if(Screen.alert.data[i].tag === tag){
+            alreadyExist = true;
+            Screen.alert.data[i].text = text;
+            Screen.alert.data[i].time = time * 30;
+            break;
+        }
+    }
+    if(!alreadyExist){
+        Screen.alert.data.push({
+            tag: tag,
+            text: text,
+            time: time * 30,
+        });
+    }
+}
 Screen.activatedHtmlElement = [];
 Screen.Settings = {
     Sound: {
