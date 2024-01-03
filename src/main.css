@@ -9,9 +9,39 @@ canvas {
     transform: translate(-50%, -50%);
 }
 
+#background {
+    z-index: -1;
+}
+
+#ui {
+    z-index: 1;
+}
+
 @font-face {
     font-family: 'GmarketSansMedium';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+}
+
+input[type="text"], input[type="password"] {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    position: absolute;
+    text-align: center;
+    display: none;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    outline: none;
+}
+
+input[type="checkbox"] {
+    display: none;
+    position: absolute;
+}
+
+#bgm-container{
+    display: none;
 }

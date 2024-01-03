@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "build": "webpack --watch",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "prod": "webpack --mode production"
   },
   "author": "0-inf",
   "license": "MIT",

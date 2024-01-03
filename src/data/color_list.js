@@ -59,7 +59,8 @@ const Color_list = {
     'block_rgb': [193, 193, 193],
     'text_default_hex': '#414141',
     'text_default_rgb': [65, 65, 65],
-    'text_onmouse_hex': '#FFFFFF'
+    'text_onmouse_hex': '#FFFFFF',
+    "text_onmouse_rgb": [255, 255, 255]
 };
 
 export { Color_list };
