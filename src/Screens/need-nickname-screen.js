@@ -23,21 +23,7 @@ needNicknameScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 120,
         clicked: function () {
             if(Screen.currentScreen.checkUIList[0].clickable === -1){
-                let alreadyExist = false;
-                for(let i = 0; i<Screen.alert.data.length; i++){
-                    if(Screen.alert.data[i].tag === 'yetfinishform'){
-                        alreadyExist = true;
-                        let alert_text = 'nickname must be 1~15 characters';
-                        Screen.alert.data[i].text = alert_text;
-                        Screen.alert.data[i].time = 150;
-                    }else{
-                        Screen.alert.data.push({
-                            tag: 'yetfinishform',
-                            text: 'nickname must be 1~15 characters',
-                            time: 150,
-                        });
-                    }
-                }
+                Screen.alert.add_Data('yetfromfinish', 'nickname must be 1~15 characters', 5)
             }else{
                 needNicknameScreen.nickname_input.hide(Screen.activatedHtmlElement);
                 Screen.currentScreen = joiningRoomScreen;
@@ -47,11 +33,7 @@ needNicknameScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                         console.log(callback.roomInfo);
                         console.log(callback.playerInfos);
                     }else{
-                        Screen.alert.data.push({
-                            tag: 'joinroomfail',
-                            text: callback.message,
-                            time: 150,
-                        });
+                        Screen.alert.add_Data('somethingwrong', 'Something went wrong with your client', 5)
                         Screen.currentScreen = viewServerListScreen;
                         Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                     }

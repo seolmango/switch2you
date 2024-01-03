@@ -89,17 +89,9 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                         console.log(callback.roomInfo);
                     }else{
                         if(callback.message === 'server full'){
-                            Screen.alert.data.push({
-                                tag: 'serverfull',
-                                text: 'Server is full',
-                                time: 150
-                            })
+                            Screen.alert.add_Data('serverfull', 'Server is full', 5);
                         }else{
-                            Screen.alert.data.push({
-                                tag: 'servererror',
-                                text: callback.message,
-                                time: 150
-                            })
+                            Screen.alert.add_Data('somethingwrong', 'Something went wrong with your client', 5);
                         }
                         Screen.currentScreen = viewServerListScreen;
                         Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);

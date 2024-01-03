@@ -61,8 +61,8 @@ howToPlayScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
             let activate = getActivate((howToPlayScreen.dragScreen_delta_queue_going === null) ? howToPlayScreen.dragScreen_delta : howToPlayScreen.dragScreen_delta_queue_going);
             activate = Math.max(1, Math.floor(activate-1));
             let need_delta = (-550 + (550 * (activate-1))) - ((howToPlayScreen.dragScreen_delta_queue_going === null) ? howToPlayScreen.dragScreen_delta : howToPlayScreen.dragScreen_delta_queue_going);
-            for(let i=0; i<20; i++){
-                howToPlayScreen.dragScreen_delta_queue.push(need_delta/20);
+            for(let i=0; i<(Screen.Settings.Display.fps / 1.5); i++){
+                howToPlayScreen.dragScreen_delta_queue.push(need_delta/(Screen.Settings.Display.fps / 1.5));
             }
             howToPlayScreen.dragScreen_delta_queue_going = (-550 + (550 * (activate-1)));
         }
@@ -77,8 +77,8 @@ howToPlayScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
             let activate = getActivate((howToPlayScreen.dragScreen_delta_queue_going === null) ? howToPlayScreen.dragScreen_delta : howToPlayScreen.dragScreen_delta_queue_going);
             activate = Math.min(5, Math.ceil(activate+1));
             let need_delta = (-550 + (550 * (activate-1))) - ((howToPlayScreen.dragScreen_delta_queue_going === null) ? howToPlayScreen.dragScreen_delta : howToPlayScreen.dragScreen_delta_queue_going);
-            for(let i=0; i<20; i++){
-                howToPlayScreen.dragScreen_delta_queue.push(need_delta/20);
+            for(let i=0; i<(Screen.Settings.Display.fps / 1.5); i++){
+                howToPlayScreen.dragScreen_delta_queue.push(need_delta/(Screen.Settings.Display.fps / 1.5));
             }
             howToPlayScreen.dragScreen_delta_queue_going = (-550 + (550 * (activate-1)));
         }

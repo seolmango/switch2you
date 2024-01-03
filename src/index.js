@@ -36,7 +36,7 @@ Screen.alert = {};
 Screen.alert.data = [];
 Screen.alert.draw = function() {
     for(let i=0; i<Screen.alert.data.length; i++){
-        let color_alpha = (Screen.alert.data[i].time === -1) ? 0.8 : Math.min(0.8, (Screen.alert.data[i].time / 30) * 0.8);
+        let color_alpha = (Screen.alert.data[i].time === -1) ? 0.8 : Math.min(0.8, (Screen.alert.data[i].time / Screen.Settings.Display.fps) * 0.8);
         drawRoundBox(UI_ctx, 960, (i*150) + 70, 1600, 120, `rgba(${Color_list.button_gray_2_rgb[0]}, ${Color_list.button_gray_2_rgb[1]}, ${Color_list.button_gray_2_rgb[2]}, ${color_alpha})`, `rgba(${Color_list.button_gray_3_rgb[0]}, ${Color_list.button_gray_3_rgb[1]}, ${Color_list.button_gray_3_rgb[2]}, ${color_alpha})`, 10, 25);
         drawText(UI_ctx, 960, (i*150) + 70, 60, 0, `rgba(${Color_list.text_onmouse_rgb[0]}, ${Color_list.text_onmouse_rgb[1]}, ${Color_list.text_onmouse_rgb[2]}, ${color_alpha})`, undefined, undefined, Screen.alert.data[i].text, "center", "GmarketSansMedium");
         if(Screen.alert.data[i].time > 0){
@@ -47,11 +47,32 @@ Screen.alert.draw = function() {
         }
     }
 };
+Screen.alert.add_Data = function (tag, text, time){
+    let alreadyExist = false;
+    for(let i=0; i<Screen.alert.data.length; i++){
+        if(Screen.alert.data[i].tag === tag){
+            alreadyExist = true;
+            Screen.alert.data[i].text = text;
+            Screen.alert.data[i].time = time * Screen.Settings.Display.fps;
+            break;
+        }
+    }
+    if(!alreadyExist){
+        Screen.alert.data.push({
+            tag: tag,
+            text: text,
+            time: time * Screen.Settings.Display.fps,
+        });
+    }
+}
 Screen.activatedHtmlElement = [];
 Screen.Settings = {
     Sound: {
         BGM: 100,
     },
+    Display: {
+        fps: 60,
+    }
 }
 
 // Set Screen Rendering Loop
@@ -59,11 +80,11 @@ window.onload = function () {
     Screen.currentScreen = agreementSoundScreen;
     Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
     canvasResize();
-    setInterval( function () {
-        Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
-        Screen.alert.draw();
-        Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
-    }, (1000 / 30));
+    Screen.display_interval = setInterval( function () {
+            Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
+            Screen.alert.draw();
+            Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
+        }, (1000 / Screen.Settings.Display.fps));
 }
 
 

@@ -48,7 +48,7 @@ settingScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 400,
         height: 120,
         clicked: function () {
-            settingScreen.page = "Graphics";
+            settingScreen.page = "Display";
         }
     });
     settingScreen.checkUIList.push({
@@ -65,8 +65,56 @@ settingScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
             }
         }
     });
+    settingScreen.checkUIList.push({
+        tag: 'setting-screen-fps-slider',
+        center_x: 960,
+        center_y: 400,
+        width: 1250,
+        height: 100,
+        clicked: function () {
+            if(settingScreen.page === 'Display') {
+                settingScreen.new[0] = Math.round((Screen.userMouse.x - 960 + 600) / 1200 * 270 + 30);
+                settingScreen.new[0] = Math.max(30, settingScreen.new[0]);
+                settingScreen.new[0] = Math.min(300, settingScreen.new[0]);
+            }
+        }
+    })
+    settingScreen.checkUIList.push({
+        tag: 'setting-screen-fps-submit',
+        center_x: 1200,
+        center_y: 300,
+        width: 80,
+        height: 80,
+        clicked: function () {
+            if(settingScreen.page === 'Display') {
+                Screen.Settings.Display.fps = settingScreen.new[0];
+                clearInterval(Screen.display_interval)
+                Screen.display_interval = setInterval( function () {
+                    Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
+                    Screen.alert.draw();
+                    Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
+                }, (1000 / Screen.Settings.Display.fps));
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+                Screen.currentScreen.page = 'Display';
+            }
+        }
+    })
+    settingScreen.checkUIList.push({
+        tag: 'setting-screen-fps-reset',
+        center_x: 1310,
+        center_y: 300,
+        width: 80,
+        height: 80,
+        clicked: function () {
+            if(settingScreen.page === 'Display') {
+                settingScreen.new[0] = settingScreen.before[0];
+            }
+        }
+    })
     settingScreen.page = 'Sound';
     settingScreen.settings = Screen.Settings;
+    settingScreen.before = [Screen.Settings.Display.fps];
+    settingScreen.new = [Screen.Settings.Display.fps];
 }
 
 settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
@@ -94,10 +142,10 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     }
     if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1600, 990, 400, 120)){
         drawRoundBox(UI_ctx, 1600,990, 400*1.05, 120*1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10*1.05, 25*1.05);
-        drawText(UI_ctx, 1600,990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Graphics", "center", "GmarketSansMedium");
+        drawText(UI_ctx, 1600,990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Display", "center", "GmarketSansMedium");
     }else{
         drawRoundBox(UI_ctx, 1600,990, 400, 120, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
-        drawText(UI_ctx, 1600,990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Graphics", "center", "GmarketSansMedium");
+        drawText(UI_ctx, 1600,990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Display", "center", "GmarketSansMedium");
     }
     if(settingScreen.page === 'Sound'){
         drawText(UI_ctx, 960, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "Sound", "center", "GmarketSansMedium");
@@ -128,7 +176,45 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     }else if(settingScreen.page === 'Game'){
         drawText(UI_ctx, 960, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "Game", "center", "GmarketSansMedium");
     }else{
-        drawText(UI_ctx, 960, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "Graphics", "center", "GmarketSansMedium");
+        drawText(UI_ctx, 960, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "Display", "center", "GmarketSansMedium");
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1200, 300, 80, 80)){
+            drawRoundBox(UI_ctx, 1200, 300, 80*1.05, 80*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
+            drawText(UI_ctx, 1200, 300, 50*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "✔", "center", "GmarketSansMedium");
+        }else{
+            drawRoundBox(UI_ctx, 1200, 300, 80, 80, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+            drawText(UI_ctx, 1200, 300, 50, 0, Color_list.text_default_hex, undefined, undefined, "✔", "center", "GmarketSansMedium");
+        }
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1310, 300, 80, 80)){
+            drawRoundBox(UI_ctx, 1310, 300, 80*1.05, 80*1.05, Color_list.button_red_2_hex, Color_list.button_red_3_hex, 10*1.05, 25*1.05);
+            drawText(UI_ctx, 1310, 300, 50*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "↺", "center", "GmarketSansMedium");
+        }else{
+            drawRoundBox(UI_ctx, 1310, 300, 80, 80, Color_list.button_red_1_hex, Color_list.button_red_2_hex, 10, 25);
+            drawText(UI_ctx, 1310, 300, 50, 0, Color_list.text_default_hex, undefined, undefined, "↺", "center", "GmarketSansMedium");
+        }
+        drawText(UI_ctx, 960, 300, 60, 0, (settingScreen.before[0] === settingScreen.new[0]) ? Color_list.text_default_hex : Color_list.button_blue_2_hex, undefined, undefined, `FPS : ${settingScreen.new[0]}`, "center", "GmarketSansMedium");
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 400, 1400, 100)){
+            drawRangeSlider(UI_ctx, 960, 400, {
+                lenght: 1200,
+                color: Color_list.button_gray_2_hex,
+                width: 10,
+            }, {
+                radius: 40,
+                color: Color_list.button_gray_2_hex,
+                stroke_color: Color_list.button_gray_3_hex,
+                stroke_width: 10,
+            }, 30, 300, settingScreen.new[0]);
+        }else {
+            drawRangeSlider(UI_ctx, 960, 400, {
+                lenght: 1200,
+                color: Color_list.button_gray_2_hex,
+                width: 10,
+            }, {
+                radius: 30,
+                color: Color_list.button_gray_2_hex,
+                stroke_color: Color_list.button_gray_3_hex,
+                stroke_width: 10,
+            }, 30, 300, settingScreen.new[0]);
+        }
     }
 }
 
@@ -150,6 +236,7 @@ settingScreen.check = function (userMouse, userKeyboard, checkUIList) {
     if(userMouse.press === true) {
         if(checkTouch(userMouse.x, userMouse.y, 960, 400, 1400, 100)){
             checkUIList[4].clicked();
+            checkUIList[5].clicked();
         }
     }
     BGM_Player.setVolume(settingScreen.settings.Sound.BGM);
