@@ -40,7 +40,7 @@ viewServerListScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                 Screen.alert.add_Data('cooldown', 'try again after 10 seconds', 5);
             }
         },
-        clickable: 300
+        clickable: 10 * Screen.Settings.Display.fps
     });
     viewServerListScreen.checkUIList.push({
         tag: "view-server-list-screen-make-new-room",
