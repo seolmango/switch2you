@@ -33,6 +33,8 @@ class Room {
         else this.name = owner.name + '의 방';
         owner.room = this;
         owner.role = 'owner';
+        owner.number = 1;
+        this.numbers = [0, 1, 1, 1, 1, 1, 1, 1]; // 안 쓴 번호들
     }
 
     get id() {
