@@ -118,13 +118,13 @@ io.on('connection', (socket) => {
         } else if (player.room) {
             callback({'status': 400, 'message': 'already join room'});
             return;
-        } // 2-2. 모든 조건을 확인 후 확정이 나면
+        }
 
-        if (Room.MaxCount <= Room.Count) { // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
+        if (Room.MaxCount <= Room.Count) { // 2-2. 모든 조건을 확인 후 확정이 나면
             callback({'status': 400, 'message': 'server full'});
             return;
         }
-        const room = new Room(player, roomName, public, password);
+        const room = new Room(player, roomName, public, password); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
         player.update(playerName);
         socket.join(room.id); // 4. room 관련 처리하고 소켓신호 보내기
         callback({'status': 200, 'roomInfo': getRoomInfo(room)});
@@ -173,7 +173,7 @@ io.on('connection', (socket) => {
 
         // 없다면 방 생성
         if (!player.room) {
-            if (!room) {
+            if (Room.MaxCount <= Room.Count) {
                 callback({'status': 400, 'message': 'server full'});
                 return;
             }
