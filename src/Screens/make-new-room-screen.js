@@ -7,6 +7,7 @@ import {viewServerListScreen} from "./view-server-list-screen";
 import {textInputElement} from "./tools/textInputElement";
 import {checkboxElement} from "./tools/checkboxElement";
 import {joiningRoomScreen} from "./joining-room-screen";
+import {waitingRoomScreen} from "./waiting-room-screen";
 
 let make_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let make_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
@@ -86,7 +87,14 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                 Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                 Screen.socket.emit('create room', makeNewRoomScreen.nickname_input.get_value(), makeNewRoomScreen.roomname_input.get_value(), makeNewRoomScreen.visibility_checkbox.get_value(), (makeNewRoomScreen.password_checkbox.get_value()) ? makeNewRoomScreen.password_input.get_value() : false, (callback) => {
                     if(callback.status === 200){
-                        console.log(callback.roomInfo);
+                        Screen.gameroomInfo = callback.roomInfo;
+                        Screen.gameroomPlayerInfo = [{
+                            id: Screen.ClientId,
+                            name: makeNewRoomScreen.nickname_input.get_value(),
+                            role: 'owner'
+                        }]
+                        Screen.currentScreen = waitingRoomScreen;
+                        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                     }else{
                         if(callback.message === 'server full'){
                             Screen.alert.add_Data('serverfull', 'Server is full', 5);

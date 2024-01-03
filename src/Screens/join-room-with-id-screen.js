@@ -7,6 +7,7 @@ import {checkTouch} from "./tools/checkTouch";
 import {textInputElement} from "./tools/textInputElement";
 import {joiningRoomScreen} from "./joining-room-screen";
 import {needPasswordInputScreen} from "./need-password-input-screen";
+import {waitingRoomScreen} from "./waiting-room-screen";
 
 let join_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let join_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
@@ -54,8 +55,10 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                 Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                 Screen.socket.emit('join room', joinRoomWithIdScreen.nickname_input.get_value(), joinRoomWithIdScreen.room_id_input.get_value(), false, (callback) => {
                     if(callback.status === 200){
-                        console.log(callback.roomInfo);
-                        console.log(callback.playerInfos);
+                        Screen.gameroomInfo = callback.roomInfo;
+                        Screen.playerInfos = callback.playerInfos;
+                        Screen.currentScreen = waitingRoomScreen;
+                        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                     }else{
                         if(callback.message === 'must have password') {
                             Screen.currentScreen = needPasswordInputScreen;

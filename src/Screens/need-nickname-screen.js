@@ -6,6 +6,7 @@ import {Color_list} from "../data/color_list";
 import {textInputElement} from "./tools/textInputElement";
 import {viewServerListScreen} from "./view-server-list-screen";
 import {joiningRoomScreen} from "./joining-room-screen";
+import {waitingRoomScreen} from "./waiting-room-screen";
 
 let blue_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let blue_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
@@ -30,8 +31,10 @@ needNicknameScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                 Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                 Screen.socket.emit('join random room', needNicknameScreen.nickname_input.get_value(), (callback) => {
                     if(callback.status === 200){
-                        console.log(callback.roomInfo);
-                        console.log(callback.playerInfos);
+                        Screen.gameroomInfo = callback.roomInfo;
+                        Screen.playerInfos = callback.playerInfos;
+                        Screen.currentScreen = waitingRoomScreen;
+                        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                     }else{
                         Screen.alert.add_Data('somethingwrong', 'Something went wrong with your client', 5)
                         Screen.currentScreen = viewServerListScreen;

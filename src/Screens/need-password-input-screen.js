@@ -7,6 +7,7 @@ import {textInputElement} from "./tools/textInputElement";
 import {viewServerListScreen} from "./view-server-list-screen";
 import {joiningRoomScreen} from "./joining-room-screen";
 import {joinRoomWithIdScreen} from "./join-room-with-id-screen";
+import {waitingRoomScreen} from "./waiting-room-screen";
 
 let blue_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let blue_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
@@ -31,8 +32,10 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                 Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                 Screen.socket.emit('join room', joinRoomWithIdScreen.nickname_input.get_value(), joinRoomWithIdScreen.room_id_input.get_value(), needPasswordInputScreen.password_input.get_value(), (callback) => {
                     if(callback.status === 200){
-                        console.log(callback.roomInfo);
-                        console.log(callback.playerInfos);
+                        Screen.gameroomInfo = callback.roomInfo;
+                        Screen.playerInfos = callback.playerInfos;
+                        Screen.currentScreen = waitingRoomScreen;
+                        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                     }else{
                         if(callback.message === 'wrong password'){
                             Screen.alert.add_Data('wrongpassword', 'Wrong Password', 5);
