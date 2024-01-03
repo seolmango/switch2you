@@ -106,7 +106,7 @@ io.on('connection', (socket) => {
         }
         let maxIndex = page * showNum;
         if (page * showNum > roomList.length) maxIndex = roomList.length;
-        callback({'status': 200, 'maxPage': maxPage, 'roomInfos': getRoomInfo(roomList.slice(page * 4 - 4, maxIndex))});
+        callback({'status': 200, 'maxPage': maxPage, 'roomInfos': getRoomInfo(roomList.slice(page * showNum - showNum, maxIndex))});
     })
 
 
