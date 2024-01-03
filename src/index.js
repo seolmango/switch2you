@@ -71,7 +71,7 @@ Screen.Settings = {
         BGM: 100,
     },
     Display: {
-        fps: 100,
+        fps: 60,
     }
 }
 
