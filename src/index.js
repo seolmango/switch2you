@@ -70,7 +70,7 @@ Screen.alert.add_Data = function (tag, text, time){
 Screen.activatedHtmlElement = [];
 Screen.Settings = {
     Sound: {
-        BGM: 100,
+        BGM: 0,
     },
     Display: {
         fps: 60,
