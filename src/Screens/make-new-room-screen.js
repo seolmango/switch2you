@@ -89,10 +89,11 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                     if(callback.status === 200){
                         Screen.gameroomInfo = callback.roomInfo;
                         Screen.gameroomPlayerInfo = [{
-                            id: Screen.ClientId,
+                            number: 1,
                             name: makeNewRoomScreen.nickname_input.get_value(),
                             role: 'owner'
                         }]
+                        Screen.Client_room_id = 1;
                         Screen.currentScreen = waitingRoomScreen;
                         Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                     }else{

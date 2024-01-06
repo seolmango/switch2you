@@ -137,8 +137,7 @@ UI_canvas.addEventListener('touchend', function(e) {
 window.addEventListener("doSocketConnect", function () {
     Screen.socket = io();
 
-    Screen.socket.on('connected', function (ClientId) {
-        Screen.ClientId = ClientId;
+    Screen.socket.on('connected', function () {
         Screen.currentScreen = titleScreen;
         Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
     });
