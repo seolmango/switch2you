@@ -10,6 +10,8 @@ import {agreementSoundScreen} from "./Screens/agreement-sound-screen";
 import {tooManyUserScreen} from "./Screens/too-many-user-screen";
 import {Color_list} from "./data/color_list";
 import {drawText} from "./Screens/tools/drawText";
+import {waitingRoomScreen} from "./Screens/waiting-room-screen";
+import {viewServerListScreen} from "./Screens/view-server-list-screen";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -74,6 +76,7 @@ Screen.Settings = {
         fps: 60,
     }
 }
+Screen.join_room = false;
 
 // Set Screen Rendering Loop
 window.onload = function () {
@@ -145,6 +148,80 @@ window.addEventListener("doSocketConnect", function () {
     Screen.socket.on('server full', function () {
         Screen.currentScreen = tooManyUserScreen;
         Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+    })
+
+    Screen.socket.on('player joined', function (data) {
+        if(Screen.join_room){
+            waitingRoomScreen.playerInfos.push(data);
+            waitingRoomScreen.user_slot = [false, false, false, false, false, false, false, false, false];
+            for(let i = 0; i < waitingRoomScreen.playerInfos.length; i++){
+                waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
+            }
+            Screen.alert.add_Data("player joined", `${data.name} joined!`, 5);
+        }
+    })
+
+    Screen.socket.on('player leaved', function (player_num) {
+        if(Screen.join_room){
+            let player_index = -1;
+            for(let i=0; i<waitingRoomScreen.playerInfos.length; i++){
+                if(waitingRoomScreen.playerInfos[i].number === player_num){
+                    player_index = i;
+                    break;
+                }
+            }
+            if(player_index !== -1){
+                Screen.alert.add_Data("player leaved", `${waitingRoomScreen.playerInfos[player_index].name} leaved!`, 5);
+                waitingRoomScreen.playerInfos.splice(player_index, 1);
+                waitingRoomScreen.user_slot = [false, false, false, false, false, false, false, false, false];
+                for(let i = 0; i < waitingRoomScreen.playerInfos.length; i++) {
+                    waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
+                }
+            }
+        }
+    })
+
+    Screen.socket.on('owner changed', function (player_num) {
+        if(Screen.join_room){
+            waitingRoomScreen.playerInfos.forEach(function (player) {
+                if(player.number === player_num){
+                    player.role = 'owner';
+                } else {
+                    player.role = 'user';
+                }
+                if(player.number === waitingRoomScreen.Client_room_id){
+                    if(player.role === 'owner'){
+                        waitingRoomScreen.Client_owner = true;
+                    }else{
+                        waitingRoomScreen.Client_owner = false;
+                    }
+                }
+            })
+        }
+    })
+
+    Screen.socket.on('you kicked', function () {
+        Screen.alert.add_Data("you kicked", `You are kicked by owner!`, 5);
+        Screen.join_room = false;
+        Screen.currentScreen = viewServerListScreen;
+        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+    })
+
+    Screen.socket.on('player number changed', function (before, after) {
+        if(Screen.join_room){
+            waitingRoomScreen.playerInfos.forEach(function (player) {
+                if(player.number === before){
+                    player.number = after;
+                }
+            })
+            waitingRoomScreen.user_slot = [false, false, false, false, false, false, false, false, false];
+            for(let i = 0; i < waitingRoomScreen.playerInfos.length; i++) {
+                waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
+            }
+            if(before === waitingRoomScreen.Client_room_id){
+                waitingRoomScreen.Client_room_id = after;
+            }
+        }
     })
 });
 
