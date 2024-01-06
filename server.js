@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
         return;
     }
     const player = new Player(socket.id); // 접속한 플레이어(세션) 마다 생성
-    socket.emit('connected', player.id); // 연결 응답 신호 전송
+    socket.emit('connected'); // 연결 응답 신호 전송
     console.log('player connected: ', player.socketId, player.id);
 
 
@@ -77,9 +77,10 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         const room = player.room;
         if (room){
+            const number = player.number;
             const result = player.leaveRoom();
-            if (result) io.to(room.id).emit('owner changed', room.owner.id);
-            if (room.players.length > 0) io.to(room.id).emit('player leaved', player.id);
+            if (result) io.to(room.id).emit('owner changed', room.owner.number);
+            if (room.players.length > 0) io.to(room.id).emit('player leaved', number);
         }
         player.delete();
         socket.disconnect();
@@ -146,7 +147,7 @@ io.on('connection', (socket) => {
         player.update(playerName);
         socket.join(player.room.id);
         socket.to(player.room.id).emit('player joined', getPlayerInfo(player));
-        callback({'status': 200, 'roomInfo': getRoomInfo(player.room), 'playerInfos': getPlayerInfo(player.room.players)});
+        callback({'status': 200, 'roomInfo': getRoomInfo(player.room), 'playerInfos': getPlayerInfo(player.room.players), 'playerNumber': player.number});
     })
 
 
@@ -167,7 +168,7 @@ io.on('connection', (socket) => {
             player.joinRoom(room);
             socket.join(room.id);
             socket.to(room.id).emit('player joined', getPlayerInfo(player));
-            callback({'status': 200, 'roomInfo': getRoomInfo(player.room), 'playerInfos': getPlayerInfo(player.room.players)});
+            callback({'status': 200, 'roomInfo': getRoomInfo(player.room), 'playerInfos': getPlayerInfo(player.room.players), 'playerNumber': player.number});
             break;
         }
 
@@ -192,6 +193,7 @@ io.on('connection', (socket) => {
         }
 
         const room = player.room;
+        const number = player.number;
         const result = player.leaveRoom();
         if (result === 'must join room') {
             callback({'status': 400, 'message': result});
@@ -199,36 +201,36 @@ io.on('connection', (socket) => {
         }
         callback({'status': 200});
         socket.leave(room.id);
-        if (result) socket.to(room.id).emit('owner changed', room.owner.id); // 방장이 바뀌었다면
-        if (room.players.length > 0) socket.to(room.id).emit('player leaved', player.id); // 방에 사람이 남아 있다면
+        if (result) socket.to(room.id).emit('owner changed', room.owner.number); // 방장이 바뀌었다면
+        if (room.players.length > 0) socket.to(room.id).emit('player leaved', number); // 방에 사람이 남아 있다면
     })
 
 
     // 방장 이전. targetId는 방장이 이전될 플레이어의 id.
-    socket.on('change owner', (targetId, callback) => {
-        if (!checkData([targetId, 'int'], [callback, 'function'])) {
+    socket.on('change owner', (targetNumber, callback) => {
+        if (!checkData([targetNumber, 'int'], [callback, 'function'])) {
             if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
             return;
         }
 
-        const result = player.giveOwner(Player.Instances[targetId]);
+        const result = player.giveOwner(Player.Instances[player.room.numbers[targetNumber - 1]]);
         if (result) {
             callback({'status': 400, 'message': result});
             return;
         }
         callback({'status': 200});
-        io.to(player.room.id).emit('owner changed', targetId);
+        io.to(player.room.id).emit('owner changed', targetNumber);
     })
 
 
     // 강제 퇴장
-    socket.on('kick player', (targetId, callback) => {
-        if (!checkData([targetId, 'int'], [callback, 'function'])) {
+    socket.on('kick player', (targetNumber, callback) => {
+        if (!checkData([targetNumber, 'int'], [callback, 'function'])) {
             if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
             return;
         }
 
-        const target = Player.Instances[targetId];
+        const target = Player.Instances[player.room.numbers[targetNumber - 1]];
         const result = player.kickPlayer(target);
         if (result) {
             callback({'status': 400, 'message': result});
@@ -236,8 +238,26 @@ io.on('connection', (socket) => {
         }
         callback({'status': 200});
         io.sockets.sockets.get(target.socketId).leave(player.room.id);
-        io.to(player.room.id).emit('player leaved', targetId);
+        io.to(player.room.id).emit('player leaved', targetNumber);
         io.to(target.socketId).emit('you kicked');
+    })
+
+
+    // 플레이어 번호 변경
+    socket.on('change player number', (number, callback) => {
+        if (!checkData([number, 'int'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        }
+
+        const tempNumber = player.number;
+        const result = player.changeNumber(number);
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
+        callback({'status': 200});
+        io.to(player.room.id).emit('player number changed', tempNumber, number);
     })
 
 

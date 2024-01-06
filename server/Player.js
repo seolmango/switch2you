@@ -48,8 +48,8 @@ class Player {
 
         this.role = 'user';
         this.room = room;
-        this.number = room.numbers.indexOf(1) + 1;
-        room.numbers[this.number - 1] = 0;
+        this.number = room.numbers.indexOf(0) + 1;
+        room.numbers[this.number - 1] = this.id;
         room.players.push(this);
     }
 
@@ -58,7 +58,7 @@ class Player {
         if (!this.room) return 'must join room';
         
         this.room.players.splice(this.room.players.indexOf(this), 1);
-        this.room.numbers[this.number - 1] = 1;
+        this.room.numbers[this.number - 1] = 0;
         let ownerChange = false; // 추가 emit을 위해 필요함
         if (this.room.players.length < 1) this.room.delete(); // 참가 인원 없을시 방 삭제
         else if (this.role === 'owner') { // 나간 플레이어가 방장이라면 방장 이전
@@ -88,6 +88,16 @@ class Player {
         if (!target || this === target) return 'wrong player';
         if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
         target.leaveRoom();
+    }
+
+    // 번호 변경
+    changeNumber(number) {
+        if (!this.room) return 'must join room';
+        if (number < 1 || 8 < number) return 'wrong number';
+        if (this.room.numbers[number - 1]) return 'already exist number';
+        this.room.numbers[this.number - 1] = 0;
+        this.number = number;
+        this.room.numbers[number - 1] = this.id;
     }
 }
 
