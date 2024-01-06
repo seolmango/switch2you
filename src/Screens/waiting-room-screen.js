@@ -7,6 +7,10 @@ import {viewServerListScreen} from "./view-server-list-screen";
 import {drawCircle} from "./tools/drawCircle";
 import {drawLine} from "./tools/drawLine";
 
+let blue_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
+let blue_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
+let blue_text = `rgba(${Color_list.text_default_rgb[0]}, ${Color_list.text_default_rgb[1]}, ${Color_list.text_default_rgb[2]}, 0.5)`;
+
 waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     Screen.join_room = true;
     waitingRoomScreen.gameroomInfo = Screen.gameroomInfo;
@@ -204,19 +208,24 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 120,
         clicked: function () {
             if(waitingRoomScreen.user_slot[waitingRoomScreen.active_slot] === false && waitingRoomScreen.active_slot !== 0) {
-                Screen.socket.emit('change player number', waitingRoomScreen.active_slot, (callback) => {
-                    if (callback.status === 200) {
-
-                    }else{
-                        if(callback.message === 'already exist number'){
-                            Screen.alert.add_Data('client error', 'Someone already use that number', 5);
-                        }else{
-                            Screen.alert.add_Data('client error', 'Something went wrong', 5);
+                if(waitingRoomScreen.checkUIList[12].clickable > 0){
+                    Screen.alert.add_Data('cooldown', 'Please wait for cooldown', 5);
+                }else {
+                    Screen.socket.emit('change player number', waitingRoomScreen.active_slot, (callback) => {
+                        if (callback.status === 200) {
+                            waitingRoomScreen.checkUIList[12].clickable = 10 * Screen.Settings.Display.fps;
+                        } else {
+                            if (callback.message === 'already exist number') {
+                                Screen.alert.add_Data('client error', 'Someone already use that number', 5);
+                            } else {
+                                Screen.alert.add_Data('client error', 'Something went wrong', 5);
+                            }
                         }
-                    }
-                })
+                    })
+                }
             }
-        }
+        },
+        clickable: 10 * Screen.Settings.Display.fps
     })
     waitingRoomScreen.redrawBackground(Background_ctx);
 }
@@ -293,24 +302,34 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
                 drawText(UI_ctx, 1440, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Kick", "center", "GmarketSansMedium");
             }
         }else{
-            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 720, 120)) {
-                drawRoundBox(UI_ctx, 960, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
-                drawText(UI_ctx, 960, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
-            }else{
-                drawRoundBox(UI_ctx, 960, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
-                drawText(UI_ctx, 960, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
+            if(waitingRoomScreen.checkUIList[12].clickable > 0){
+                drawRoundBox(UI_ctx, 960, 990, 720, 120, blue_1, blue_2, 10, 25);
+                drawText(UI_ctx, 960, 990, 60, 0, blue_text, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
+            }else {
+                if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 720, 120)) {
+                    drawRoundBox(UI_ctx, 960, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
+                    drawText(UI_ctx, 960, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
+                } else {
+                    drawRoundBox(UI_ctx, 960, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+                    drawText(UI_ctx, 960, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
+                }
             }
         }
     }else{
         if(waitingRoomScreen.active_slot === 0){
 
         }else{
-            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 720, 120)) {
-                drawRoundBox(UI_ctx, 960, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
-                drawText(UI_ctx, 960, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
+            if(waitingRoomScreen.checkUIList[12].clickable > 0) {
+                drawRoundBox(UI_ctx, 960, 990, 720, 120, blue_1, blue_2, 10, 25);
+                drawText(UI_ctx, 960, 990, 60, 0, blue_text, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
             }else{
-                drawRoundBox(UI_ctx, 960, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
-                drawText(UI_ctx, 960, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
+                if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 720, 120)) {
+                    drawRoundBox(UI_ctx, 960, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
+                    drawText(UI_ctx, 960, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
+                } else {
+                    drawRoundBox(UI_ctx, 960, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+                    drawText(UI_ctx, 960, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
+                }
             }
         }
     }
@@ -334,6 +353,9 @@ waitingRoomScreen.check = function (userMouse, userKeyboard, checkUIList){
     }
     if(!waitingRoomScreen.touch_any_slot){
         waitingRoomScreen.active_slot = 0;
+    }
+    if(waitingRoomScreen.checkUIList[12].clickable > 0){
+        waitingRoomScreen.checkUIList[12].clickable -= 1;
     }
 }
 
