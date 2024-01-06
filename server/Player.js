@@ -22,6 +22,7 @@ class Player {
         this.room = null; // 참가한 방 객체
         this.name; // 유저 이름
         this.role; // 유저 역할
+        this.number; // 방에서 유저 번호
     }
 
     get id() {
@@ -47,6 +48,8 @@ class Player {
 
         this.role = 'user';
         this.room = room;
+        this.number = room.numbers.indexOf(1) + 1;
+        room.numbers[this.number - 1] = 0;
         room.players.push(this);
     }
 
@@ -55,6 +58,7 @@ class Player {
         if (!this.room) return 'must join room';
         
         this.room.players.splice(this.room.players.indexOf(this), 1);
+        this.room.numbers[this.number - 1] = 1;
         let ownerChange = false; // 추가 emit을 위해 필요함
         if (this.room.players.length < 1) this.room.delete(); // 참가 인원 없을시 방 삭제
         else if (this.role === 'owner') { // 나간 플레이어가 방장이라면 방장 이전
@@ -64,6 +68,7 @@ class Player {
         this.room = null;
         this.name = null;
         this.role = null;
+        this.number = null;
         return ownerChange;
     }
 
