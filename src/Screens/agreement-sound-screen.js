@@ -17,7 +17,7 @@ agreementSoundScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 150,
         clicked: function (){
             BGM_Player.play();
-            BGM_Player.setVolume(100);
+            BGM_Player.setVolume(Screen.Settings.Sound.BGM);
             Screen.currentScreen = connectingSocketScreen;
             Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         }
