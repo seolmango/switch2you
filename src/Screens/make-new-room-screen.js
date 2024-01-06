@@ -88,11 +88,11 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                 Screen.socket.emit('create room', makeNewRoomScreen.nickname_input.get_value(), makeNewRoomScreen.roomname_input.get_value(), makeNewRoomScreen.visibility_checkbox.get_value(), (makeNewRoomScreen.password_checkbox.get_value()) ? makeNewRoomScreen.password_input.get_value() : false, (callback) => {
                     if(callback.status === 200){
                         Screen.gameroomInfo = callback.roomInfo;
-                        Screen.gameroomPlayerInfo = [{
+                        Screen.playerInfos = [{
                             number: 1,
                             name: makeNewRoomScreen.nickname_input.get_value(),
                             role: 'owner'
-                        }]
+                        }];
                         Screen.Client_room_id = 1;
                         Screen.currentScreen = waitingRoomScreen;
                         Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
