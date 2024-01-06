@@ -63,7 +63,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 350,
         height: 350,
         clicked: function () {
-            if(waitingRoomScreen.user_slot[1] === false || waitingRoomScreen.Client_owner) {
+            if((waitingRoomScreen.user_slot[1] === false || waitingRoomScreen.Client_owner) && waitingRoomScreen.Client_room_id !== 1) {
                 waitingRoomScreen.active_slot = 1;
                 waitingRoomScreen.touch_any_slot = true;
             }
@@ -76,7 +76,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 350,
         height: 350,
         clicked: function () {
-            if(waitingRoomScreen.user_slot[2] === false || waitingRoomScreen.Client_owner) {
+            if((waitingRoomScreen.user_slot[2] === false || waitingRoomScreen.Client_owner) && waitingRoomScreen.Client_room_id !== 2) {
                 waitingRoomScreen.active_slot = 2;
                 waitingRoomScreen.touch_any_slot = true;
             }
@@ -89,7 +89,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 350,
         height: 350,
         clicked: function () {
-            if(waitingRoomScreen.user_slot[3] === false || waitingRoomScreen.Client_owner) {
+            if((waitingRoomScreen.user_slot[3] === false || waitingRoomScreen.Client_owner) && waitingRoomScreen.Client_room_id !== 3) {
                 waitingRoomScreen.active_slot = 3;
                 waitingRoomScreen.touch_any_slot = true;
             }
@@ -102,7 +102,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 350,
         height: 350,
         clicked: function () {
-            if(waitingRoomScreen.user_slot[4] === false || waitingRoomScreen.Client_owner) {
+            if((waitingRoomScreen.user_slot[4] === false || waitingRoomScreen.Client_owner) && waitingRoomScreen.Client_room_id !== 4) {
                 waitingRoomScreen.active_slot = 4;
                 waitingRoomScreen.touch_any_slot = true;
             }
@@ -115,7 +115,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 350,
         height: 350,
         clicked: function () {
-            if(waitingRoomScreen.user_slot[5] === false || waitingRoomScreen.Client_owner) {
+            if((waitingRoomScreen.user_slot[5] === false || waitingRoomScreen.Client_owner) && waitingRoomScreen.Client_room_id !== 5) {
                 waitingRoomScreen.active_slot = 5;
                 waitingRoomScreen.touch_any_slot = true;
             }
@@ -128,7 +128,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 350,
         height: 350,
         clicked: function () {
-            if(waitingRoomScreen.user_slot[6] === false || waitingRoomScreen.Client_owner) {
+            if((waitingRoomScreen.user_slot[6] === false || waitingRoomScreen.Client_owner) && waitingRoomScreen.Client_room_id !== 6) {
                 waitingRoomScreen.active_slot = 6;
                 waitingRoomScreen.touch_any_slot = true;
             }
@@ -141,7 +141,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 350,
         height: 350,
         clicked: function () {
-            if(waitingRoomScreen.user_slot[7] === false || waitingRoomScreen.Client_owner) {
+            if((waitingRoomScreen.user_slot[7] === false || waitingRoomScreen.Client_owner) && waitingRoomScreen.Client_room_id !== 7) {
                 waitingRoomScreen.active_slot = 7;
                 waitingRoomScreen.touch_any_slot = true;
             }
@@ -154,7 +154,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 350,
         height: 350,
         clicked: function () {
-            if(waitingRoomScreen.user_slot[8] === false || waitingRoomScreen.Client_owner) {
+            if((waitingRoomScreen.user_slot[8] === false || waitingRoomScreen.Client_owner) && waitingRoomScreen.Client_room_id !== 8) {
                 waitingRoomScreen.active_slot = 8;
                 waitingRoomScreen.touch_any_slot = true;
             }
@@ -222,7 +222,6 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
 }
 
 waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
-    console.log(waitingRoomScreen.Client_room_id);
     UI_ctx.clearRect(0, 0, 1920, 1080);
     if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 180, 72, 240, 96)) {
         drawRoundBox(UI_ctx, 180, 72, 240 * 1.05, 96 * 1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10 * 1.05, 25 * 1.05);
@@ -268,8 +267,10 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         if(waitingRoomScreen.user_slot[i] === false){
             if((checkTouch(Screen.userMouse.x, Screen.userMouse.y, center_x, center_y, 350, 350) && waitingRoomScreen.Client_room_id !== i) || waitingRoomScreen.active_slot === i) {
                 drawRoundBox(UI_ctx, center_x, center_y, 350 * 1.05, 350 * 1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10 * 1.05, 25 * 1.05);
+                drawText(UI_ctx, center_x-150, center_y-100, 100*1.05, 0, Color_list[`player_${i}_inside_hex`], Color_list[`player_${i}_outside_hex`], 5, `${i}`, "left", "GmarketSansMedium");
             }else{
                 drawRoundBox(UI_ctx, center_x, center_y, 350, 350, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
+                drawText(UI_ctx, center_x-150, center_y-100, 100, 0, Color_list[`player_${i}_inside_hex`], Color_list[`player_${i}_outside_hex`], 5, `${i}`, "left", "GmarketSansMedium");
             }
         }
     }
