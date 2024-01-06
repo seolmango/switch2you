@@ -41,7 +41,7 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
             if(Screen.currentScreen.checkUIList[1].clickable === -1){
                 let alert_text = '';
                 if(!joinRoomWithIdScreen.nickname_input.check(joinRoomWithIdScreen.nickname_input.get_value())){
-                    alert_text = 'nickname must be 1~15 characters';
+                    alert_text = 'nickname is too short or too long';
                 }else if(!joinRoomWithIdScreen.room_id_input.check(joinRoomWithIdScreen.room_id_input.get_value())){
                     alert_text = 'room id must be 8 characters';
                 }else{
@@ -90,10 +90,12 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         clickable: 0
     })
     joinRoomWithIdScreen.nickname_input = new textInputElement('user_name_input', 1360, 393, 700, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
-        if(value.length > 0 && value.length < 16){
-            return true;
-        }else{
+        Background_ctx.font = "40px GmarketSansMedium";
+        let text = Background_ctx.measureText(value);
+        if(text.width > 330 || text.width < 10 || text.fontBoundingBoxAscent - text.fontBoundingBoxDescent > 50){
             return false;
+        }else{
+            return true;
         }
     });
     joinRoomWithIdScreen.nickname_input.show(Screen.activatedHtmlElement);

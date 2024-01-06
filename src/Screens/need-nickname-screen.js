@@ -24,7 +24,7 @@ needNicknameScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 120,
         clicked: function () {
             if(Screen.currentScreen.checkUIList[0].clickable === -1){
-                Screen.alert.add_Data('yetfromfinish', 'nickname must be 1~15 characters', 5)
+                Screen.alert.add_Data('yetfromfinish', 'nickname is too short or long', 5)
             }else{
                 needNicknameScreen.nickname_input.hide(Screen.activatedHtmlElement);
                 Screen.currentScreen = joiningRoomScreen;
@@ -69,10 +69,12 @@ needNicknameScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         clickable: 0,
     });
     needNicknameScreen.nickname_input = new textInputElement('user_name_input', 1380, 520, 670, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
-        if(value.length > 0 && value.length < 16){
-            return true;
-        }else{
+        Background_ctx.font = "40px GmarketSansMedium";
+        let text = Background_ctx.measureText(value);
+        if(text.width > 330 || text.width < 10 || text.fontBoundingBoxAscent - text.fontBoundingBoxDescent > 50){
             return false;
+        }else{
+            return true;
         }
     })
     needNicknameScreen.nickname_input.show(Screen.activatedHtmlElement);
