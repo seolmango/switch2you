@@ -64,11 +64,13 @@ class JoystickController {
     activate() {
         this.joyStickCanvas.style.zIndex = 5;
         this.joyStickCanvas.style.display = "block";
+        this.active = true;
     }
 
     deactivate() {
         this.joyStickCanvas.style.zIndex = -5;
         this.joyStickCanvas.style.display = "none";
+        this.active = false;
     }
 
     draw() {

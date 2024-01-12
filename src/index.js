@@ -13,6 +13,7 @@ import {drawText} from "./Screens/tools/drawText";
 import {waitingRoomScreen} from "./Screens/waiting-room-screen";
 import {viewServerListScreen} from "./Screens/view-server-list-screen";
 import {JoystickController} from "./joystick/joystick";
+import {checkMobile} from "./Screens/tools/checkMobile";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -80,15 +81,19 @@ Screen.Settings = {
 Screen.join_room = false;
 Screen.joyStickCanvas = document.getElementById('joystick');
 Screen.joyStickController = new JoystickController('joystick');
-
+Screen.mobile = checkMobile();
 // Set Screen Rendering Loop
 window.onload = function () {
-    Screen.joyStickController.activate();
+    if(Screen.mobile){
+        Screen.joyStickController.activate();
+    }
     Screen.currentScreen = agreementSoundScreen;
     Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
     canvasResize();
     Screen.display_interval = setInterval( function () {
-        Screen.joyStickController.draw();
+        if(Screen.joyStickController.active) {
+            Screen.joyStickController.draw();
+        }
         Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
         Screen.alert.draw();
         Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList)
