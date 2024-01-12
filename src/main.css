@@ -2,7 +2,6 @@ canvas {
     display: block;
     margin: 0 auto;
     padding: 0;
-    border: 5px black solid;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -44,4 +43,13 @@ input[type="checkbox"] {
 
 #bgm-container{
     display: none;
+}
+
+body {
+    overflow: hidden;
+    height: 100%;
+}
+
+body * {
+    touch-action: none;
 }
