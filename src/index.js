@@ -95,6 +95,12 @@ window.onload = function () {
         Screen.alert.draw();
         Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList)
     }, (1000 / Screen.Settings.Display.fps));
+    if(Screen.mobile){
+        Screen.alert.add_Data("mobile", `The screen automatically fits!`, 5);
+    }
+    setTimeout(function () {
+        canvasResize();
+    }, 3000);
 }
 
 
