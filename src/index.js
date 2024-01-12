@@ -12,6 +12,7 @@ import {Color_list} from "./data/color_list";
 import {drawText} from "./Screens/tools/drawText";
 import {waitingRoomScreen} from "./Screens/waiting-room-screen";
 import {viewServerListScreen} from "./Screens/view-server-list-screen";
+import {JoystickController} from "./joystick/joystick";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -77,17 +78,21 @@ Screen.Settings = {
     }
 }
 Screen.join_room = false;
+Screen.joyStickCanvas = document.getElementById('joystick');
+Screen.joyStickController = new JoystickController('joystick');
 
 // Set Screen Rendering Loop
 window.onload = function () {
+    Screen.joyStickController.activate();
     Screen.currentScreen = agreementSoundScreen;
     Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
     canvasResize();
     Screen.display_interval = setInterval( function () {
-            Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
-            Screen.alert.draw();
-            Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
-        }, (1000 / Screen.Settings.Display.fps));
+        Screen.joyStickController.draw();
+        Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
+        Screen.alert.draw();
+        Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList)
+    }, (1000 / Screen.Settings.Display.fps));
 }
 
 
@@ -232,6 +237,8 @@ function canvasResize() {
     } else {
         Screen.scale = window.innerHeight / 1080 * 0.9;
     }
+    Screen.joyStickCanvas.width = window.innerWidth;
+    Screen.joyStickCanvas.height = window.innerHeight;
     Background_canvas.width = 1920 * Screen.scale;
     Background_canvas.height = 1080 * Screen.scale;
     UI_canvas.width = 1920 * Screen.scale;
