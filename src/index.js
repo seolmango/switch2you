@@ -84,9 +84,6 @@ Screen.joyStickController = new JoystickController('joystick');
 Screen.mobile = checkMobile();
 // Set Screen Rendering Loop
 window.onload = function () {
-    if(Screen.mobile){
-        Screen.joyStickController.activate();
-    }
     Screen.currentScreen = agreementSoundScreen;
     Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
     canvasResize();
