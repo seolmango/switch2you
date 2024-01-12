@@ -111,6 +111,45 @@ settingScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
             }
         }
     })
+    settingScreen.checkUIList.push({
+        tag: 'setting-screen-fullscreen',
+        center_x: 1360,
+        center_y: 500,
+        width: 720,
+        height: 100,
+        clicked: function () {
+            if(settingScreen.page === 'Display') {
+                let isInFullScreen = (document.fullscreenElement && true) || (document.webkitFullscreenElement && true) || (document.mozFullScreenElement && true) || (document.msFullscreenElement && true);
+                if(!isInFullScreen){
+                    const container = document.documentElement;
+                    if (container.requestFullscreen) {
+                        container.requestFullscreen();
+                    } else if (container.webkitRequestFullscreen) {
+                        container.webkitRequestFullscreen();
+                    } else if (container.mozRequestFullscreen) {
+                        container.mozRequestFullscreen();
+                    } else if (container.msRequestFullscreen) {
+                        container.msRequestFullscreen();
+                    } else {
+                        console.log("Fullscreen API is not supported.");
+                    }
+                }else {
+                    const container = document;
+                    if (container.exitFullscreen) {
+                        container.exitFullscreen();
+                    } else if (container.webkitCancelFullscreen) {
+                        container.webkitCancelFullscreen();
+                    } else if (container.mozCancelFullscreen) {
+                        container.mozCancelFullscreen();
+                    } else if (container.msExitFullscreen) {
+                        container.msExitFullscreen();
+                    } else {
+                        console.log("Fullscreen API is not supported.");
+                    }
+                }
+            }
+        }
+    })
     settingScreen.page = 'Sound';
     settingScreen.settings = Screen.Settings;
     settingScreen.before = [Screen.Settings.Display.fps];
@@ -214,6 +253,25 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
                 stroke_color: Color_list.button_gray_3_hex,
                 stroke_width: 10,
             }, 30, 300, settingScreen.new[0]);
+        }
+        drawText(UI_ctx, 200, 500, 60, 0, Color_list.text_default_hex, undefined, undefined, "Change Screen Mode > ", "left", "GmarketSansMedium")
+        let isInFullScreen = (document.fullscreenElement && true) || (document.webkitFullscreenElement && true) || (document.mozFullScreenElement && true) || (document.msFullscreenElement && true);
+        if(!isInFullScreen){
+            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1360, 500, 720, 100)){
+                drawRoundBox(UI_ctx, 1360, 500, 720*1.05, 100*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
+                drawText(UI_ctx, 1360, 500, 50*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Enter FullScreen", "center", "GmarketSansMedium");
+            }else{
+                drawRoundBox(UI_ctx, 1360, 500, 720, 100, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+                drawText(UI_ctx, 1360, 500, 50, 0, Color_list.text_default_hex, undefined, undefined, "Enter FullScreen", "center", "GmarketSansMedium");
+            }
+        }else{
+            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1360, 500, 720, 100)){
+                drawRoundBox(UI_ctx, 1360, 500, 720*1.05, 100*1.05, Color_list.button_red_2_hex, Color_list.button_red_3_hex, 10*1.05, 25*1.05);
+                drawText(UI_ctx, 1360, 500, 50*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Exit FullScreen", "center", "GmarketSansMedium");
+            }else{
+                drawRoundBox(UI_ctx, 1360, 500, 720, 100, Color_list.button_red_1_hex, Color_list.button_red_2_hex, 10, 25);
+                drawText(UI_ctx, 1360, 500, 50, 0, Color_list.text_default_hex, undefined, undefined, "Exit FullScreen", "center", "GmarketSansMedium");
+            }
         }
     }
 }
