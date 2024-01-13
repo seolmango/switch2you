@@ -97,6 +97,7 @@ window.onload = function () {
     }, (1000 / Screen.Settings.Display.fps));
     if(Screen.mobile){
         Screen.alert.add_Data("mobile", `The screen automatically fits!`, 5);
+        Screen.alert.add_Data('debug', `{width: ${window.innerWidth}, height: ${window.innerHeight}, ${window.devicePixelRatio}}`, 5)
     }
     setTimeout(function () {
         canvasResize();
@@ -247,6 +248,9 @@ function canvasResize() {
     }
     Screen.joyStickCanvas.width = window.innerWidth;
     Screen.joyStickCanvas.height = window.innerHeight;
+    Screen.joyStickCanvas.style.top = '50%';
+    Screen.joyStickCanvas.style.left = '50%';
+    Screen.joyStickCanvas.style.transform = 'translate(-50%, -50%)';
     Background_canvas.width = 1920 * Screen.scale;
     Background_canvas.height = 1080 * Screen.scale;
     UI_canvas.width = 1920 * Screen.scale;
