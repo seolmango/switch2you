@@ -42,41 +42,17 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 120,
         clicked: function () {
             if(Screen.currentScreen.checkUIList[1].clickable === -1){
-                let alreadyExist = false;
-                for(let i=0; i<Screen.alert.data.length; i++){
-                    if(Screen.alert.data[i].tag === 'yetfinishform') {
-                        alreadyExist = true;
-                        let alert_text = '';
-                        if(!makeNewRoomScreen.nickname_input.check(makeNewRoomScreen.nickname_input.get_value())){
-                            alert_text = 'nickname is too short or too long';
-                        }else if(!makeNewRoomScreen.roomname_input.check(makeNewRoomScreen.roomname_input.get_value())){
-                            alert_text = 'room name must be 1~10 characters';
-                        }else if(makeNewRoomScreen.password_checkbox.get_value() && !makeNewRoomScreen.password_input.check(makeNewRoomScreen.password_input.get_value())){
-                            alert_text = 'password must be 1~10 characters';
-                        }else{
-                            alert_text = 'Something went wrong with your client';
-                        }
-                        Screen.alert.data[i].time = 150;
-                        Screen.alert.data[i].text = alert_text;
-                    }
+                let alert_text = '';
+                if(!makeNewRoomScreen.nickname_input.check(makeNewRoomScreen.nickname_input.get_value())){
+                    alert_text = 'nickname is too short or too long';
+                }else if(!makeNewRoomScreen.roomname_input.check(makeNewRoomScreen.roomname_input.get_value())){
+                    alert_text = 'room name must be 1~10 characters';
+                }else if(makeNewRoomScreen.password_checkbox.get_value() && !makeNewRoomScreen.password_input.check(makeNewRoomScreen.password_input.get_value())){
+                    alert_text = 'password must be 1~10 characters';
+                }else{
+                    alert_text = 'Something went wrong with your client';
                 }
-                if(!alreadyExist) {
-                    let alert_text = '';
-                    if(!makeNewRoomScreen.nickname_input.check(makeNewRoomScreen.nickname_input.get_value())){
-                        alert_text = 'nickname is too short or too long';
-                    }else if(!makeNewRoomScreen.roomname_input.check(makeNewRoomScreen.roomname_input.get_value())){
-                        alert_text = 'room name must be 1~10 characters';
-                    }else if(makeNewRoomScreen.password_checkbox.get_value() && !makeNewRoomScreen.password_input.check(makeNewRoomScreen.password_input.get_value())){
-                        alert_text = 'password must be 1~10 characters';
-                    }else{
-                        alert_text = 'Something went wrong with your client';
-                    }
-                    Screen.alert.data.push({
-                        tag: 'yetfinishform',
-                        text: alert_text,
-                        time: 150
-                    });
-                }
+                Screen.alert.add_Data('yetformfinish', alert_text, 5);
             }else{
                 makeNewRoomScreen.nickname_input.hide(Screen.activatedHtmlElement);
                 makeNewRoomScreen.roomname_input.hide(Screen.activatedHtmlElement);
