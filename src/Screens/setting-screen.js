@@ -90,9 +90,12 @@ settingScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                 Screen.Settings.Display.fps = settingScreen.new[0];
                 clearInterval(Screen.display_interval)
                 Screen.display_interval = setInterval( function () {
+                    if(Screen.joyStickController.active) {
+                        Screen.joyStickController.draw();
+                    }
                     Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
                     Screen.alert.draw();
-                    Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
+                    Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList)
                 }, (1000 / Screen.Settings.Display.fps));
                 Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                 Screen.currentScreen.page = 'Display';
