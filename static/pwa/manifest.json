@@ -1,0 +1,81 @@
+{
+  "background_color": "#ffffff",
+  "description": "swITch is the web game based on hide on seek",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "swITch: Web Based Hide and Seek",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "swITch",
+  "start_url": "/",
+  "theme_color": "#bbffff",
+  "categories": [
+    "games"
+  ],
+  "screenshots": [
+    {
+      "src": "/pwa/screenshots/main-wide.png",
+      "type": "image/png",
+      "sizes": "960x540",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/pwa/screenshots/main-narrow.png",
+      "type": "image/png",
+      "sizes": "540x960",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/pwa/screenshots/room-wide.png",
+      "type": "image/png",
+      "sizes": "960x540",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/pwa/screenshots/room-narrow.png",
+      "type": "image/png",
+      "sizes": "540x960",
+      "form_factor": "narrow"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/pwa/192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/pwa/512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Play swITch",
+      "url": "/",
+      "description": "Play swITch",
+      "icons": [
+        {
+          "src": "/pwa/192.png",
+          "type": "image/png",
+          "sizes": "192x192"
+        },
+        {
+          "src": "/pwa/512.png",
+          "type": "image/png",
+          "sizes": "512x512"
+        }
+      ]
+    }
+  ],
+  "id": "swITch",
+  "lang": "en",
+  "display_override": [
+    "window-controls-overlay",
+    "fullscreen",
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ]
+}
