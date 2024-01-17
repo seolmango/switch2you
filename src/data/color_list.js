@@ -63,4 +63,26 @@ const Color_list = {
     "text_onmouse_rgb": [255, 255, 255]
 };
 
+Color_list.player_inside_colors = [
+    Color_list.player_1_inside_hex,
+    Color_list.player_2_inside_hex,
+    Color_list.player_3_inside_hex,
+    Color_list.player_4_inside_hex,
+    Color_list.player_5_inside_hex,
+    Color_list.player_6_inside_hex,
+    Color_list.player_7_inside_hex,
+    Color_list.player_8_inside_hex
+]
+
+Color_list.player_outside_colors = [
+    Color_list.player_1_outside_hex,
+    Color_list.player_2_outside_hex,
+    Color_list.player_3_outside_hex,
+    Color_list.player_4_outside_hex,
+    Color_list.player_5_outside_hex,
+    Color_list.player_6_outside_hex,
+    Color_list.player_7_outside_hex,
+    Color_list.player_8_outside_hex
+]
+
 export { Color_list };

@@ -251,7 +251,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         let center_x = ((index > 4) ? index - 4 : index) * 400 - 40;
         let center_y = (index > 4) ? 710 : 330;
         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, center_x, center_y, 350, 350) && waitingRoomScreen.Client_owner && index !== waitingRoomScreen.Client_room_id){
-            drawRoundBox(UI_ctx, center_x, center_y, 350 * 1.05, 350 * 1.05, Color_list[`player_${index}_inside_hex`], Color_list[`player_${index}_outside_hex`], 10 * 1.05, 25 * 1.05);
+            drawRoundBox(UI_ctx, center_x, center_y, 350 * 1.05, 350 * 1.05, Color_list.player_inside_colors[index-1], Color_list.player_outside_colors[index-1], 10 * 1.05, 25 * 1.05);
             drawText(UI_ctx, center_x-150, center_y-100, 100*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${index}`, "left", "GmarketSansMedium");
             drawText(UI_ctx, center_x, center_y+50, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${waitingRoomScreen.playerInfos[i].name}`, "center", "GmarketSansMedium");
             if(waitingRoomScreen.playerInfos[i].role === 'owner'){
@@ -260,7 +260,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
                 drawText(UI_ctx, center_x, center_y+90, 30 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `(You)`, "center", "GmarketSansMedium");
             }
         }else{
-            drawRoundBox(UI_ctx, center_x, center_y, 350, 350, Color_list[`player_${index}_inside_hex`], Color_list[`player_${index}_outside_hex`], 10, 25);
+            drawRoundBox(UI_ctx, center_x, center_y, 350, 350, Color_list.player_inside_colors[index-1], Color_list.player_outside_colors[index-1], 10, 25);
             drawText(UI_ctx, center_x-150, center_y-100, 100, 0, Color_list.text_default_hex, undefined, undefined, `${index}`, "left", "GmarketSansMedium");
             drawText(UI_ctx, center_x, center_y+50, 40, 0, Color_list.text_default_hex, undefined, undefined, `${waitingRoomScreen.playerInfos[i].name}`, "center", "GmarketSansMedium");
             if(waitingRoomScreen.playerInfos[i].role === 'owner'){
@@ -276,10 +276,10 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         if(waitingRoomScreen.user_slot[i] === false){
             if((checkTouch(Screen.userMouse.x, Screen.userMouse.y, center_x, center_y, 350, 350) && waitingRoomScreen.Client_room_id !== i) || waitingRoomScreen.active_slot === i) {
                 drawRoundBox(UI_ctx, center_x, center_y, 350 * 1.05, 350 * 1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10 * 1.05, 25 * 1.05);
-                drawText(UI_ctx, center_x-150, center_y-100, 100*1.05, 0, Color_list[`player_${i}_inside_hex`], Color_list[`player_${i}_outside_hex`], 5, `${i}`, "left", "GmarketSansMedium");
+                drawText(UI_ctx, center_x-150, center_y-100, 100*1.05, 0, Color_list.player_inside_colors[i-1], Color_list.player_outside_colors[i-1], 5, `${i}`, "left", "GmarketSansMedium");
             }else{
                 drawRoundBox(UI_ctx, center_x, center_y, 350, 350, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
-                drawText(UI_ctx, center_x-150, center_y-100, 100, 0, Color_list[`player_${i}_inside_hex`], Color_list[`player_${i}_outside_hex`], 5, `${i}`, "left", "GmarketSansMedium");
+                drawText(UI_ctx, center_x-150, center_y-100, 100, 0, Color_list.player_inside_colors[i-1], Color_list.player_outside_colors[i-1], 5, `${i}`, "left", "GmarketSansMedium");
             }
         }
     }

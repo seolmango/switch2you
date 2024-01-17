@@ -149,9 +149,9 @@ class JoystickController {
                 let angle = (i * 45 - 22.5) * Math.PI / 180;
                 drawLine(this.joyStickctx, this.joyStickCanvas.width / 2 + Math.cos(angle) * 50,  this.joyStickCanvas.height / 2 + Math.sin(angle) * 50, this.joyStickCanvas.width / 2 + Math.cos(angle) * 100,  this.joyStickCanvas.height / 2 + Math.sin(angle) * 100, Color_list.button_gray_2_hex, 10);
                 if(i === this.switch_direction - 1 && switch_distance > switch_size*0.3){
-                    drawCircle(this.joyStickctx, this.joyStickCanvas.width / 2 + Math.cos(angle + 22.5 * Math.PI / 180) * 100,  this.joyStickCanvas.height / 2 + Math.sin(angle + 22.5 * Math.PI / 180) * 100, 30, Color_list[`player_${i+1}_inside_hex`], Color_list[`player_${i+1}_outside_hex`], 15);
+                    drawCircle(this.joyStickctx, this.joyStickCanvas.width / 2 + Math.cos(angle + 22.5 * Math.PI / 180) * 100,  this.joyStickCanvas.height / 2 + Math.sin(angle + 22.5 * Math.PI / 180) * 100, 30, Color_list.player_inside_colors[i], Color_list.player_outside_colors[i], 15);
                 }else {
-                    drawCircle(this.joyStickctx, this.joyStickCanvas.width / 2 + Math.cos(angle + 22.5 * Math.PI / 180) * 100, this.joyStickCanvas.height / 2 + Math.sin(angle + 22.5 * Math.PI / 180) * 100, 20, Color_list[`player_${i + 1}_inside_hex`], Color_list[`player_${i + 1}_outside_hex`], 10);
+                    drawCircle(this.joyStickctx, this.joyStickCanvas.width / 2 + Math.cos(angle + 22.5 * Math.PI / 180) * 100, this.joyStickCanvas.height / 2 + Math.sin(angle + 22.5 * Math.PI / 180) * 100, 20, Color_list.player_inside_colors[i], Color_list.player_outside_colors[i], 10);
                 }
             }
             drawCircle(this.joyStickctx, this.joyStickCanvas.width / 2, this.joyStickCanvas.height / 2, 50, undefined, Color_list.button_gray_2_hex, 10);
