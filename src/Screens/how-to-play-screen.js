@@ -166,6 +166,24 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     if(activate === 3){
         drawText(UI_ctx, 1510-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "3. Skill-switch", "center", "GmarketSansMedium");
         drawText(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - 420, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "On the verge of being tagged?\nWhen your distance from\nthe tagger is close enough, tap\nanother player's number to\nchange the tagger.", "left", "GmarketSansMedium");
+        let animation_frame = Date.now() % 3000;
+        if(animation_frame >= 0 && animation_frame < 1000){
+            drawCircle(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - 300, 750, 50, Color_list.player_1_inside_hex, Color_list.player_1_outside_hex, 20);
+            drawCircle(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - (150 * ((animation_frame -500)/500)), 750, 50, Color_list.player_4_inside_hex, Color_list.player_tagger_outside_hex, 20);
+            drawCircle(UI_ctx, 1510-howToPlayScreen.dragScreen_delta + 300, 750, 50, Color_list.player_8_inside_hex, Color_list.player_8_outside_hex, 20);
+        }else if(animation_frame >= 1000 && animation_frame < 2000){
+            drawCircle(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - 300, 750, 50, Color_list.player_1_inside_hex, Color_list.player_1_outside_hex, 20);
+            drawCircle(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - 150, 750, 50, Color_list.player_4_inside_hex, (animation_frame > 1500) ? Color_list.player_4_outside_hex : Color_list.player_tagger_outside_hex, 20);
+            drawCircle(UI_ctx, 1510-howToPlayScreen.dragScreen_delta + 300, 750, 50, Color_list.player_8_inside_hex, (animation_frame > 1500) ? Color_list.player_tagger_outside_hex : Color_list.player_8_outside_hex, 20);
+            if(animation_frame >= 1500 && animation_frame < 1600){
+                let switch_color = `rgba(${Color_list.player_4_outside_rgb[0]}, ${Color_list.player_4_outside_rgb[1]}, ${Color_list.player_4_outside_rgb[2]}, ${(animation_frame - 1500)/100})`;
+                drawCircle(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - 300, 750, 100, switch_color, undefined, 0);
+            }
+        }else{
+            drawCircle(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - 300, 750, 50, Color_list.player_1_inside_hex, Color_list.player_1_outside_hex, 20);
+            drawCircle(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - 150, 750, 50, Color_list.player_4_inside_hex, Color_list.player_4_outside_hex, 20);
+            drawCircle(UI_ctx, 1510-howToPlayScreen.dragScreen_delta + 300, 750, 50, Color_list.player_8_inside_hex, Color_list.player_tagger_outside_hex, 20);
+        }
     }else{
         drawText(UI_ctx, 520, -(1510-howToPlayScreen.dragScreen_delta-((250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1)))*((activate > 3) ? 1 : -1))),80, 90, Color_list.text_default_hex, undefined, undefined, "3. Skill-switch", "center", "GmarketSansMedium");
     }
@@ -177,6 +195,27 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     if(activate === 4){
         drawText(UI_ctx, 2060-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "4. Skill-dash", "center", "GmarketSansMedium");
         drawText(UI_ctx, 2060-howToPlayScreen.dragScreen_delta - 420, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "Is it moving too slowly? Then\npress the space bar and\nrush quickly! All other players\ncan see footsteps that\nyou made a long time ago!", "left", "GmarketSansMedium")
+        let animation_frame = Date.now() % 1500;
+        if(animation_frame >= 0 && animation_frame < 500) {
+            drawCircle(UI_ctx, 2060 - howToPlayScreen.dragScreen_delta - (150 * ((animation_frame - 500) / 500)), 750, 50, Color_list.player_2_inside_hex, Color_list.player_2_outside_hex, 20);
+            drawCircle(UI_ctx, 2060 - howToPlayScreen.dragScreen_delta + 150 - (150 * ((animation_frame - 500) / 500)), 750, 50, Color_list.player_7_inside_hex, Color_list.player_tagger_outside_hex, 20);
+        }else if(animation_frame >=500 && animation_frame < 1200){
+            for(let dash_shadow_time = 500; dash_shadow_time < animation_frame; dash_shadow_time += 100){
+                UI_ctx.globalAlpha = 1 - (Math.min(animation_frame - dash_shadow_time, 500) / 500);
+                drawCircle(UI_ctx, 2060 - howToPlayScreen.dragScreen_delta - (300 * ((dash_shadow_time - 500) / 500)), 750, 50, Color_list.player_2_inside_hex, Color_list.player_2_outside_hex, 20);
+                UI_ctx.globalAlpha = 1;
+            }
+            drawCircle(UI_ctx, 2060 - howToPlayScreen.dragScreen_delta - (300 * ((animation_frame - 500) / 500)), 750, 50, Color_list.player_2_inside_hex, Color_list.player_2_outside_hex, 20);
+            drawCircle(UI_ctx, 2060 - howToPlayScreen.dragScreen_delta + 150 - (150 * ((animation_frame - 500) / 500)), 750, 50, Color_list.player_7_inside_hex, Color_list.player_tagger_outside_hex, 20);
+        }else{
+            for(let dash_shadow_time = 500; dash_shadow_time < 1200; dash_shadow_time += 100){
+                UI_ctx.globalAlpha = 1 - (Math.min(animation_frame - dash_shadow_time, 500) / 500);
+                drawCircle(UI_ctx, 2060 - howToPlayScreen.dragScreen_delta - (300 * ((dash_shadow_time - 500) / 500)), 750, 50, Color_list.player_2_inside_hex, Color_list.player_2_outside_hex, 20);
+                UI_ctx.globalAlpha = 1;
+            }
+            drawCircle(UI_ctx, 2060 - howToPlayScreen.dragScreen_delta - 420, 750, 50, Color_list.player_2_inside_hex, Color_list.player_2_outside_hex, 20);
+            drawCircle(UI_ctx, 2060 - howToPlayScreen.dragScreen_delta - 60, 750, 50, Color_list.player_7_inside_hex, Color_list.player_tagger_outside_hex, 20);
+        }
     }else{
         drawText(UI_ctx, 520, -(2060-howToPlayScreen.dragScreen_delta-((250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1)))*((activate > 4) ? 1 : -1))),80, 90, Color_list.text_default_hex, undefined, undefined, "4. Skill-dash", "center", "GmarketSansMedium");
     }
