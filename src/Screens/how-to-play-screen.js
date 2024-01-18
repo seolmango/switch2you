@@ -3,8 +3,8 @@ import {drawText} from "./tools/drawText";
 import {drawRoundBox} from "./tools/drawRoundBox";
 import {checkTouch} from "./tools/checkTouch";
 import {drawCircle} from "./tools/drawCircle";
-import {drawLine} from "./tools/drawLine";
 import {Color_list} from "../data/color_list"
+import {image} from "../data/image";
 
 import {titleScreen} from "./title-screen";
 
@@ -165,6 +165,7 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     }
     if(activate === 3){
         drawText(UI_ctx, 1510-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "3. Skill-switch", "center", "GmarketSansMedium");
+        UI_ctx.drawImage(image.skill_switch, 1510-howToPlayScreen.dragScreen_delta + 300, 80, 180, 180);
         drawText(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - 420, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "On the verge of being tagged?\nWhen your distance from\nthe tagger is close enough, tap\nanother player's number to\nchange the tagger.", "left", "GmarketSansMedium");
         let animation_frame = Date.now() % 3000;
         if(animation_frame >= 0 && animation_frame < 1000){
@@ -194,6 +195,7 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     }
     if(activate === 4){
         drawText(UI_ctx, 2060-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "4. Skill-dash", "center", "GmarketSansMedium");
+        UI_ctx.drawImage(image.skill_dash, 2060-howToPlayScreen.dragScreen_delta + 300, 80, 180, 180);
         drawText(UI_ctx, 2060-howToPlayScreen.dragScreen_delta - 420, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "Is it moving too slowly? Then\npress the space bar and\nrush quickly! All other players\ncan see footsteps that\nyou made a long time ago!", "left", "GmarketSansMedium")
         let animation_frame = Date.now() % 1500;
         if(animation_frame >= 0 && animation_frame < 500) {
@@ -226,6 +228,7 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     }
     if(activate === 5){
         drawText(UI_ctx, 2610-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "5. Skill-teleport", "center", "GmarketSansMedium");
+        UI_ctx.drawImage(image.skill_teleport, 2610-howToPlayScreen.dragScreen_delta + 300, 80, 180, 180);
         drawText(UI_ctx, 2610-howToPlayScreen.dragScreen_delta - 410, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "Is dash skill too slow? Then\ntry changing the dash skill\nto teleport. The distance is\nshort than dash, but it\ncan go over the wall.", "left", "GmarketSansMedium");
     }else{
         drawText(UI_ctx, 520, -(2610-howToPlayScreen.dragScreen_delta+((250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1))))),80, 90, Color_list.text_default_hex, undefined, undefined, "5. Skill-teleport", "center", "GmarketSansMedium");
