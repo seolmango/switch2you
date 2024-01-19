@@ -14,39 +14,39 @@
   ],
   "screenshots": [
     {
-      "src": "/pwa/screenshots/main-wide.png",
-      "type": "image/png",
+      "src": "/pwa/screenshots/main-wide.webp",
+      "type": "image/webp",
       "sizes": "960x540",
       "form_factor": "wide"
     },
     {
-      "src": "/pwa/screenshots/main-narrow.png",
-      "type": "image/png",
+      "src": "/pwa/screenshots/main-narrow.webp",
+      "type": "image/webp",
       "sizes": "540x960",
       "form_factor": "narrow"
     },
     {
-      "src": "/pwa/screenshots/room-wide.png",
-      "type": "image/png",
+      "src": "/pwa/screenshots/room-wide.webp",
+      "type": "image/webp",
       "sizes": "960x540",
       "form_factor": "wide"
     },
     {
-      "src": "/pwa/screenshots/room-narrow.png",
-      "type": "image/png",
+      "src": "/pwa/screenshots/room-narrow.webp",
+      "type": "image/webp",
       "sizes": "540x960",
       "form_factor": "narrow"
     }
   ],
   "icons": [
     {
-      "src": "/pwa/192.png",
-      "type": "image/png",
+      "src": "/pwa/192.webp",
+      "type": "image/webp",
       "sizes": "192x192"
     },
     {
-      "src": "/pwa/512.png",
-      "type": "image/png",
+      "src": "/pwa/512.webp",
+      "type": "image/webp",
       "sizes": "512x512"
     }
   ],
@@ -57,13 +57,13 @@
       "description": "Play swITch",
       "icons": [
         {
-          "src": "/pwa/192.png",
-          "type": "image/png",
+          "src": "/pwa/192.webp",
+          "type": "image/webp",
           "sizes": "192x192"
         },
         {
-          "src": "/pwa/512.png",
-          "type": "image/png",
+          "src": "/pwa/512.webp",
+          "type": "image/webp",
           "sizes": "512x512"
         }
       ]
