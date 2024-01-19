@@ -16,6 +16,7 @@ Room.MaxCount = Config.roomMaxNum;
 
 
 const port = process.env.PORT || 3000;
+app.disable('x-powered-by');
 app.use(express.static(path.join(__dirname, 'dist')));
 http.listen(port, function (){
     console.log('listening on : http://localhost:' + port);
