@@ -16,7 +16,6 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     waitingRoomScreen.playerInfos = Screen.playerInfos;
     waitingRoomScreen.Client_room_id = Screen.Client_room_id;
     waitingRoomScreen.temp_player_skill = Screen.playerInfos[waitingRoomScreen.Client_room_id-1].skill;
-    console.log(waitingRoomScreen.playerInfos);
     waitingRoomScreen.user_slot = [false, false, false, false, false, false, false, false, false];
     for(let i = 0; i < waitingRoomScreen.playerInfos.length; i++){
         waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
