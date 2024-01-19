@@ -77,7 +77,7 @@ class Player {
     // 다른 플레이어에게 방장 이전
     giveOwner(target) {
         if (!this.room) return 'must join room';
-        if (!target || this === target) return 'wrong player';
+        if (!target || this === target) return 'wrong player'; // 없거나 자신이거나
         if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
         this.role = 'user';
         target.role = 'owner';
@@ -105,7 +105,7 @@ class Player {
     // 스킬 변경
     changeSkill(skill) {
         if (!this.room) return 'must join room';
-        if (this.skill === skill || !['dash', 'teleport'].includes(skill)) return 'wrong skill';
+        if (this.skill === skill || !['dash', 'teleport'].includes(skill)) return 'wrong skill'; // 존재하지 않는 스킬이거나 이미 사용하는 스킬이거나
         this.skill = skill;
     }
 }
