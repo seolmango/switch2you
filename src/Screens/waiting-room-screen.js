@@ -22,6 +22,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
         if(waitingRoomScreen.playerInfos[i].number === Screen.Client_room_id){
             waitingRoomScreen.Client_owner = (waitingRoomScreen.playerInfos[i].role === 'owner') ? true : false;
+            waitingRoomScreen.client_player = waitingRoomScreen.playerInfos[i];
         }
     }
     UI_ctx.clearRect(0, 0, 1920, 1080);
@@ -235,7 +236,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 720,
         height: 120,
         clicked: function () {
-            if(waitingRoomScreen.Client_owner){
+            if(waitingRoomScreen.Client_owner && waitingRoomScreen.active_slot === 0){
                 console.log('start game');
             }
         }
@@ -274,7 +275,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 80,
         clicked: function () {
             if(waitingRoomScreen.active_slot === waitingRoomScreen.Client_room_id){
-                if(waitingRoomScreen.temp_player_skill !== waitingRoomScreen.playerInfos[waitingRoomScreen.Client_room_id-1].skill){
+                if(waitingRoomScreen.temp_player_skill !== waitingRoomScreen.client_player.skill){
                     Screen.socket.emit('change player skill', waitingRoomScreen.temp_player_skill, (callback) => {
                         if(callback.status === 200){
 
@@ -294,7 +295,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 80,
         clicked: function () {
             if(waitingRoomScreen.active_slot === waitingRoomScreen.Client_room_id){
-                waitingRoomScreen.temp_player_skill = Screen.playerInfos[waitingRoomScreen.Client_room_id-1].skill;
+                waitingRoomScreen.temp_player_skill = waitingRoomScreen.client_player.skill;
                 waitingRoomScreen.touch_any_slot = true;
             }
         }
@@ -420,7 +421,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         }
     }
     if(waitingRoomScreen.active_slot === waitingRoomScreen.Client_room_id){
-        drawText(UI_ctx, 185, 990, 60, 0, (waitingRoomScreen.temp_player_skill !== waitingRoomScreen.playerInfos[waitingRoomScreen.Client_room_id-1].skill) ? Color_list.button_blue_2_hex : Color_list.text_default_hex, undefined, undefined, `Skill > ${waitingRoomScreen.temp_player_skill}`, "left", "GmarketSansMedium");
+        drawText(UI_ctx, 185, 990, 60, 0, (waitingRoomScreen.temp_player_skill !== waitingRoomScreen.client_player.skill) ? Color_list.button_blue_2_hex : Color_list.text_default_hex, undefined, undefined, `Skill > ${waitingRoomScreen.temp_player_skill}`, "left", "GmarketSansMedium");
         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1100, 990, 120, 120)){
             UI_ctx.drawImage(image.skill_dash, 1037, 927, 126, 126);
         }else{
