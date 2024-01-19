@@ -166,6 +166,7 @@ window.addEventListener("doSocketConnect", function () {
 
     Screen.socket.on('player joined', function (data) {
         if(Screen.join_room){
+            console.log(data);
             waitingRoomScreen.playerInfos.push(data);
             waitingRoomScreen.user_slot = [false, false, false, false, false, false, false, false, false];
             for(let i = 0; i < waitingRoomScreen.playerInfos.length; i++){
@@ -235,6 +236,16 @@ window.addEventListener("doSocketConnect", function () {
             if(before === waitingRoomScreen.Client_room_id){
                 waitingRoomScreen.Client_room_id = after;
             }
+        }
+    })
+
+    Screen.socket.on('player skill changed', function (player_num, skill) {
+        if(Screen.join_room){
+            waitingRoomScreen.playerInfos.forEach(function (player) {
+                if(player.number === player_num){
+                    player.skill = skill;
+                }
+            })
         }
     })
 });

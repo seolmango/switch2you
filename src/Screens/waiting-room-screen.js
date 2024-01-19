@@ -15,6 +15,8 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     waitingRoomScreen.gameroomInfo = Screen.gameroomInfo;
     waitingRoomScreen.playerInfos = Screen.playerInfos;
     waitingRoomScreen.Client_room_id = Screen.Client_room_id;
+    waitingRoomScreen.temp_player_skill = Screen.playerInfos[waitingRoomScreen.Client_room_id-1].skill;
+    console.log(waitingRoomScreen.playerInfos);
     waitingRoomScreen.user_slot = [false, false, false, false, false, false, false, false, false];
     for(let i = 0; i < waitingRoomScreen.playerInfos.length; i++){
         waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
@@ -272,7 +274,15 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 80,
         clicked: function () {
             if(waitingRoomScreen.active_slot === waitingRoomScreen.Client_room_id){
+                if(waitingRoomScreen.temp_player_skill !== waitingRoomScreen.playerInfos[waitingRoomScreen.Client_room_id-1].skill){
+                    Screen.socket.emit('change player skill', waitingRoomScreen.temp_player_skill, (callback) => {
+                        if(callback.status === 200){
 
+                        }else{
+                            Screen.alert.add_Data('server error', 'Something went wrong', 5);
+                        }
+                    })
+                }
             }
         }
     })
@@ -284,12 +294,12 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 80,
         clicked: function () {
             if(waitingRoomScreen.active_slot === waitingRoomScreen.Client_room_id){
-
+                waitingRoomScreen.temp_player_skill = Screen.playerInfos[waitingRoomScreen.Client_room_id-1].skill;
+                waitingRoomScreen.touch_any_slot = true;
             }
         }
     })
     waitingRoomScreen.redrawBackground(Background_ctx);
-    waitingRoomScreen.temp_player_skill = 'teleport';
 }
 
 waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
@@ -315,6 +325,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, center_x, center_y, 350, 350) && (waitingRoomScreen.Client_owner || index === waitingRoomScreen.Client_room_id)){
             drawRoundBox(UI_ctx, center_x, center_y, 350 * 1.05, 350 * 1.05, Color_list.player_inside_colors[index-1], Color_list.player_outside_colors[index-1], 10 * 1.05, 25 * 1.05);
             drawText(UI_ctx, center_x-150, center_y-100, 100*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${index}`, "left", "GmarketSansMedium");
+            UI_ctx.drawImage((waitingRoomScreen.playerInfos[i].skill === 'dash') ? image.skill_dash : image.skill_teleport, center_x, center_y-150*1.05, 150*1.05, 150*1.05);
             drawText(UI_ctx, center_x, center_y+50, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${waitingRoomScreen.playerInfos[i].name}`, "center", "GmarketSansMedium");
             if(waitingRoomScreen.playerInfos[i].role === 'owner'){
                 drawText(UI_ctx, center_x, center_y+90, 30 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `(Owner)`, "center", "GmarketSansMedium");
@@ -325,6 +336,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             drawRoundBox(UI_ctx, center_x, center_y, 350, 350, Color_list.player_inside_colors[index-1], Color_list.player_outside_colors[index-1], 10, 25);
             drawText(UI_ctx, center_x-150, center_y-100, 100, 0, Color_list.text_default_hex, undefined, undefined, `${index}`, "left", "GmarketSansMedium");
             drawText(UI_ctx, center_x, center_y+50, 40, 0, Color_list.text_default_hex, undefined, undefined, `${waitingRoomScreen.playerInfos[i].name}`, "center", "GmarketSansMedium");
+            UI_ctx.drawImage((waitingRoomScreen.playerInfos[i].skill === 'dash') ? image.skill_dash : image.skill_teleport, center_x, center_y-150, 150, 150);
             if(waitingRoomScreen.playerInfos[i].role === 'owner'){
                 drawText(UI_ctx, center_x, center_y+90, 30, 0, Color_list.text_default_hex, undefined, undefined, `(Owner)`, "center", "GmarketSansMedium");
             }else if(index === waitingRoomScreen.Client_room_id){
@@ -402,11 +414,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         }
     }
     if(waitingRoomScreen.active_slot === waitingRoomScreen.Client_room_id){
-        if(true){
-            drawText(UI_ctx, 185, 990, 60, 0, Color_list.button_blue_2_hex, undefined, undefined, `Skill > ${waitingRoomScreen.temp_player_skill}`, "left", "GmarketSansMedium");
-        }else{
-            drawText(UI_ctx, 185, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Skill > Teleport", "left", "GmarketSansMedium");
-        }
+        drawText(UI_ctx, 185, 990, 60, 0, (waitingRoomScreen.temp_player_skill !== waitingRoomScreen.playerInfos[waitingRoomScreen.Client_room_id-1].skill) ? Color_list.button_blue_2_hex : Color_list.text_default_hex, undefined, undefined, `Skill > ${waitingRoomScreen.temp_player_skill}`, "left", "GmarketSansMedium");
         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1100, 990, 120, 120)){
             UI_ctx.drawImage(image.skill_dash, 1037, 927, 126, 126);
         }else{

@@ -67,7 +67,8 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                         Screen.playerInfos = [{
                             number: 1,
                             name: makeNewRoomScreen.nickname_input.get_value(),
-                            role: 'owner'
+                            role: 'owner',
+                            skill: "dash"
                         }];
                         Screen.Client_room_id = 1;
                         Screen.currentScreen = waitingRoomScreen;
