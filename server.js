@@ -28,7 +28,7 @@ http.listen(port, function (){
  * @returns 
  */
 function getPlayerInfo(players) {
-    const infoFilter = (player) => { return {'number': player.number, 'name': player.name, 'role': player.role, 'skill': player.skill} }
+    const infoFilter = (player) => { return {'number': player.number, 'name': player.name, 'role': player.role, 'device': player.device, 'skill': player.skill} }
     if (Array.isArray(players))
         return players.map(infoFilter);
     else
@@ -86,6 +86,20 @@ io.on('connection', (socket) => {
         socket.disconnect();
         console.log('player disconnected: ', player.socketId, player.id);
     });
+
+
+    // 기초 플레이어 정보 설정
+    socket.on('set player info', (device, callback) => {
+        if (!checkData([device, 'string'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        } else if (device != 'phone' && device != 'computer') {
+            callback({'status': 400, 'message': 'wrong device'});
+            return;
+        }
+        player.device = device;
+        callback({'status': 200});
+    })
 
 
     // 방 목록
