@@ -19,6 +19,7 @@ class Player {
         Player.#_Count++;
 
         this.socketId = socketId; // 유저의 소켓 id
+        this.device = 'unknown'; // 유저의 장치
         this.room = null; // 참가한 방 객체
         this.name; // 유저 이름
         this.role; // 유저 역할
