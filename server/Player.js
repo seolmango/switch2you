@@ -101,6 +101,13 @@ class Player {
         this.number = number;
         this.room.numbers[number - 1] = this.id;
     }
+
+    // 스킬 변경
+    changeSkill(skill) {
+        if (!this.room) return 'must join room';
+        if (this.skill === skill || !['dash', 'teleport'].includes(skill)) return 'wrong skill';
+        this.skill = skill;
+    }
 }
 
 module.exports = Player;
