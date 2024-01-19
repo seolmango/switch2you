@@ -23,6 +23,7 @@ class Player {
         this.name; // 유저 이름
         this.role; // 유저 역할
         this.number; // 방에서 유저 번호
+        this.skill = 'dash'; // 유저의 스킬
     }
 
     get id() {
@@ -69,13 +70,14 @@ class Player {
         this.name = null;
         this.role = null;
         this.number = null;
+        this.skill = null;
         return ownerChange;
     }
 
     // 다른 플레이어에게 방장 이전
     giveOwner(target) {
         if (!this.room) return 'must join room';
-        if (!target || this === target) return 'wrong player';
+        if (!target || this === target) return 'wrong player'; // 없거나 자신이거나
         if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
         this.role = 'user';
         target.role = 'owner';
@@ -98,6 +100,13 @@ class Player {
         this.room.numbers[this.number - 1] = 0;
         this.number = number;
         this.room.numbers[number - 1] = this.id;
+    }
+
+    // 스킬 변경
+    changeSkill(skill) {
+        if (!this.room) return 'must join room';
+        if (this.skill === skill || !['dash', 'teleport'].includes(skill)) return 'wrong skill'; // 존재하지 않는 스킬이거나 이미 사용하는 스킬이거나
+        this.skill = skill;
     }
 }
 

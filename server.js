@@ -28,7 +28,7 @@ http.listen(port, function (){
  * @returns 
  */
 function getPlayerInfo(players) {
-    const infoFilter = (player) => { return {'number': player.number, 'name': player.name, 'role': player.role} }
+    const infoFilter = (player) => { return {'number': player.number, 'name': player.name, 'role': player.role, 'skill': player.skill} }
     if (Array.isArray(players))
         return players.map(infoFilter);
     else
@@ -258,6 +258,23 @@ io.on('connection', (socket) => {
         }
         callback({'status': 200});
         io.to(player.room.id).emit('player number changed', tempNumber, number);
+    })
+
+
+    // 플레이어 스킬 변경
+    socket.on('change player skill', (skill, callback) => {
+        if (!checkData([skill, 'string'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        }
+
+        const result = player.changeSkill(skill);
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
+        callback({'status': 200});
+        io.to(player.room.id).emit('player skill changed', player.number, player.skill);
     })
 
 
