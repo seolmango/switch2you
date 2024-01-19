@@ -23,6 +23,7 @@ class Player {
         this.name; // 유저 이름
         this.role; // 유저 역할
         this.number; // 방에서 유저 번호
+        this.skill = 'dash'; // 유저의 스킬
     }
 
     get id() {
@@ -69,6 +70,7 @@ class Player {
         this.name = null;
         this.role = null;
         this.number = null;
+        this.skill = null;
         return ownerChange;
     }
 

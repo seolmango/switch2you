@@ -28,7 +28,7 @@ http.listen(port, function (){
  * @returns 
  */
 function getPlayerInfo(players) {
-    const infoFilter = (player) => { return {'number': player.number, 'name': player.name, 'role': player.role} }
+    const infoFilter = (player) => { return {'number': player.number, 'name': player.name, 'role': player.role, 'skill': player.skill} }
     if (Array.isArray(players))
         return players.map(infoFilter);
     else
