@@ -23,7 +23,7 @@ class Player {
         this.name; // 유저 이름
         this.role; // 유저 역할
         this.number; // 방에서 유저 번호
-        this.skill = 'dash'; // 유저의 스킬
+        this.skill; // 유저의 스킬
     }
 
     get id() {
@@ -52,6 +52,7 @@ class Player {
         this.number = room.numbers.indexOf(0) + 1;
         room.numbers[this.number - 1] = this.id;
         room.players.push(this);
+        this.skill = 'dash';
     }
 
     // 방 퇴장
