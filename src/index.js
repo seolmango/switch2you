@@ -157,6 +157,13 @@ window.addEventListener("doSocketConnect", function () {
     Screen.socket.on('connected', function () {
         Screen.currentScreen = titleScreen;
         Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+        Screen.socket.emit('set player info', (Screen.mobile) ? 'phone' : 'computer', (callback) => {
+            if(callback.status === 200){
+
+            }else{
+                Screen.alert.add_Data('error', 'error', 5);
+            }
+        })
     });
 
     Screen.socket.on('server full', function () {

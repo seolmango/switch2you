@@ -68,7 +68,8 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                             number: 1,
                             name: makeNewRoomScreen.nickname_input.get_value(),
                             role: 'owner',
-                            skill: "dash"
+                            skill: "dash",
+                            device: (Screen.mobile) ? 'phone' : 'computer',
                         }];
                         Screen.Client_room_id = 1;
                         Screen.currentScreen = waitingRoomScreen;
