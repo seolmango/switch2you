@@ -34,6 +34,7 @@ class Room {
         owner.room = this;
         owner.role = 'owner';
         owner.number = 1;
+        owner.skill = 'dash';
         this.numbers = [owner.id, 0, 0, 0, 0, 0, 0, 0]; // 번호 안 썼는지 여부. 0이면 안썼고, 0이 아니면 썼음. 0이 아닌 숫자는 그 번호에 해당하는 player의 id.
     }
 
