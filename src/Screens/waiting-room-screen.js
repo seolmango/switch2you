@@ -312,7 +312,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         let index = waitingRoomScreen.playerInfos[i].number;
         let center_x = ((index > 4) ? index - 4 : index) * 400 - 40;
         let center_y = (index > 4) ? 710 : 330;
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, center_x, center_y, 350, 350) && waitingRoomScreen.Client_owner || index === waitingRoomScreen.Client_room_id){
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, center_x, center_y, 350, 350) && (waitingRoomScreen.Client_owner || index === waitingRoomScreen.Client_room_id)){
             drawRoundBox(UI_ctx, center_x, center_y, 350 * 1.05, 350 * 1.05, Color_list.player_inside_colors[index-1], Color_list.player_outside_colors[index-1], 10 * 1.05, 25 * 1.05);
             drawText(UI_ctx, center_x-150, center_y-100, 100*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${index}`, "left", "GmarketSansMedium");
             drawText(UI_ctx, center_x, center_y+50, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${waitingRoomScreen.playerInfos[i].name}`, "center", "GmarketSansMedium");
