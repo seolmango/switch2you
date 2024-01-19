@@ -1,10 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, target-densitydpi=high-dpi, user-scalable=no">
+    <title>swITch-io</title>
+    <link rel="icon" href="/image/favicon.ico">
+    <meta name='description' content='swITch is the web game based on hide on seek'>
+    <meta name='keywords' content='io,game,swITch,tagger'>
+    <link rel="manifest" href="/pwa/manifest.json">
 </head>
 <body>
+    <script>
+        if (typeof navigator.serviceWorker !== 'undefined') {
+            navigator.serviceWorker.register('/pwa/sw.js')
+        }
+    </script>
+    <script>
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        const BGM_Player = {};
+        function onYouTubeIframeAPIReady() {
+            BGM_Player.Youtube_player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: 'x8Xf47Bl0Hc',
+                playerVars: {
+                    loop: 1,
+                    playlist: 'x8Xf47Bl0Hc',
+                    autoplay: 0,
+                    mute: 0,
+                },
+            });
+        }
+        BGM_Player.play = function(){
+            BGM_Player.Youtube_player.playVideo();
+        }
 
+        BGM_Player.pause = function(){
+            BGM_Player.Youtube_player.pauseVideo();
+        }
+
+        BGM_Player.setVolume = function(volume){
+            BGM_Player.Youtube_player.setVolume(volume);
+        }
+    </script>
+    <div id="main-container">
+        <canvas id="joystick" width="100" height="100"></canvas>
+        <canvas id="background" width="100" height="100"></canvas>
+        <canvas id="ui" width="100" height="100"></canvas>
+        <input type="text" id="user_name_input" placeholder="Enter your Nickname">
+        <input type="text" id="room_name_input" placeholder="Enter the room name">
+        <input type="password" id="make_room_password_input" placeholder="Enter the room password">
+        <input type="password" id="join_room_password_input" placeholder="Enter the room password">
+        <input type="text" id="join_room_id_input" placeholder="Enter the room id">
+        <input type="checkbox" id="make_room_visibility_checkbox" checked>
+        <input type="checkbox" id="make_room_password_checkbox">
+    </div>
+    <div id="bgm-container">
+        <div id="player">
+
+        </div>
+    </div>
+    <noscript>
+        <div style="text-align: center; margin-top: 50px;">
+            <h1>JavaScript를 활성화 해주세요.</h1>
+            <p>swITch는 JavaScript를 사용합니다.</p>
+            <p>JavaScript를 활성화 하지 않으면 게임을 플레이 할 수 없습니다.</p>
+        </div>
+    </noscript>
 </body>
 </html>

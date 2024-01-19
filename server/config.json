@@ -1,3 +1,4 @@
 {
-    "playerMaxNum": 300
+    "playerMaxNum": 300,
+    "roomMaxNum": 300
 }

@@ -4,8 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "build": "webpack",
-    "start": "node server.js"
+    "build": "webpack --watch",
+    "start": "nodemon server.js",
+    "prod": "webpack --mode production"
   },
   "author": "0-inf",
   "license": "MIT",
@@ -15,8 +16,10 @@
     "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.8.1",
     "html-webpack-plugin": "^5.6.0",
+    "nodemon": "^3.0.2",
     "style-loader": "^3.3.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"
