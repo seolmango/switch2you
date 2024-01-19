@@ -327,7 +327,9 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             drawText(UI_ctx, center_x-150, center_y-100, 100*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${index}`, "left", "GmarketSansMedium");
             UI_ctx.drawImage((waitingRoomScreen.playerInfos[i].skill === 'dash') ? image.skill_dash : image.skill_teleport, center_x, center_y-150*1.05, 150*1.05, 150*1.05);
             drawText(UI_ctx, center_x, center_y+50, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${waitingRoomScreen.playerInfos[i].name}`, "center", "GmarketSansMedium");
-            UI_ctx.drawImage(image.pc_icon, center_x-20*1.05, center_y+115*1.05, 40*1.05, 40*1.05);
+            if(waitingRoomScreen.playerInfos[i].device !== 'unknown'){
+                UI_ctx.drawImage((waitingRoomScreen.playerInfos[i].device === 'phone') ? image.mobile_icon : image.pc_icon, center_x-20*1.05, center_y+115*1.05, 40*1.05, 40*1.05);
+            }
             if(waitingRoomScreen.playerInfos[i].role === 'owner'){
                 drawText(UI_ctx, center_x, center_y+90, 30 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `(Owner)`, "center", "GmarketSansMedium");
             }else if(index === waitingRoomScreen.Client_room_id){
@@ -338,7 +340,9 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             drawText(UI_ctx, center_x-150, center_y-100, 100, 0, Color_list.text_default_hex, undefined, undefined, `${index}`, "left", "GmarketSansMedium");
             drawText(UI_ctx, center_x, center_y+50, 40, 0, Color_list.text_default_hex, undefined, undefined, `${waitingRoomScreen.playerInfos[i].name}`, "center", "GmarketSansMedium");
             UI_ctx.drawImage((waitingRoomScreen.playerInfos[i].skill === 'dash') ? image.skill_dash : image.skill_teleport, center_x, center_y-150, 150, 150);
-            UI_ctx.drawImage(image.mobile_icon, center_x-20, center_y+115, 40, 40);
+            if(waitingRoomScreen.playerInfos[i].device !== 'unknown'){
+                UI_ctx.drawImage((waitingRoomScreen.playerInfos[i].device === 'phone') ? image.mobile_icon : image.pc_icon, center_x-20, center_y+115, 40, 40);
+            }
             if(waitingRoomScreen.playerInfos[i].role === 'owner'){
                 drawText(UI_ctx, center_x, center_y+90, 30, 0, Color_list.text_default_hex, undefined, undefined, `(Owner)`, "center", "GmarketSansMedium");
             }else if(index === waitingRoomScreen.Client_room_id){
