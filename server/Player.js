@@ -83,6 +83,7 @@ class Player {
         if (!this.room) return 'must join room';
         if (!target || this === target) return 'wrong player'; // 없거나 자신이거나
         if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
+
         this.role = 'user';
         target.role = 'owner';
         this.room.owner = target;
@@ -93,6 +94,7 @@ class Player {
         if (!this.room) return 'must join room';
         if (!target || this === target) return 'wrong player';
         if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
+
         target.leaveRoom();
     }
 
@@ -101,6 +103,7 @@ class Player {
         if (!this.room) return 'must join room';
         if (number < 1 || 8 < number) return 'wrong number';
         if (this.room.numbers[number - 1]) return 'already exist number';
+
         this.room.numbers[this.number - 1] = 0;
         this.number = number;
         this.room.numbers[number - 1] = this.id;
@@ -110,13 +113,24 @@ class Player {
     changeSkill(skill) {
         if (!this.room) return 'must join room';
         if (this.skill === skill || !['dash', 'teleport'].includes(skill)) return 'wrong skill'; // 존재하지 않는 스킬이거나 이미 사용하는 스킬이거나
+
         this.skill = skill;
     }
 
     // 게임 준비
     setReady(ready) {
         if (!this.room) return 'must join room';
+        
         this.ready = ready;
+    }
+
+    // 게임 시작
+    startGame() {
+        if (!this.room) return 'must join room';
+        if (this.role !== 'owner') return 'no permission';
+
+        const result = this.room.startGame();
+        if (result) return result;
     }
 }
 

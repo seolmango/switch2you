@@ -203,9 +203,7 @@ io.on('connection', (socket) => {
 
     // 방 퇴장
     socket.on('leave room', (callback) => {
-        if (typeof callback !== 'function') {
-            return;
-        }
+        if (typeof callback !== 'function') return;
 
         const room = player.room;
         const number = player.number;
@@ -312,7 +310,15 @@ io.on('connection', (socket) => {
 
     // 게임 시작
     socket.on('start game', (callback) => {
+        if (typeof callback !== 'function') return;
 
+        const result = player.startGame();
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
+        callback({'status': 200});
+        io.to(player.room.id).emit('game started');
     })
 
 

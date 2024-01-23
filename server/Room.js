@@ -1,3 +1,5 @@
+const Map2d = require('./server/Map2d.js');
+
 class Room {
     static MaxCount = 0;
     static #_Count = 0;
@@ -32,6 +34,7 @@ class Room {
         if (roomName) this.name = roomName; // 방 이름
         else this.name = owner.name + '\'s Room';
         this.numbers = [0, 0, 0, 0, 0, 0, 0, 0]; // 번호 안 썼는지 여부들. 0이면 안썼고, 0이 아니면 썼음. 0이 아닌 숫자는 그 번호에 해당하는 player의 id.
+        this.map;
         owner.joinRoom(this, password);
         owner.role = 'owner';
     }
@@ -44,6 +47,22 @@ class Room {
         if (this.public) delete Room.#_Publics[this.id];
         delete Room.#_Instances[this.id];
         Room.#_Count--;
+    }
+
+    startGame() {
+        if (this.players.length < 3) return 'not enough player';
+        if (this.playing) return 'already play game';
+        let readyCheck = true;
+        this.players.forEach((player) => {
+            if (player.ready === false) {
+                readyCheck = false;
+                return false;
+            }
+        })
+        if (!readyCheck) return 'not all ready';
+
+        this.playing = true;
+        this.map = new Map2d();
     }
 }
 
