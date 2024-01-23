@@ -293,6 +293,29 @@ io.on('connection', (socket) => {
     })
 
 
+    // 게임 준비 여부 변경
+    socket.on('ready game', (ready, callback) => {
+        if (!checkData([ready, 'boolean'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        }
+
+        const result = player.setReady(ready);
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
+        callback({'status': 200});
+        io.to(player.room.id).emit('player readied', player.number, player.ready);
+    })
+
+
+    // 게임 시작
+    socket.on('start game', (callback) => {
+
+    })
+
+
     /**
     
 

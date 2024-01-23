@@ -25,6 +25,7 @@ class Player {
         this.role; // 유저 역할
         this.number; // 방에서 유저 번호
         this.skill; // 유저의 스킬
+        this.ready; // 게임 준비 여부
     }
 
     get id() {
@@ -73,6 +74,7 @@ class Player {
         this.role = null;
         this.number = null;
         this.skill = null;
+        this.ready = null;
         return ownerChange;
     }
 
@@ -109,6 +111,12 @@ class Player {
         if (!this.room) return 'must join room';
         if (this.skill === skill || !['dash', 'teleport'].includes(skill)) return 'wrong skill'; // 존재하지 않는 스킬이거나 이미 사용하는 스킬이거나
         this.skill = skill;
+    }
+
+    // 게임 준비
+    setReady(ready) {
+        if (!this.room) return 'must join room';
+        this.ready = ready;
     }
 }
 
