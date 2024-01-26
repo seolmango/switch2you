@@ -8,9 +8,17 @@ class Vector2 {
         return new Vector2(this.x + vector2.x, this.y + vector2.y);
     }
 
+    minus(vector2) {
+        return new Vector2(this.x - vector2.x, this.y - vector2.y);
+    }
+
     // 길이
     get magnitude () {
         return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+
+    normalize() {
+        return new Vector2(this.x / this.magnitude, this.y / this.magnitude);
     }
 
     // 사이각

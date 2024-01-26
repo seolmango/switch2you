@@ -7,4 +7,8 @@ class OBB extends Polygon {
         this.pos2 = pos2;
         this.rotation = 0;
     }
+
+    projection(angle) {
+        
+    }
 }
