@@ -17,6 +17,7 @@ class Vector2 {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
+    // 단위벡터 반환
     normalize() {
         return new Vector2(this.x / this.magnitude, this.y / this.magnitude);
     }

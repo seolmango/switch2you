@@ -7,7 +7,7 @@ class Circle extends Polygon {
         this.radius = radius;
     }
 
-    projection(angle) {
-        return this.radius;
+    projection(unit) {
+        return {'middle': angle}
     }
 }

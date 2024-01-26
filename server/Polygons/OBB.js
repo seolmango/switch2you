@@ -1,11 +1,12 @@
 const Polygon = require('./server/Polygons/Polygon.js');
 
 class OBB extends Polygon {
-    constructor(pos1, pos2) {
+    constructor(center, width, height, rotation = 0) {
         super();
-        this.pos1 = pos1;
-        this.pos2 = pos2;
-        this.rotation = 0;
+        this.center = center;
+        this.width = width;
+        this.height = height;
+        this.rotation = rotation;
     }
 
     projection(angle) {

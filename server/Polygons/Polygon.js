@@ -11,7 +11,7 @@ class Polygon {
         // 볼록 다각형 충돌 확인
         line1 = this.projection();
         line2 = polygon.projection();
-        if (line1.middle + line2.middle / 2 > line1.length + line2.length) { // 직선에 투영시킨게 닿는지 확인
+        if (Math.abs(line1.middle - line2.middle) > line1.half + line2.half) { // 직선에 투영시킨게 닿는지 확인
 
         }
     }
