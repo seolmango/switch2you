@@ -1,4 +1,4 @@
-const Map2d = require('./server/Map2d.js');
+const Map2d = require('./Map2d.js');
 
 class Room {
     static MaxCount = 0;

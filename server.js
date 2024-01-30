@@ -8,6 +8,10 @@ const io = require('socket.io')(http);
 const Config = require('./server/config.json');
 const Player = require('./server/Player.js');
 const Room = require('./server/Room.js');
+const Vector2 = require('./server/Polygons/Vector2.js');
+const Polygon = require('./server/Polygons/Polygon.js');
+const Circle = require('./server/Polygons/Circle.js');
+const OBB = require('./server/Polygons/OBB.js');
 
 
 // 설정 불러오기
@@ -17,7 +21,7 @@ Room.MaxCount = Config.roomMaxNum;
 
 const port = process.env.PORT || 3000;
 app.disable('x-powered-by');
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'test')));
 http.listen(port, function (){
     console.log('listening on : http://localhost:' + port);
 });
@@ -319,6 +323,18 @@ io.on('connection', (socket) => {
         }
         callback({'status': 200});
         io.to(player.room.id).emit('game started');
+    })
+
+
+    socket.on('test', (polygons, callback) => {
+        const checks = [];
+        for (const polygon of polygons) {
+            if (polygon.type === 'OBB')
+                checks.push(new OBB(new Vector2(polygon.x, polygon.y), polygon.width2, polygon.height2, polygon.rotation));
+            else
+                checks.push(new Circle(new Vector2(polygon.x, polygon.y), polygon.radius));
+        }
+        callback(checks[0].collisionCheck(checks[1]));
     })
 
 

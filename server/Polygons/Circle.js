@@ -1,13 +1,18 @@
-const Polygon = require('./server/Polygons/Polygon.js');
+const Polygon = require('./Polygon.js');
 
 class Circle extends Polygon {
     constructor(pos, radius) {
-        super();
-        this.pos = pos;
+        super(pos);
         this.radius = radius;
     }
 
-    projection(unit) {
-        return {'middle': angle}
+    get unitVector() {
+        return [];
+    }
+
+    projection(unitVector) {
+        return this.radius;
     }
 }
+
+module.exports = Circle;

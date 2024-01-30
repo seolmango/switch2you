@@ -24,19 +24,21 @@ class Vector2 {
 
     // 사이각
     getContainedAngle(vector2) { // 각 계산은 모두 라디안 (이게 편함)
-        const angle1 = Math.atan(this.x, this.y);
-        const angle2 = Math.atan(vector2.x, vector2.y);
+        const angle1 = Math.atan2(this.y, this.x);
+        const angle2 = Math.atan2(vector2.y, vector2.x);
         if (angle1 > angle2) return angle1 - angle2;
         else return angle2 - angle1;
     }
 
     // 내적
     innerProduct(vector2) {
-        return new Vector2(Math.cos(getContainedAngle) * this.magnitude * vector2.magnitude);
+        return Math.cos(this.getContainedAngle(vector2)) * this.magnitude * vector2.magnitude;
     }
 
     // 외적
     outerProduct(vector2) {
-        return new Vector2(Math.sin(getContainedAngle) * this.magnitude * vector2.magnitude);
+        return Math.sin(this.getContainedAngle(vector2)) * this.magnitude * vector2.magnitude;
     }
 }
+
+module.exports = Vector2;
