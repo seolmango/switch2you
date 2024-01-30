@@ -3,7 +3,7 @@ const Polygon = require('./Polygon.js');
 
 class OBB extends Polygon {
     constructor(pos, width2, height2, rotation = 0) {
-        super(pos);
+        super('OBB', pos);
         this.width2 = width2; // 절반
         this.height2 = height2; // 절반
         this.rotation = rotation;

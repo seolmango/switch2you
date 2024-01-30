@@ -2,16 +2,8 @@ const Polygon = require('./Polygon.js');
 
 class Circle extends Polygon {
     constructor(pos, radius) {
-        super(pos);
+        super('Circle', pos);
         this.radius = radius;
-    }
-
-    get unitVector() {
-        return [];
-    }
-
-    projection(unitVector) {
-        return this.radius;
     }
 }
 
