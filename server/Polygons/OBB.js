@@ -16,7 +16,7 @@ class OBB extends Polygon {
 
     updateCheckSize() {
         const axisVector = new Vector2(Math.abs(Math.cos(this.rotation)) * this.width2, Math.abs(Math.sin(this.rotation)) * this.width2);
-        const plusVector = new Vector2(-Math.abs(-Math.sin(this.rotation)) * this.height2, Math.abs(Math.cos(this.rotation)) * this.height2);
+        const plusVector = new Vector2(-Math.abs(Math.sin(this.rotation)) * this.height2, Math.abs(Math.cos(this.rotation)) * this.height2);
         this.checkWidth2 = axisVector.minus(plusVector).x;
         this.checkHeight2 = axisVector.plus(plusVector).y;
     }

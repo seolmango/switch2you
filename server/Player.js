@@ -2,20 +2,25 @@ class Player {
     static MaxCount = 0;
     static #_Count = 0;
     static #_Id = 1;
-    static Instances = {};
+    static #_Instances = {};
+    #_id;
 
     static get Count() {
-        return Player._Count;
+        return Player.#_Count;
     }
 
     static get Id() {
-        return Player._Id;
+        return Player.#_Id;
+    }
+
+    static get Instances() {
+        return Player.#_Instances;
     }
 
     constructor(socketId) {
         // Player 객체 기초 설정
-        this._id = Player.#_Id++;
-        Player.Instances[this.id] = this;
+        this.#_id = Player.#_Id++;
+        Player.#_Instances[this.id] = this;
         Player.#_Count++;
 
         this.socketId = socketId; // 유저의 소켓 id
@@ -29,11 +34,11 @@ class Player {
     }
 
     get id() {
-        return this._id;
+        return this.#_id;
     }
 
     delete() {
-        delete Player.Instances[this.id];
+        delete Player.#_Instances[this.id];
         Player.#_Count--;
     }
 

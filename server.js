@@ -9,9 +9,6 @@ const Config = require('./server/config.json');
 const Player = require('./server/Player.js');
 const Room = require('./server/Room.js');
 const Map2d = require('./server/Map2d.js');
-const Vector2 = require('./server/Polygons/Vector2.js');
-const Circle = require('./server/Polygons/Circle.js');
-const OBB = require('./server/Polygons/OBB.js');
 
 
 // 설정 불러오기
@@ -345,8 +342,8 @@ io.on('connection', (socket) => {
 
     socket.on('move', (dx, dy, rotate, callback) => {
         if (!player.map2d) player.map2d = new Map2d();
-        player.map2d.polygons[0].pos.x += dx;
-        player.map2d.polygons[0].pos.y += dy;
+        player.map2d.polygons[0].velocity.x = dx;
+        player.map2d.polygons[0].velocity.y = dy;
         player.map2d.polygons[0].rotation += rotate * Math.PI / 180;
         callback(getPolygonInfos(player.map2d.polygons));
     })

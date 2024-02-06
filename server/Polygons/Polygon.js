@@ -5,10 +5,11 @@ const Vector2 = require('./Vector2.js');
 class Polygon {
     #_rotation; // 회전량. 먼저 정의 해버리면 값이 꼬여버림
 
-    constructor(type, pos) {
+    constructor(type, pos, mass = 1,) {
         this.type = type; // 도형 종류
         this.pos = pos; // 중심
-        this.velocity = 0; // 속도
+        this.mass = mass; // 질량
+        this.velocity = new Vector2(); // 속도
         this.checkWidth2; // 절반
         this.checkHeight2; // 절반
     }
@@ -40,7 +41,6 @@ class Polygon {
         // 사전 충돌 검사
         if ((Math.abs(this.pos.x - polygon.pos.x) >= this.checkWidth2 + polygon.checkWidth2) || (Math.abs(this.pos.y - polygon.pos.y) >= this.checkHeight2 + polygon.checkHeight2))
             return false;
-        else return true;
         // 직사각형, 원 충돌 확인
         if (this.type === "OBB" && polygon.type === "OBB") {
             let check = true;
@@ -56,9 +56,13 @@ class Polygon {
                 // 닿는 코드 작성
             }
             return check;
+
         } else if (this.type === "Circle" && polygon.type === "Circle") {
             const check = Math.abs(this.pos.minus(polygon.pos).magnitude) < this.radius + polygon.radius;
-            return check;
+            if (check) {
+
+            }
+
         } else if ((this.type === "Circle" && polygon.type === "OBB") || (polygon.type === "Circle" && this.type === "OBB")) {
             let circle, obb;
             if (this.type === "Circle") {

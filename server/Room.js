@@ -5,6 +5,7 @@ class Room {
     static #_Count = 0;
     static #_Instances = {};
     static #_Publics = {};
+    #_id;
 
     static get Count() {
         return Room.#_Count;
@@ -20,7 +21,7 @@ class Room {
 
     constructor(owner, roomName = false, public_ = true, password = false) {
         // Room 객체 기초 설정
-        do this._id = randomString(8); // 방 id. 중복되지 않음. 경우의 수가 64^8이라 중복검사를 이 방법으로 하는게 좋음.
+        do this.#_id = randomString(8); // 방 id. 중복되지 않음. 경우의 수가 64^8이라 중복검사를 이 방법으로 하는게 좋음.
         while (Room.Instances[this.id]);
         Room.#_Instances[this.id] = this;
         Room.#_Count++;
@@ -34,13 +35,13 @@ class Room {
         if (roomName) this.name = roomName; // 방 이름
         else this.name = owner.name + '\'s Room';
         this.numbers = [0, 0, 0, 0, 0, 0, 0, 0]; // 번호 안 썼는지 여부들. 0이면 안썼고, 0이 아니면 썼음. 0이 아닌 숫자는 그 번호에 해당하는 player의 id.
-        this.map;
+        this.map2d; // 방의 맵 (1대1 대응)
         owner.joinRoom(this, password);
         owner.role = 'owner';
     }
 
     get id() {
-        return this._id;
+        return this.#_id;
     }
 
     delete() {
@@ -62,7 +63,7 @@ class Room {
         if (!readyCheck) return 'not all ready';
 
         this.playing = true;
-        this.map = new Map2d();
+        this.map2d = new Map2d();
     }
 }
 
