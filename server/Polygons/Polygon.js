@@ -38,8 +38,9 @@ class Polygon {
 
     collisionCheck(polygon) {
         // 사전 충돌 검사
-        if ((this.pos.x + polygon.pos.x > this.checkWidth2 + polygon.checkWidth2) || (this.pos.y + polygon.pos.y > this.checkheight2 + polygon.checkHeight2))
+        if ((Math.abs(this.pos.x - polygon.pos.x) >= this.checkWidth2 + polygon.checkWidth2) || (Math.abs(this.pos.y - polygon.pos.y) >= this.checkHeight2 + polygon.checkHeight2))
             return false;
+        else return true;
         // 직사각형, 원 충돌 확인
         if (this.type === "OBB" && polygon.type === "OBB") {
             let check = true;

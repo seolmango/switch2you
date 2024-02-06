@@ -343,10 +343,17 @@ io.on('connection', (socket) => {
     })
 
 
-    socket.on('test', (move, callback) => {
+    socket.on('move', (dx, dy, rotate, callback) => {
         if (!player.map2d) player.map2d = new Map2d();
-        player.map2d.polygons[0].rotation += move * Math.PI / 180;
+        player.map2d.polygons[0].pos.x += dx;
+        player.map2d.polygons[0].pos.y += dy;
+        player.map2d.polygons[0].rotation += rotate * Math.PI / 180;
         callback(getPolygonInfos(player.map2d.polygons));
+    })
+
+    socket.on('check', (callback) => {
+        const result = player.map2d.polygons[0].collisionCheck(player.map2d.polygons[1]);
+        callback(result);
     })
 
 
