@@ -1,5 +1,9 @@
 class Vector2 {
     constructor(x = 0, y = 0) {
+        this.set(x, y);
+    }
+
+    set(x, y) {
         this.x = x;
         this.y = y;
     }
@@ -10,6 +14,10 @@ class Vector2 {
 
     minus(vector2) {
         return new Vector2(this.x - vector2.x, this.y - vector2.y);
+    }
+
+    multiply(number) {
+        return new Vector2(this.x * number, this.y * number);
     }
 
     // 길이

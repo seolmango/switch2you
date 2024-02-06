@@ -340,17 +340,11 @@ io.on('connection', (socket) => {
     })
 
 
-    socket.on('move', (dx, dy, rotate, callback) => {
+    socket.on('move', (dx, dy, rotate) => {
         if (!player.map2d) player.map2d = new Map2d();
         player.map2d.polygons[0].velocity.x = dx;
         player.map2d.polygons[0].velocity.y = dy;
         player.map2d.polygons[0].rotation += rotate * Math.PI / 180;
-        callback(getPolygonInfos(player.map2d.polygons));
-    })
-
-    socket.on('check', (callback) => {
-        const result = player.map2d.polygons[0].collisionCheck(player.map2d.polygons[1]);
-        callback(result);
     })
 
 
@@ -394,3 +388,13 @@ io.on('connection', (socket) => {
     */
 
 });
+
+function ingameLoop() {
+    for (let key in Map2d.Instances) {
+        const map2d = Map2d.Instances[key];
+        map2d.update();
+        io.to(Object.values(Player.Instances)[0]?.socketId).emit('ingame updated', getPolygonInfos(map2d.polygons));
+    }
+}
+
+setInterval(ingameLoop, 33);
