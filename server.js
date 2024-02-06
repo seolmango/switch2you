@@ -8,8 +8,8 @@ const io = require('socket.io')(http);
 const Config = require('./server/config.json');
 const Player = require('./server/Player.js');
 const Room = require('./server/Room.js');
+const Map2d = require('./server/Map2d.js');
 const Vector2 = require('./server/Polygons/Vector2.js');
-const Polygon = require('./server/Polygons/Polygon.js');
 const Circle = require('./server/Polygons/Circle.js');
 const OBB = require('./server/Polygons/OBB.js');
 
@@ -46,6 +46,23 @@ function getRoomInfo(rooms) {
         return rooms.map(infoFilter);
     else
         return infoFilter(rooms);
+}
+
+function getPolygonInfos(polygons) {
+    const infoFilter = (polygon) => {
+        let info = {'type': polygon.type, 'x': polygon.pos.x, 'y': polygon.pos.y, 'rotation': polygon.rotation, 'velocity': polygon.velocity, 'checkWidth2': polygon.checkWidth2, 'checkHeight2': polygon.checkHeight2};
+        if (polygon.type === 'OBB') {
+            info['width2'] = polygon.width2;
+            info['height2'] = polygon.height2;
+        } else {
+            info['radius'] = polygon.radius;
+        }
+        return info;
+    }
+    if (Array.isArray(polygons))
+        return polygons.map(infoFilter);
+    else
+        return infoFilter(polygons);
 }
 
 function checkData(...args) {
@@ -326,15 +343,10 @@ io.on('connection', (socket) => {
     })
 
 
-    socket.on('test', (polygons, callback) => {
-        const checks = [];
-        for (const polygon of polygons) {
-            if (polygon.type === 'OBB')
-                checks.push(new OBB(new Vector2(polygon.x, polygon.y), polygon.width2, polygon.height2, polygon.rotation));
-            else
-                checks.push(new Circle(new Vector2(polygon.x, polygon.y), polygon.radius));
-        }
-        callback(checks[0].collisionCheck(checks[1]));
+    socket.on('test', (move, callback) => {
+        if (!player.map2d) player.map2d = new Map2d();
+        player.map2d.polygons[0].rotation += move * Math.PI / 180;
+        callback(getPolygonInfos(player.map2d.polygons));
     })
 
 
