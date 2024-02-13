@@ -9,6 +9,7 @@ const Config = require('./server/config.json');
 const Player = require('./server/Player.js');
 const Room = require('./server/Room.js');
 const Map2d = require('./server/Map2d.js');
+const Vector2 = require('./server/Physics/Vector2.js');
 
 
 // 설정 불러오기
@@ -45,21 +46,25 @@ function getRoomInfo(rooms) {
         return infoFilter(rooms);
 }
 
-function getPolygonInfos(polygons) {
-    const infoFilter = (polygon) => {
-        let info = {'type': polygon.type, 'x': polygon.pos.x, 'y': polygon.pos.y, 'rotation': polygon.rotation, 'velocity': polygon.velocity, 'checkWidth2': polygon.checkWidth2, 'checkHeight2': polygon.checkHeight2};
-        if (polygon.type === 'OBB') {
-            info['width2'] = polygon.width2;
-            info['height2'] = polygon.height2;
-        } else {
-            info['radius'] = polygon.radius;
+function getRigidBodyInfos(rigidBodys) {
+    const infoFilter = (rigidBody) => {
+        let info = {
+            'type': rigidBody.shape.type, 'checkWidth2': rigidBody.shape.checkWidth2, 'checkHeight2': rigidBody.shape.checkHeight2,
+            'x': rigidBody.pos.x, 'y': rigidBody.pos.y, 'vx': rigidBody.v.x, 'vy': rigidBody.v.y,
+            'rotation': rigidBody.rotation
+        };
+        if (rigidBody.shape.type === 'Circle') {
+            info['radius'] = rigidBody.shape.radius;
+        } else if (rigidBody.shape.type === 'OBB') {
+            info['width2'] = rigidBody.shape.width2;
+            info['height2'] = rigidBody.shape.height2;
         }
         return info;
     }
-    if (Array.isArray(polygons))
-        return polygons.map(infoFilter);
+    if (Array.isArray(rigidBodys))
+        return rigidBodys.map(infoFilter);
     else
-        return infoFilter(polygons);
+        return infoFilter(rigidBodys);
 }
 
 function checkData(...args) {
@@ -340,11 +345,14 @@ io.on('connection', (socket) => {
     })
 
 
-    socket.on('move', (dx, dy, rotate) => {
-        if (!player.map2d) player.map2d = new Map2d();
-        player.map2d.polygons[0].velocity.x = dx;
-        player.map2d.polygons[0].velocity.y = dy;
-        player.map2d.polygons[0].rotation += rotate * Math.PI / 180;
+    // 플레이어 이동
+    socket.on('move', (doing, direction) => {
+        if (!checkData([doing, 'boolean'], [direction, 'number'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        }
+        if (!player.map2d) player.map2d = new Map2d(player);
+        player.actions.move = {'doing': doing, 'direction': direction};
     })
 
 
@@ -392,8 +400,8 @@ io.on('connection', (socket) => {
 function ingameLoop() {
     for (let key in Map2d.Instances) {
         const map2d = Map2d.Instances[key];
-        map2d.update();
-        io.to(Object.values(Player.Instances)[0]?.socketId).emit('ingame updated', getPolygonInfos(map2d.polygons));
+        map2d.update(30);
+        io.to(Object.values(Player.Instances)[0]?.socketId).emit('ingame updated', getRigidBodyInfos(map2d.rigidBodys));
     }
 }
 

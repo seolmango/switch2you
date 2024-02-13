@@ -5,19 +5,20 @@ const Vector2 = require('./Vector2.js');
 class RigidBody {
     #_rotation; // 각도
 
-    constructor(shape, pos, mass = 1, rotation = 0) {
+    constructor(shape, mass, pos, rotation = 0) {
         this.shape = shape; // 모양
+        this.mass = mass; // 질량
+        this.frictionCoef = 0.5; // friction coefficient. 마찰계수
 
         this.pos = pos; // 중심, 위치
         this.v = new Vector2(); // 속도
         this.a = new Vector2(); // 가속도
+        this.f = new Vector2(); // 힘
 
         this.rotation = rotation; // 각도
         this.angV; // angular velocity. 각속도
         this.angA; // 각가속도
-
-        this.mass = mass; // 질량
-        this.frictionCoef = 5; // friction coefficient. 마찰계수
+        this.t; // 토크
     }
 
     delete() {}
@@ -26,10 +27,9 @@ class RigidBody {
         return this.#_rotation;
     }
 
-    // 각도 변경
     set rotation(value) {
         this.#_rotation = value;
-        this.shape.updateCheckSize();
+        this.shape.updateCheckSize(this.#_rotation); // 각도 변경시 자동으로 사전 검사 크기 재조정
     }
 
 

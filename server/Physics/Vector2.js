@@ -20,6 +20,10 @@ class Vector2 {
         return new Vector2(this.x * number, this.y * number);
     }
 
+    divide(number) {
+        return new Vector2(this.x / number, this.y / number);
+    }
+
     // 길이
     get magnitude () {
         return Math.sqrt(this.x * this.x + this.y * this.y);

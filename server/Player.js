@@ -31,6 +31,7 @@ class Player {
         this.number; // 방에서 유저 번호
         this.skill; // 유저의 스킬
         this.ready; // 게임 준비 여부
+        this.actions = []; // 유저가 취하고 있는 행동들 (fps를 맞추기 위함임)
     }
 
     get id() {
