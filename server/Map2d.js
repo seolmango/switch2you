@@ -1,6 +1,7 @@
-const Vector2 = require('./Polygons/Vector2.js');
-const OBB = require('./Polygons/OBB.js');
-const Circle = require('./Polygons/Circle.js');
+const Vector2 = require('./Physics/Vector2.js');
+const RigidBody = require('./Physics/RigidBody.js');
+const Circle = require('./Physics/Circle.js');
+const OBB = require('./Physics/OBB.js');
 
 
 class Map2d {
@@ -22,11 +23,11 @@ class Map2d {
         Map2d.#_Instances[this.id] = this;
 
         this.createdTime = Date.now();
-        this.polygons = [];
+        this.rigidBodys = [];
 
-        //this.polygons.push(new OBB(new Vector2(430, 250), 40, 20));
-        this.polygons.push(new Circle(new Vector2(2000, 1000), 80));
-        this.polygons.push(new Circle(new Vector2(2500, 1000), 400));
+        // test
+        this.rigidBodys.push(new RigidBody(new Circle(80), new Vector2(2000, 1000)));
+        this.rigidBodys.push(new RigidBody(new Circle(400), new Vector2(2500, 1000)));
     }
 
     get id() {
@@ -37,21 +38,30 @@ class Map2d {
         delete Map2d.#_Instances[this.id];
     }
 
-    update() {
-        // 충돌 확인
-        /**
-        for (let i = 0; i < this.polygons.length - 1; i++)
-            for (let j = i + 1; j < this.polygons.length; j++)
-                this.polygons[i].collisionCheck(this.polygons[j]);
-        */
+    update(fps) {
+        const dt = 1 / fps;
+
+        // 플레이어 행동에 따른 외부 힘 적용
+        // ~~어쩌구 저쩌구
 
         // 이동
-        const friction = 10; // 마찰력
-        for (let polygon of this.polygons) {
-            if (polygon.velocity.magnitude > friction) polygon.velocity = polygon.velocity.minus(polygon.velocity.normalize().multiply(friction)); // 마찰력 상쇄
-            else polygon.velocity.set(0, 0);
+        const frictionCoef = 5; // 지면의 마찰계수
+        for (let rigidBody of this.rigidBodys) {
+            if (rigidBody.v.magnitude > friction) polygon.velocity = polygon.velocity.minus(polygon.velocity.normalize().multiply(friction)); // 마찰력 상쇄
+            else rigidBody.v.set(0, 0);
             polygon.pos = polygon.pos.plus(polygon.velocity); // 속도만큼 이동
-            if (polygon.radius === 80) console.log(polygon.velocity);
+        }
+
+        // 충돌 확인과 알짜힘 계산
+        for (const polygon of polygons) polygon.netForce = new Vector2(); // 알짜힘 초기화
+        for (let i = 0; i < this.polygons.length - 1; i++) // 알짜힘 계산
+            for (let j = i + 1; j < this.polygons.length; j++)
+                this.polygons[i].collisionCheck(this.polygons[j]);
+
+        // 보정과 반응
+        for (const polygon of polygons) { // 알짜힘 적용(보정) 및 초기화
+            polygon.
+            polygon.netForce = new Vector2();
         }
     }
 }
