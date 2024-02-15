@@ -33,6 +33,7 @@ class RigidBody {
     }
 
 
+    // 충돌 확인과 힘 계산
     collisionCheck(rigidBody) {
         // 사전 충돌 검사
         if ((Math.abs(this.pos.x - rigidBody.pos.x) >= this.checkWidth2 + rigidBody.checkWidth2) || (Math.abs(this.pos.y - rigidBody.pos.y) >= this.checkHeight2 + rigidBody.checkHeight2)) return;
@@ -133,6 +134,11 @@ class RigidBody {
             
             return check;
         }*/
+    }
+
+    // 보정
+    response() {
+        return;
     }
 }
 

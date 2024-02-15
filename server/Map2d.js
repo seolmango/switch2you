@@ -74,21 +74,16 @@ class Map2d {
             rigidBody.pos = rigidBody.pos.plus(rigidBody.v.multiply(dt));
         }
 
-        // 힘 초기화
-        this.rigidBodys.forEach(rigidBody => rigidBody.f.set(0, 0));
+        // 충돌 확인과 힘 계산
+        for (let i = 0; i < this.rigidBodys.length - 1; i++) // 알짜힘 계산
+            for (let j = i + 1; j < this.rigidBodys.length; j++)
+                this.rigidBodys[i].collisionCheck(this.rigidBodys[j]);
 
-        // 충돌 확인과 알짜힘 계산
-        /**
-        for (const polygon of polygons) polygon.netForce = new Vector2(); // 알짜힘 초기화
-        for (let i = 0; i < this.polygons.length - 1; i++) // 알짜힘 계산
-            for (let j = i + 1; j < this.polygons.length; j++)
-                this.polygons[i].collisionCheck(this.polygons[j]);
-
-        // 보정과 반응
-        for (const polygon of polygons) { // 알짜힘 적용(보정) 및 초기화
-            polygon.
-            polygon.netForce = new Vector2();
-        }*/
+        // 보정
+        this.rigidBodys.forEach(rigidBody => {
+            rigidBody.response(); // 위치 보정
+            rigidBody.f.set(0,0); // 계산 끝났으니 힘 초기화
+        })
     }
 }
 
