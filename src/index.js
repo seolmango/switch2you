@@ -248,11 +248,7 @@ window.addEventListener("doSocketConnect", function () {
                     player.role = 'user';
                 }
                 if(player.number === waitingRoomScreen.Client_room_id){
-                    if(player.role === 'owner'){
-                        waitingRoomScreen.Client_owner = true;
-                    }else{
-                        waitingRoomScreen.Client_owner = false;
-                    }
+                    waitingRoomScreen.Client_owner = player.role === 'owner';
                 }
             })
         }
