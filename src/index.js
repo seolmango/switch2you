@@ -1,6 +1,4 @@
-// css load
 import {drawRoundBox} from "./Screens/tools/drawRoundBox";
-
 require('./main.css');
 
 // js load
@@ -23,19 +21,45 @@ const UI_ctx = UI_canvas.getContext('2d');
 
 // Set Data
 const Screen = {};
+
+/**
+ * information of user's mouse
+ * @type {{x: number, y: number, press: boolean, click: boolean}}
+ */
 Screen.userMouse = {
     x: 0,
     y: 0,
     click: false,
     press: false,
 };
+
 Screen.userKeyboard = new Array(100).fill(false);
+/**
+ * scale of the window size compared to the original size (1920, 1080)
+ * @type {number}
+ */
 Screen.scale = 1;
+
 Screen.currentScreen = {};
 Screen.currentScreen.draw = function () {};
 Screen.currentScreen.checkUIList = [];
+
+/**
+ * the gap between the client's screen and canvas width
+ * @type {number}
+ */
 Screen.X0real = 0;
+
+/**
+ * the gap between the client's screen and canvas height
+ * @type {number}
+ */
 Screen.Y0real = 0;
+
+/**
+ * the data of the alert message
+ * @type {{data: {tag: string, text: string, time: number}[], draw: function, add_Data: function}}
+ */
 Screen.alert = {};
 Screen.alert.data = [];
 Screen.alert.draw = function() {
@@ -69,7 +93,17 @@ Screen.alert.add_Data = function (tag, text, time){
         });
     }
 }
+
+/**
+ * the list of activated html elements
+ * @type {Array}
+ */
 Screen.activatedHtmlElement = [];
+
+/**
+ * the data of user setting
+ * @type {{Sound: {BGM: number}, Display: {fps: number}}}
+ */
 Screen.Settings = {
     Sound: {
         BGM: 0,
@@ -78,6 +112,7 @@ Screen.Settings = {
         fps: 60,
     }
 }
+
 Screen.join_room = false;
 Screen.joyStickCanvas = document.getElementById('joystick');
 Screen.joyStickController = new JoystickController('joystick');
