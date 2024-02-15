@@ -30,8 +30,8 @@ class checkboxElement {
     /**
      * Resize the checkbox element
      * @param {number} scale - scale of the window size compared to the original size {1920, 1080)
-     * @param {number} innerWidth - the gap between the client window and canvas in the x direction
-     * @param {number} innerHeight - the gap between the client window and canvas in the y direction
+     * @param {number} innerWidth - window.innerWidth
+     * @param {number} innerHeight - window.innerHeight
      */
     resize(scale, innerWidth, innerHeight) {
         this.DOM.style.width = this.width * scale + 'px';
