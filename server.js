@@ -163,7 +163,7 @@ io.on('connection', (socket) => {
             callback({'status': 400, 'message': 'server full'});
             return;
         }
-        player.update(playerName);
+        player.changeName(playerName);
         const room = new Room(player, roomName, public, password); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
         socket.join(room.id); // 4. room 관련 처리하고 소켓신호 보내기
         callback({'status': 200, 'roomInfo': getRoomInfo(room)});
@@ -182,7 +182,7 @@ io.on('connection', (socket) => {
             callback({'status': 400, 'message': result});
             return;
         }
-        player.update(playerName);
+        player.changeName(playerName);
         socket.join(player.room.id);
         socket.to(player.room.id).emit('player joined', getPlayerInfo(player));
         callback({'status': 200, 'roomInfo': getRoomInfo(player.room), 'playerInfos': getPlayerInfo(player.room.players), 'playerNumber': player.number});
@@ -202,7 +202,7 @@ io.on('connection', (socket) => {
         // 공개 빈 방 탐색
         for (const room of Object.values(Room.Publics)) {
             if (room.password || room.players.length > 8 || room.playing) continue; // 비공개거나, 비밀번호가 있거나, 꽉찾거나, 게임중이면 건너뛰기
-            player.update(playerName);
+            player.changeName(playerName);
             player.joinRoom(room);
             socket.join(room.id);
             socket.to(room.id).emit('player joined', getPlayerInfo(player));
@@ -216,7 +216,7 @@ io.on('connection', (socket) => {
                 callback({'status': 400, 'message': 'server full'});
                 return;
             }
-            player.update(playerName);
+            player.changeName(playerName);
             const room = new Room(player);
             socket.join(room.id);
             callback({'status': 200, 'roomInfo': getRoomInfo(room)});
@@ -314,14 +314,14 @@ io.on('connection', (socket) => {
     })
 
 
-    // 게임 준비 여부 변경
-    socket.on('ready game', (ready, callback) => {
+    // 플레이어 게임 준비 여부 변경
+    socket.on('change player ready', (ready, callback) => {
         if (!checkData([ready, 'boolean'], [callback, 'function'])) {
             if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
             return;
         }
 
-        const result = player.setReady(ready);
+        const result = player.changeReady(ready);
         if (result) {
             callback({'status': 400, 'message': result});
             return;

@@ -43,7 +43,7 @@ class Player {
         Player.#_Count--;
     }
 
-    update(name) {
+    changeName(name) {
         this.name = name;
     }
 
@@ -123,8 +123,8 @@ class Player {
         this.skill = skill;
     }
 
-    // 게임 준비
-    setReady(ready) {
+    // 게임 준비 변경
+    changeReady(ready) {
         if (!this.room) return 'must join room';
         
         this.ready = ready;
