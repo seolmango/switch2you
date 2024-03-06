@@ -1,40 +1,45 @@
-const Vector2 = require('./Vector2.js');
+//const Vector2 = require('./Vector2.js');
 
 
 // 강체
 class RigidBody {
-    #_rotation; // 각도
+    #_angle; // 각도
 
-    constructor(shape, mass, pos, rotation = 0) {
+    constructor(shape, mass, pos, angle = 0) {
         this.shape = shape; // 모양
         this.mass = mass; // 질량
-        this.frictionCoef = 0.5; // friction coefficient. 마찰계수
 
+        this.frictionCoefficient = 0.5; // 마찰계수
         this.pos = pos; // 중심, 위치
         this.v = new Vector2(); // 속도
         this.a = new Vector2(); // 가속도
         this.f = new Vector2(); // 힘
 
-        this.rotation = rotation; // 각도
-        this.angV; // angular velocity. 각속도
-        this.angA; // 각가속도
-        this.t; // 토크
+        this.rotationalInertia = 1; // 회전 관성
+        this.angle = angle; // 각도
+        this.angV = 0; // angular velocity. 각속도
+        this.angA = 0; // 각가속도
+        this.t = 0; // 토크
     }
 
     delete() {}
 
-    get rotation() {
-        return this.#_rotation;
+    get angle() {
+        return this.#_angle;
     }
 
-    set rotation(value) {
-        this.#_rotation = value;
-        this.shape.updateCheckSize(this.#_rotation); // 각도 변경시 자동으로 사전 검사 크기 재조정
+    set angle(value) {
+        this.#_angle = value;
+        this.shape.updateCheckSize(this.#_angle); // 각도 변경시 자동으로 사전 검사 크기 재조정
+    }
+
+    get p() { // 운동량
+        return this.v.multiply(this.mass);
     }
 
 
     // 충돌 확인과 힘 계산
-    collisionCheck(rigidBody) {
+    collisionCheck(fps, rigidBody) {
         // 사전 충돌 검사
         if ((Math.abs(this.pos.x - rigidBody.pos.x) >= this.checkWidth2 + rigidBody.checkWidth2) || (Math.abs(this.pos.y - rigidBody.pos.y) >= this.checkHeight2 + rigidBody.checkHeight2)) return;
 
@@ -54,8 +59,22 @@ class RigidBody {
 
             const penetration = (circle1.shape.radius + circle2.shape.radius) - Math.abs(circle1.pos.minus(circle2.pos).magnitude); // 충돌 정도
             if (penetration > 0) { // 충돌함
-                
+                // 충돌
+                let p1 = circle1.p; // 운동량
+                let p2 = circle2.p;
+                circle1.f = circle1.f.plus(p2.minus(p1).multiply(fps)); // 충돌한 값 + 반작용. 충격량을 구하기 위해 dt를 사용해 프레임에 따라 매우 부정확해지는 문제가 있어서 뺌.
+                circle2.f = circle2.f.plus(p1.minus(p2).multiply(fps));
+                // 보정
+                let distance = circle1.pos.minus(circle2.pos).normalize().multiply(penetration);
+                if (circle1.v.magnitude + circle2.v.magnitude) {
+                    circle1.pos = circle1.pos.plus(distance.multiply(circle1.v.magnitude / (circle1.v.magnitude + circle2.v.magnitude)));
+                    circle2.pos = circle2.pos.minus(distance.multiply(circle2.v.magnitude / (circle1.v.magnitude + circle2.v.magnitude)));
+                } else {
+                    circle1.pos = circle1.pos.plus(distance.multiply(0.5));
+                    circle2.pos = circle2.pos.minus(distance.multiply(0.5));
+                }
             }
+            // 탄성(공)력? 충돌시 자기도 멈추는게 아니라 뒤로 밀림 절대벽 같은 경우엔 -1인거지
 
         } else if (check[0] === 'Circle' && check[1] === 'OBB') {
             const circle = this;
@@ -142,4 +161,4 @@ class RigidBody {
     }
 }
 
-module.exports = RigidBody;
+//exports = RigidBody;

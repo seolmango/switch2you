@@ -1,4 +1,4 @@
-const Shape = require('./Shape.js');
+//const Shape = require('./Shape.js');
 
 
 class Circle extends Shape {
@@ -7,10 +7,10 @@ class Circle extends Shape {
         this.radius = radius;
     }
 
-    updateCheckSize(rotation) {
+    updateCheckSize(angle) {
         this.checkWidth2 = this.radius;
         this.checkHeight2 = this.radius;
     }
 }
 
-module.exports = Circle;
+//module.exports = Circle;

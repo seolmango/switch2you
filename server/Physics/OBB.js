@@ -1,17 +1,17 @@
-const Vector2 = require('./Vector2.js');
-const Polygon = require('./Shape.js');
+//const Vector2 = require('./Vector2.js');
+//const Shape = require('./Shape.js');
 
 
-class OBB extends Polygon {
-    constructor(pos, width2, height2, rotation = 0) {
+class OBB extends Shape {
+    constructor(width2, height2) {
         super('OBB');
         this.width2 = width2; // 절반
         this.height2 = height2; // 절반
     }
 
-    updateCheckSize(rotation) {
-        const CosR = Math.abs(Math.cos(rotation));
-        const SinR = Math.abs(Math.sin(rotation));
+    updateCheckSize(angle) {
+        const CosR = Math.abs(Math.cos(angle));
+        const SinR = Math.abs(Math.sin(angle));
         const axisVector = new Vector2(CosR * this.width2, SinR * this.width2); // 오른쪽으로의 거리
         const plusVector = new Vector2(-SinR * this.height2, CosR * this.height2); // 거기서 위 아래로의 거리
         this.checkWidth2 = axisVector.minus(plusVector).x;
@@ -37,4 +37,4 @@ class OBB extends Polygon {
     }*/
 }
 
-module.exports = OBB;
+//module.exports = OBB;
