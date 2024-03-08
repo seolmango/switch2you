@@ -5,12 +5,17 @@
 class RigidBody {
     #_angle; // 각도
 
-    constructor(shape, mass, pos, angle = 0) {
+    constructor(shape, mass, pos, angle, restitution = 0, friction = 1, damping = 1) {
         this.shape = shape; // 모양
         this.mass = mass; // 질량
+        this.invMass = 1 / mass; // 질량의 역수 (계산에 이용됨)
 
-        this.frictionCoefficient = 0.5; // 마찰계수
+        this.restitution = restitution; // 복원력 (탄성계수)
+        this.friction = friction; // 마찰력
+        this.damping = damping; // 저항력 (공기저항 등)
+
         this.pos = pos; // 중심, 위치
+        this.correctionPos = new Vector2(); // 보정 위치값의 합
         this.v = new Vector2(); // 속도
         this.a = new Vector2(); // 가속도
         this.f = new Vector2(); // 힘
@@ -33,20 +38,16 @@ class RigidBody {
         this.shape.updateCheckSize(this.#_angle); // 각도 변경시 자동으로 사전 검사 크기 재조정
     }
 
-    get p() { // 운동량
-        return this.v.multiply(this.mass);
-    }
 
-
-    // 충돌 확인과 힘 계산
-    collisionCheck(fps, rigidBody) {
+    // 충돌 감지와 보정
+    static checkCollision(fps, rigidBody1, rigidBody2) {
         // 사전 충돌 검사
-        if ((Math.abs(this.pos.x - rigidBody.pos.x) >= this.checkWidth2 + rigidBody.checkWidth2) || (Math.abs(this.pos.y - rigidBody.pos.y) >= this.checkHeight2 + rigidBody.checkHeight2)) return;
+        if ((Math.abs(rigidBody1.pos.x - rigidBody2.pos.x) >= rigidBody1.checkWidth2 + rigidBody2.checkWidth2) || (Math.abs(rigidBody1.pos.y - rigidBody2.pos.y) >= rigidBody1.checkHeight2 + rigidBody2.checkHeight2)) return;
 
         // type 정렬과 할당
         const types = ['Circle', 'OBB'];
-        let check = [this.shape.type, rigidBody.shape.type];
-        if (types.indexOf(this.shape.type) > types.indexOf(rigidBody.shape.type)) {
+        let check = [rigidBody1.shape.type, rigidBody2.shape.type];
+        if (types.indexOf(rigidBody1.shape.type) > types.indexOf(rigidBody2.shape.type)) {
             let temp = check[0]
             check[0] = check[1];
             check[1] = temp;
@@ -54,36 +55,29 @@ class RigidBody {
 
         // 정확한 충돌 검사
         if (check[0] === 'Circle' && check[1] === 'Circle') {
-            const circle1 = this;
-            const circle2 = rigidBody;
+            const circle1 = rigidBody1;
+            const circle2 = rigidBody2;
 
             const penetration = (circle1.shape.radius + circle2.shape.radius) - Math.abs(circle1.pos.minus(circle2.pos).magnitude); // 충돌 정도
             if (penetration > 0) { // 충돌함
-                // 충돌
-                let p1 = circle1.p; // 운동량
-                let p2 = circle2.p;
-                circle1.f = circle1.f.plus(p2.minus(p1).multiply(fps)); // 충돌한 값 + 반작용. 충격량을 구하기 위해 dt를 사용해 프레임에 따라 매우 부정확해지는 문제가 있어서 뺌.
-                circle2.f = circle2.f.plus(p1.minus(p2).multiply(fps));
                 // 보정
-                let distance = circle1.pos.minus(circle2.pos).normalize().multiply(penetration);
-                if (circle1.v.magnitude + circle2.v.magnitude) {
-                    circle1.pos = circle1.pos.plus(distance.multiply(circle1.v.magnitude / (circle1.v.magnitude + circle2.v.magnitude)));
-                    circle2.pos = circle2.pos.minus(distance.multiply(circle2.v.magnitude / (circle1.v.magnitude + circle2.v.magnitude)));
-                } else {
-                    circle1.pos = circle1.pos.plus(distance.multiply(0.5));
-                    circle2.pos = circle2.pos.minus(distance.multiply(0.5));
-                }
+                const normal = circle2.pos.minus(circle1.pos).normalize(); // 법선벡터. circle1이 이동한 방향이라 생각하면 됨.
+                let distance = normal.multiply(penetration); // 보정 거리
+                circle1.correctionPos = circle1.correctionPos.minus(distance.multiply(circle2.mass / (circle1.mass + circle2.mass))); // 질량을 이용해 조금 더 정확한 보정
+                circle2.correctionPos = circle2.correctionPos.plus(distance.multiply(circle1.mass / (circle1.mass + circle2.mass)));
+
+                // 해결
+                RigidBody.resolveCollision(fps, circle1, circle2, normal);
             }
-            // 탄성(공)력? 충돌시 자기도 멈추는게 아니라 뒤로 밀림 절대벽 같은 경우엔 -1인거지
 
         } else if (check[0] === 'Circle' && check[1] === 'OBB') {
-            const circle = this;
-            const obb = rigidBody;
+            const circle = rigidBody1;
+            const obb = rigidBody2;
             // 나중에
 
         } else if (check[0] === 'OBB' && check[1] === 'OBB') {
-            const obb1 = this;
-            const obb2 = rigidBody;
+            const obb1 = rigidBody1;
+            const obb2 = rigidBody2;
 
             /**
             let check = true;
@@ -155,9 +149,17 @@ class RigidBody {
         }*/
     }
 
-    // 보정
-    response() {
-        return;
+    // 충돌 해결
+    static resolveCollision(fps, rigidBody1, rigidBody2, normal) {
+        const relativeV = rigidBody2.v.minus(rigidBody1.v);
+        if (normal.dot(relativeV) > 0) return; // 서로 멀어지고 있는가?
+        const e = Math.min(rigidBody1.restitution, rigidBody2.restitution);
+        let j = -(1 + e) * normal.dot(relativeV);
+        j /= rigidBody1.invMass + rigidBody2.invMass;
+
+        const impulse = normal.multiply(j);
+        rigidBody1.f = rigidBody1.f.minus(impulse.multiply(fps));
+        rigidBody2.f = rigidBody2.f.plus(impulse.multiply(fps));
     }
 }
 
