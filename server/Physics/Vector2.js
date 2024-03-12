@@ -31,6 +31,7 @@ class Vector2 {
 
     // 단위벡터 반환
     normalize() {
+        if (this.magnitude === 0) return new Vector2(0, 0);
         return new Vector2(this.x / this.magnitude, this.y / this.magnitude);
     }
 
@@ -51,6 +52,11 @@ class Vector2 {
     // 외적
     cross(vector2) {
         return this.x * vector2.y - this.y * vector2.x;
+    }
+
+    // 회전변환
+    rotationConversion(angle) {
+        return new Vector2(Math.cos(angle) * this.x - Math.sin(angle) * this.y, Math.sin(angle) * this.x + Math.cos(angle) * this.y);
     }
 }
 
