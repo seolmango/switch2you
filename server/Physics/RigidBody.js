@@ -39,13 +39,13 @@ class RigidBody {
     }
 
 
-    // 충돌 감지와 보정, 모든 검사는 rigidBody1 기준으로
+    // 충돌 감지와 보정, 모든 벡터량은 rigidBody1 기준으로
     static checkCollision(fps, rigidBody1, rigidBody2) {
         // 사전 충돌 검사
         if ((Math.max((rigidBody2.pos.x - rigidBody2.shape.checkLeft) - (rigidBody1.pos.x + rigidBody1.shape.checkRight), (rigidBody1.pos.x - rigidBody1.shape.checkLeft) - (rigidBody2.pos.x + rigidBody2.shape.checkRight)) >= 0) || (Math.max((rigidBody2.pos.y - rigidBody2.shape.checkDown) - (rigidBody1.pos.y + rigidBody1.shape.checkUp), (rigidBody1.pos.y - rigidBody1.shape.checkDown) - (rigidBody2.pos.y + rigidBody2.shape.checkUp)) >= 0)) return;
 
         let normal; // 접촉면의 법선벡터
-        let penetration; // 침투(충돌) 정도
+        let penetration = 0; // 침투(충돌) 정도
         let relativePos = rigidBody2.pos.minus(rigidBody1.pos); // 거리 차
 
         // 정확한 충돌 검사
@@ -65,9 +65,9 @@ class RigidBody {
             // 나중에
 
         } else if (rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Convex') {
-            const normals = [...rigidBody1.shape.getNormals(rigidBody1.angle), ...rigidBody2.shape.getNormals(rigidBody2.angle)];
+            const normals = [...rigidBody1.shape.getNormals(rigidBody1.angle), ...rigidBody2.shape.getNormals(rigidBody1.angle)];
+
             for (let checkNormal of normals) {
-                let distance = checkNormal.dot(relativePos);
                 let [left1, right1] = rigidBody1.shape.getProjections(checkNormal);
                 let [left2, right2] = rigidBody2.shape.getProjections(checkNormal);
                 let pos1 = checkNormal.dot(rigidBody1.pos);
@@ -76,18 +76,15 @@ class RigidBody {
                 right1 = pos1 + right1;
                 left2 = pos2 - left2;
                 right2 = pos2 + right2;
-                //console.log(distance, left1, right1, left2, right2);
-                if ((left2 > right1) || (left1 > right2)) return; // 충돌안함
+                if ((left2 >= right1) || (left1 >= right2)) return; // 충돌안함
                 let r = Math.min(right1 - left2, right2 - left1);
                 if (penetration === 0 || penetration > r) {
                     penetration = r;
                     normal = checkNormal;
                 }
-
-                // 충돌과 침투거리 계산 만들어야 함
             }
-            console.log("닿음");
 
+            if (normal.dot(relativePos) < 0) normal = normal.multiply(-1);
 
             // 잘못된 강좌가 코드를 망친 예 ㅠㅠ
             // 이 방법은 모든 변의 법선벡터를 통하여 점이 다른 도형안에 들어가있는지 확인하는거지, 법선벡터에 투영된 거리차이로 감지하는게 아님.
@@ -123,8 +120,8 @@ class RigidBody {
             
         }
 
-        //RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration) // 충돌 보정
-        //RigidBody.resolveCollision(rigidBody1, rigidBody2, normal, fps); // 충돌 해결
+        RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration) // 충돌 보정
+        RigidBody.resolveCollision(rigidBody1, rigidBody2, normal, fps); // 충돌 해결
 
 
         /*
