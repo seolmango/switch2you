@@ -41,7 +41,6 @@ class Convex extends Shape {
     // rotationedPoints 업데이트
     #rotationPoints() {
         this.#_rotationedPoints = this.points.map(point => point.rotationConversion(this.#_angle));
-        console.log('check2', this.#_points);
     }
 
     getNormals() {

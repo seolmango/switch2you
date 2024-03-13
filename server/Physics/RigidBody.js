@@ -66,13 +66,18 @@ class RigidBody {
 
         } else if (rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Convex') {
             const normals = [...rigidBody1.shape.getNormals(rigidBody1.angle), ...rigidBody2.shape.getNormals(rigidBody2.angle)];
-
-            /**
             for (let checkNormal of normals) {
                 let distance = checkNormal.dot(relativePos);
                 let [left1, right1] = rigidBody1.shape.getProjections(checkNormal);
                 let [left2, right2] = rigidBody2.shape.getProjections(checkNormal);
-                if ((right1 + left2 >= Math.abs(distance)) || (left1 + right2 >= Math.abs(distance))) return; // 충돌안함
+                let pos1 = checkNormal.dot(rigidBody1.pos);
+                let pos2 = checkNormal.dot(rigidBody2.pos);
+                left1 = pos1 - left1; // rigidBody 중심기준인 좌표를 월드맵 절대좌표로 변환
+                right1 = pos1 + right1;
+                left2 = pos2 - left2;
+                right2 = pos2 + right2;
+                //console.log(distance, left1, right1, left2, right2);
+                if ((left2 > right1) || (left1 > right2)) return; // 충돌안함
                 let r = Math.min(right1 - left2, right2 - left1);
                 if (penetration === 0 || penetration > r) {
                     penetration = r;
@@ -80,8 +85,8 @@ class RigidBody {
                 }
 
                 // 충돌과 침투거리 계산 만들어야 함
-            }*/
-            return;
+            }
+            console.log("닿음");
 
 
             // 잘못된 강좌가 코드를 망친 예 ㅠㅠ
@@ -118,8 +123,8 @@ class RigidBody {
             
         }
 
-        RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration) // 충돌 보정
-        RigidBody.resolveCollision(rigidBody1, rigidBody2, normal, fps); // 충돌 해결
+        //RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration) // 충돌 보정
+        //RigidBody.resolveCollision(rigidBody1, rigidBody2, normal, fps); // 충돌 해결
 
 
         /*
