@@ -4,13 +4,12 @@
 
 class OBB extends Convex {
     constructor(width2, height2) {
-        super('OBB');
+        super([new Vector2(width2, height2), new Vector2(-width2, height2), new Vector2(-width2, -height2), new Vector2(width2, -height2)]);
         this.width2 = width2; // 절반
         this.height2 = height2; // 절반
-        this.points = [new Vector2(width2, height2), new Vector2(-width2, height2), new Vector2(-width2, -height2), new Vector2(width2, -height2)]
     }
 
-    // 최적화를 위한 오버라이드
+    /** 최적화를 위한 오버라이드 나중에
     updateCheckSize(angle) {
         const CosR = Math.abs(Math.cos(angle));
         const SinR = Math.abs(Math.sin(angle));
@@ -18,7 +17,7 @@ class OBB extends Convex {
         const plusVector = new Vector2(-SinR * this.height2, CosR * this.height2); // 거기서 위 아래로의 거리
         this.checkWidth2 = axisVector.minus(plusVector).x;
         this.checkHeight2 = axisVector.plus(plusVector).y;
-    }
+    }*/
 
     /** 최적화를 위한 오버라이드 나중에
     getPoints(angle) {

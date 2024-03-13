@@ -11,7 +11,6 @@ class World {
             if (rigidBody.isStatic) continue;
             // calc a
             let fric = fps * fps * 400 // 임시마찰력
-            console.log(rigidBody.f.magnitude, rigidBody.v.normalize().multiply(fric).magnitude);
             rigidBody.f = rigidBody.f.minus(rigidBody.v.normalize().multiply(fric));
             rigidBody.a = rigidBody.f.divide(rigidBody.mass); // F = ma
             rigidBody.angA = rigidBody.t / rigidBody.rotationalInertia;
@@ -29,7 +28,7 @@ class World {
 
         // init f
         for (const rigidBody of this.rigidBodies) {
-            rigidBody.f.set(0, 0); // 중력은 0, 100 * rigidBody.mass
+            rigidBody.f.set(0, 0); // 중력은 0, 300 * rigidBody.mass
             rigidBody.t = 0;
             rigidBody.correctionPos.set(0, 0);
         }

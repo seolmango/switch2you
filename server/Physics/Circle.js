@@ -8,8 +8,10 @@ class Circle extends Shape {
     }
 
     updateCheckSize(angle) {
-        this.checkWidth2 = this.radius;
-        this.checkHeight2 = this.radius;
+        this.checkRight = this.radius;
+        this.checkLeft = this.radius;
+        this.checkUp = this.radius;
+        this.checkDown = this.radius;
     }
 }
 

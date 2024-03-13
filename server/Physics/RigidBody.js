@@ -29,8 +29,6 @@ class RigidBody {
         this.t = 0; // 토크
     }
 
-    delete() {}
-
     get angle() {
         return this.#_angle;
     }
@@ -44,8 +42,7 @@ class RigidBody {
     // 충돌 감지와 보정, 모든 검사는 rigidBody1 기준으로
     static checkCollision(fps, rigidBody1, rigidBody2) {
         // 사전 충돌 검사
-        if ((Math.abs(rigidBody1.pos.x - rigidBody2.pos.x) >= rigidBody1.shape.checkWidth2 + rigidBody2.shape.checkWidth2) || (Math.abs(rigidBody1.pos.y - rigidBody2.pos.y) >= rigidBody1.shape.checkHeight2 + rigidBody2.shape.checkHeight2)) return;
-
+        if ((Math.max((rigidBody2.pos.x - rigidBody2.shape.checkLeft) - (rigidBody1.pos.x + rigidBody1.shape.checkRight), (rigidBody1.pos.x - rigidBody1.shape.checkLeft) - (rigidBody2.pos.x + rigidBody2.shape.checkRight)) >= 0) || (Math.max((rigidBody2.pos.y - rigidBody2.shape.checkDown) - (rigidBody1.pos.y + rigidBody1.shape.checkUp), (rigidBody1.pos.y - rigidBody1.shape.checkDown) - (rigidBody2.pos.y + rigidBody2.shape.checkUp)) >= 0)) return;
 
         let normal; // 접촉면의 법선벡터
         let penetration; // 침투(충돌) 정도
@@ -68,12 +65,32 @@ class RigidBody {
             // 나중에
 
         } else if (rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Convex') {
-            const points1 = rigidBody1.shape.getPoints(rigidBody1.angle);
-            const points2 = rigidBody2.shape.getPoints(rigidBody2.angle);
-            const normals1 = rigidBody1.shape.getNormals(rigidBody1.angle);
-            const normals2 = rigidBody2.shape.getNormals(rigidBody2.angle);
+            const normals = [...rigidBody1.shape.getNormals(rigidBody1.angle), ...rigidBody2.shape.getNormals(rigidBody2.angle)];
 
-            let isCollide;
+            /**
+            for (let checkNormal of normals) {
+                let distance = checkNormal.dot(relativePos);
+                let [left1, right1] = rigidBody1.shape.getProjections(checkNormal);
+                let [left2, right2] = rigidBody2.shape.getProjections(checkNormal);
+                if ((right1 + left2 >= Math.abs(distance)) || (left1 + right2 >= Math.abs(distance))) return; // 충돌안함
+                let r = Math.min(right1 - left2, right2 - left1);
+                if (penetration === 0 || penetration > r) {
+                    penetration = r;
+                    normal = checkNormal;
+                }
+
+                // 충돌과 침투거리 계산 만들어야 함
+            }*/
+            return;
+
+
+            // 잘못된 강좌가 코드를 망친 예 ㅠㅠ
+            // 이 방법은 모든 변의 법선벡터를 통하여 점이 다른 도형안에 들어가있는지 확인하는거지, 법선벡터에 투영된 거리차이로 감지하는게 아님.
+            // 이 방식은 SAT와는 다름! 완전히 달라서 일부경우 충돌감지가 안됨. 즉, 처음에 했던 SAT방식이 더 나음...
+            // 이렇게하면 예각 삼각형끼리 닿았을때 변과 변의 충돌을 감지할 수가 없기 때문에 감지가 불가능함.
+            // 에린 카토가 진짜로 이런강좌를 했다면 왜 했는지 의문이고, 자신도 어떻게 해결했는지 모르는게 당연함.
+            // 2024.03.12 내가 강좌글을 뛰어넘은 순간
+            /**
             for (let i = 0; i < points1.length; i++) {
                 let point1 = rigidBody1.pos.plus(points1[i]);
 
@@ -85,8 +102,8 @@ class RigidBody {
                         isCollide = false;
                         break;
                     }
-                    if (penetration === undefined || penetration > Math.abs(r)) {
-                        penetration = Math.abs(r); // 가장 얕은 침투 거리
+                    if (penetration === undefined || penetration > -r) {
+                        penetration = -r; // 가장 얕은 침투 거리
                         normal = normals2[j];
                     }
                 }
@@ -97,51 +114,8 @@ class RigidBody {
                     rigidBody2 = temp;
                     break;
                 }
-            }
-
-            
-            if (!isCollide) {
-                for (let i = 0; i < points2.length; i++) {
-                    let point2 = rigidBody2.pos.plus(points2[i]);
-    
-                    isCollide = true;
-                    for (let j = 0; j < points1.length; j++) {
-                        let point1 = rigidBody1.pos.plus(points1[j]);
-                        let r = normals1[j].dot(point2.minus(point1)) // 침투정도
-                        if (r >= 0) {
-                            isCollide = false;
-                            break;
-                        }
-                        if (penetration === undefined || penetration > Math.abs(r)) {
-                            penetration = Math.abs(r); // 가장 얕은 침투 거리
-                            normal = normals1[j];
-                        }
-                    }
-    
-                    if (isCollide) break;
-                }
-            }
-
-            /**
-            const obb1 = rigidBody1;
-            const obb2 = rigidBody2;
-
-            // penetration 효율을 위해 다른방식을 재고해볼 필요가 있음.
-            const axises = [...obb1.shape.getAxis(obb1.angle), ...obb2.shape.getAxis(obb2.angle)];
-
-            let isCollide = true;
-            for (let axis of axises) {
-                let w1 = Math.abs(axis.dot(new Vector2(Math.cos(obb1.angle), Math.sin(obb1.angle))) * obb1.shape.width2);
-                let h1 = Math.abs(axis.dot(new Vector2(-Math.sin(obb1.angle), Math.cos(obb1.angle))) * obb1.shape.height2);
-                let w2 = Math.abs(axis.dot(new Vector2(Math.cos(obb2.angle), Math.sin(obb2.angle))) * obb2.shape.width2);
-                let h2 = Math.abs(axis.dot(new Vector2(-Math.sin(obb2.angle), Math.cos(obb2.angle))) * obb2.shape.height2);
-                if (Math.abs(axis.dot(relativePos)) >= w1 + h1 + w2 + h2) {
-                    isCollide = false;
-                    break;
-                }
             }*/
-
-            if (!isCollide) return;
+            
         }
 
         RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration) // 충돌 보정

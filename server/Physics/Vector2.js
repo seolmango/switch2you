@@ -35,15 +35,6 @@ class Vector2 {
         return new Vector2(this.x / this.magnitude, this.y / this.magnitude);
     }
 
-    // 사이각
-    /**
-    getContainedAngle(vector2) { // 각 계산은 모두 라디안 (이게 편함)
-        const angle1 = Math.atan2(this.y, this.x);
-        const angle2 = Math.atan2(vector2.y, vector2.x);
-        if (angle1 > angle2) return angle1 - angle2;
-        else return angle2 - angle1;
-    }*/
-
     // 내적
     dot(vector2) {
         return this.x * vector2.x + this.y * vector2.y;
