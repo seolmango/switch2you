@@ -10,8 +10,8 @@ class World {
         for (const rigidBody of this.rigidBodies) {
             if (rigidBody.isStatic) continue;
             // calc a
-            let fric = fps * fps * 400 // 임시마찰력
-            rigidBody.f = rigidBody.f.minus(rigidBody.v.normalize().multiply(fric));
+            /**let fric = fps * fps * 400 // 임시마찰력
+            rigidBody.f = rigidBody.f.minus(rigidBody.v.normalize().multiply(fric));*/
             rigidBody.a = rigidBody.f.divide(rigidBody.mass); // F = ma
             rigidBody.angA = rigidBody.t / rigidBody.rotationalInertia;
             // calc v

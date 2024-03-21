@@ -17,7 +17,6 @@ class RigidBody {
         this.damping = damping; // 저항력 (공기저항 등)
 
         this.pos = pos; // 중심, 위치
-        this.correctionPos = new Vector2(); // 보정 위치값의 합
         this.v = new Vector2(); // 속도
         this.a = new Vector2(); // 가속도
         this.f = new Vector2(); // 힘
@@ -90,7 +89,7 @@ class RigidBody {
             // 이 방법은 모든 변의 법선벡터를 통하여 점이 다른 도형안에 들어가있는지 확인하는거지, 법선벡터에 투영된 거리차이로 감지하는게 아님.
             // 이 방식은 SAT와는 다름! 완전히 달라서 일부경우 충돌감지가 안됨. 즉, 처음에 했던 SAT방식이 더 나음...
             // 이렇게하면 예각 삼각형끼리 닿았을때 변과 변의 충돌을 감지할 수가 없기 때문에 감지가 불가능함.
-            // 에린 카토가 진짜로 이런강좌를 했다면 왜 했는지 의문이고, 자신도 어떻게 해결했는지 모르는게 당연함.
+            // 이런강좌를 왜 했는지 의문이고, 자신도 어떻게 해결했는지 모르는게 당연함.
             // 2024.03.12 내가 강좌글을 뛰어넘은 순간
             /**
             for (let i = 0; i < points1.length; i++) {
@@ -159,8 +158,8 @@ class RigidBody {
         if (rigidBody1.isStatic) rigidBody2.correctionPos = rigidBody2.correctionPos.plus(distance);
         else if (rigidBody2.isStatic) rigidBody1.correctionPos = rigidBody1.correctionPos.minus(distance);
         else {
-            rigidBody1.correctionPos = rigidBody1.correctionPos.minus(distance.multiply(rigidBody2.mass / (rigidBody1.mass + rigidBody2.mass))); // 질량을 이용해 조금 더 정확한 보정
-            rigidBody2.correctionPos = rigidBody2.correctionPos.plus(distance.multiply(rigidBody1.mass / (rigidBody1.mass + rigidBody2.mass)));
+            rigidBody1.pos = rigidBody1.pos.minus(distance.multiply(rigidBody2.mass / (rigidBody1.mass + rigidBody2.mass))); // 질량을 이용해 조금 더 정확한 보정
+            rigidBody2.pos = rigidBody2.pos.plus(distance.multiply(rigidBody1.mass / (rigidBody1.mass + rigidBody2.mass)));
         }
     }
 
