@@ -8,6 +8,7 @@ class World {
 
         // move
         for (const rigidBody of this.rigidBodies) {
+            rigidBody.shape.contacts = [];
             if (rigidBody.isStatic) continue;
             // calc a
             /**let fric = fps * fps * 400 // 임시마찰력
@@ -30,7 +31,6 @@ class World {
         for (const rigidBody of this.rigidBodies) {
             rigidBody.f.set(0, 0); // 중력은 0, 300 * rigidBody.mass
             rigidBody.t = 0;
-            rigidBody.correctionPos.set(0, 0);
         }
 
         // calc f
@@ -39,12 +39,6 @@ class World {
                 if (this.rigidBodies[i].isStatic && this.rigidBodies[j].isStatic) continue;
                 RigidBody.checkCollision(fps, this.rigidBodies[i], this.rigidBodies[j]);
             }
-
-        // apply correction
-        for (const rigidBody of this.rigidBodies) rigidBody.pos = rigidBody.pos.plus(rigidBody.correctionPos);
-        
-        //console.log(this.rigidBodies[0].correctionPos);
-        //console.log(this.rigidBodies[0].v, this.rigidBodies[1].v);
     }
 }
 

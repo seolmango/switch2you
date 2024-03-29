@@ -5,7 +5,7 @@
 class RigidBody {
     #_angle; // 각도
 
-    constructor(type, isStatic, shape, mass, pos, angle = 0, restitution = 0, friction = 1, damping = 1) {
+    constructor(type, isStatic, shape, mass, pos, angle = 0, restitution = 1, friction = 1, damping = 1) {
         this.type = type; // 강체의 종류 (벽, 플레이어 등)
         this.isStatic = isStatic; // 고정된 강체인가?
         this.shape = shape; // 모양
@@ -45,6 +45,7 @@ class RigidBody {
 
         let normal; // 접촉면의 법선벡터
         let penetration = 0; // 침투(충돌) 정도
+        let contactPoints = []; // 접촉점들 (토크 계산시 필요)
         let relativePos = rigidBody2.pos.minus(rigidBody1.pos); // 거리 차
 
         // 정확한 충돌 검사
@@ -64,7 +65,7 @@ class RigidBody {
             // 나중에
 
         } else if (rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Convex') {
-            const normals = [...rigidBody1.shape.getNormals(rigidBody1.angle), ...rigidBody2.shape.getNormals(rigidBody1.angle)];
+            const normals = [...rigidBody1.shape.getNormals(), ...rigidBody2.shape.getNormals()];
 
             for (let checkNormal of normals) {
                 let [left1, right1] = rigidBody1.shape.getProjections(checkNormal);
@@ -83,7 +84,51 @@ class RigidBody {
                 }
             }
 
-            if (normal.dot(relativePos) < 0) normal = normal.multiply(-1);
+            if (normal.dot(relativePos) < 0) // 기본적으로, 법선벡터와 강체1 기준 좌표차의 내적이 반대방향이니 이 조건은 법선벡터가 강체2 꺼라는 걸 의미함.
+                normal = normal.multiply(-1); // 하지만, 강체 구분 외에 평행한 법선벡터들의 방향 구분의 역할도 수행해서 이걸로 온전한 강체 구분은 불가능함.
+
+
+            // 접촉점들 찾기. 각 강체에서 법선벡터의 변에 가장 가까운 점들을 찾고, 수직으로 돌려 각 양 끝점(충돌하지 않은 꼭짓점)을 제거함.
+            // 강체의 무게중심(위치)가 강체 안에 존재해야 함.
+            let contactPoints1 = [];
+            for (let point of rigidBody1.shape.rotationedPoints) {
+                let maxDot = contactPoints1.length ? normal.dot(contactPoints1[0]):-1;
+                let dot = normal.dot(point);
+                if (Math.abs(maxDot - dot) < 0.0001) contactPoints1.push(point); // 회전시 소수점 오차때문에 이렇게 비교해야 함.
+                else if (maxDot < dot) contactPoints1 = [point];
+            }
+            let contactPoints2 = [];
+            for (let point of rigidBody2.shape.rotationedPoints) {
+                let minDot = contactPoints2.length ? normal.dot(contactPoints2[0]):1;
+                let dot = normal.dot(point);
+                if (Math.abs(minDot - dot) < 0.0001) contactPoints2.push(point); // 회전시 소수점 오차때문에 이렇게 비교해야 함.
+                else if (minDot > dot) contactPoints2 = [point];
+            }
+
+            // 수직으로 돌려 양 끝점 제거 (수직 단위 벡터에 내적)
+            // 원래는 비교할때 각 꼭짓점 + 그 강체의 좌표를 해서 월드 절대좌표를 얻어야 제대로된 비교가 가능하지만, 결국에는 비교기 때문에 강체좌표의 차를 이용해 구할 수 있음.
+            // 이 방식은 간단하지만, 강체의 꼭짓점이 변 위에 놓여있으면 안됨. (그럼 위 감지 코드에서 contactPoints의 길이가 3이 넘어버려서 문제가 발생함.)
+            let checkNormal = new Vector2(-normal.y, normal.x);
+            let min1 = 0, min2 = 0, max1 = 0, max2 = 0;
+            if (contactPoints1.length === 2)
+                if (checkNormal.dot(contactPoints1[0]) > checkNormal.dot(contactPoints1[1])) min1 = 1;
+            if (contactPoints2.length === 2)
+                if (checkNormal.dot(contactPoints2[0]) > checkNormal.dot(contactPoints2[1])) min2 = 1;
+            
+            if (checkNormal.dot(contactPoints1[min1]) > checkNormal.dot(relativePos.plus(contactPoints2[min2]))) contactPoints2.splice(min2, 1);
+            else contactPoints1.splice(min1, 1);
+
+            if (contactPoints1.length === 2)
+                if (checkNormal.dot(contactPoints1[0]) < checkNormal.dot(contactPoints1[1])) max1 = 1;
+            if (contactPoints2.length === 2)
+                if (checkNormal.dot(contactPoints2[0]) < checkNormal.dot(contactPoints2[1])) max2 = 1;
+            console.log(contactPoints1[max1], contactPoints2[max2]);
+            if (checkNormal.dot(contactPoints1[max1]) < checkNormal.dot(relativePos.plus(contactPoints2[max2]))) contactPoints2.splice(max2, 1);
+            else contactPoints1.splice(max1, 1);
+
+            rigidBody1.shape.contacts = contactPoints1;
+            rigidBody2.shape.contacts = contactPoints2;
+
 
             // 잘못된 강좌가 코드를 망친 예 ㅠㅠ
             // 이 방법은 모든 변의 법선벡터를 통하여 점이 다른 도형안에 들어가있는지 확인하는거지, 법선벡터에 투영된 거리차이로 감지하는게 아님.
@@ -120,7 +165,7 @@ class RigidBody {
         }
 
         RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration) // 충돌 보정
-        RigidBody.resolveCollision(rigidBody1, rigidBody2, normal, fps); // 충돌 해결
+        RigidBody.resolveCollision(rigidBody1, rigidBody2, normal, contactPoints, fps); // 충돌 해결
 
 
         /*
@@ -155,8 +200,8 @@ class RigidBody {
     static correctionCollision(rigidBody1, rigidBody2, normal, penetration) {
         let distance = normal.multiply(penetration); // 총 보정 거리
 
-        if (rigidBody1.isStatic) rigidBody2.correctionPos = rigidBody2.correctionPos.plus(distance);
-        else if (rigidBody2.isStatic) rigidBody1.correctionPos = rigidBody1.correctionPos.minus(distance);
+        if (rigidBody1.isStatic) rigidBody2.pos = rigidBody2.pos.plus(distance);
+        else if (rigidBody2.isStatic) rigidBody1.pos = rigidBody1.pos.minus(distance);
         else {
             rigidBody1.pos = rigidBody1.pos.minus(distance.multiply(rigidBody2.mass / (rigidBody1.mass + rigidBody2.mass))); // 질량을 이용해 조금 더 정확한 보정
             rigidBody2.pos = rigidBody2.pos.plus(distance.multiply(rigidBody1.mass / (rigidBody1.mass + rigidBody2.mass)));
@@ -164,7 +209,7 @@ class RigidBody {
     }
 
     // 충돌 해결
-    static resolveCollision(rigidBody1, rigidBody2, normal, fps) {
+    static resolveCollision(rigidBody1, rigidBody2, normal, contactPoint, fps) {
         const relativeV = rigidBody2.v.minus(rigidBody1.v);
         if (normal.dot(relativeV) > 0) return; // 서로 멀어지고 있는가?
         const e = Math.min(rigidBody1.restitution, rigidBody2.restitution);

@@ -9,6 +9,7 @@ class Convex extends Shape {
         this.#_angle = 0;
         this.#_points = points; // point 와 normal(법선 벡터)의 변은 반드시 인접해야함.즉, 이걸 고려해서 getNormals 만들기. 방향과의 통일을 위해 반시계방향으로 저장
         this.#_rotationedPoints = []; // 회전된 points
+        this.contacts = []; // 접촉한 점들의 좌표 (리스트의 인덱스로 할 수 있으나, 이 방법이 더 편함)
     }
 
     get points() {
@@ -56,10 +57,9 @@ class Convex extends Shape {
         let points = this.rotationedPoints.map(point => normal.dot(point));
         let min = 0;
         let max = 0;
-        for (let point of points) {
+        for (let point of points)
             if (min > point) min = point;
-            if (max < point) max = point;
-        }
+            else if (max < point) max = point;
         return [-min, max];
     }
 }
