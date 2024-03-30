@@ -5,12 +5,12 @@
 class RigidBody {
     #_angle; // 각도
 
-    constructor(type, isStatic, shape, mass, pos, angle = 0, restitution = 1, friction = 1, damping = 1) {
+    constructor(type, isStatic, shape, mass, pos, angle = 0, restitution = 0.5, friction = 1, damping = 1) {
         this.type = type; // 강체의 종류 (벽, 플레이어 등)
         this.isStatic = isStatic; // 고정된 강체인가?
         this.shape = shape; // 모양
         this.mass = mass; // 질량
-        this.invMass = 1 / mass; // 질량의 역수 (계산에 이용됨)
+        isStatic ? this.invMass = 0 : this.invMass = 1 / mass; // 질량의 역수 (계산에 이용됨)
 
         this.restitution = restitution; // 복원력 (탄성계수)
         this.friction = friction; // 마찰력
@@ -21,7 +21,8 @@ class RigidBody {
         this.a = new Vector2(); // 가속도
         this.f = new Vector2(); // 힘
 
-        this.rotationalInertia = 1; // 회전 관성
+        this.inertia = this.mass * this.mass * 0.2; // 회전 관성
+        this.invInertia = 1 / this.inertia // 회전관성의 역수 (계산에 이용됨);
         this.angle = angle; // 각도
         this.angV = 0; // angular velocity. 각속도
         this.angA = 0; // 각가속도
@@ -88,26 +89,29 @@ class RigidBody {
                 normal = normal.multiply(-1); // 하지만, 강체 구분 외에 평행한 법선벡터들의 방향 구분의 역할도 수행해서 이걸로 온전한 강체 구분은 불가능함.
 
 
+            RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration) // 충돌 보정. 접촉점을 찾기 전에 보정을 해야 정확해짐.
+
             // 접촉점들 찾기. 각 강체에서 법선벡터의 변에 가장 가까운 점들을 찾고, 수직으로 돌려 각 양 끝점(충돌하지 않은 꼭짓점)을 제거함.
             // 강체의 무게중심(위치)가 강체 안에 존재해야 함.
             let contactPoints1 = [];
             for (let point of rigidBody1.shape.rotationedPoints) {
                 let maxDot = contactPoints1.length ? normal.dot(contactPoints1[0]):-1;
                 let dot = normal.dot(point);
-                if (Math.abs(maxDot - dot) < 0.0001) contactPoints1.push(point); // 회전시 소수점 오차때문에 이렇게 비교해야 함.
+                if (Math.abs(maxDot - dot) < 0.001) contactPoints1.push(point); // 회전시 소수점 오차때문에 이렇게 비교해야 함.
                 else if (maxDot < dot) contactPoints1 = [point];
             }
             let contactPoints2 = [];
             for (let point of rigidBody2.shape.rotationedPoints) {
                 let minDot = contactPoints2.length ? normal.dot(contactPoints2[0]):1;
                 let dot = normal.dot(point);
-                if (Math.abs(minDot - dot) < 0.0001) contactPoints2.push(point); // 회전시 소수점 오차때문에 이렇게 비교해야 함.
+                if (Math.abs(minDot - dot) < 0.001) contactPoints2.push(point); // 회전시 소수점 오차때문에 이렇게 비교해야 함.
                 else if (minDot > dot) contactPoints2 = [point];
             }
+            contactPoints1 = contactPoints1.map(e => rigidBody1.pos.plus(e));
+            contactPoints2 = contactPoints2.map(e => rigidBody2.pos.plus(e));
 
             // 수직으로 돌려 양 끝점 제거 (수직 단위 벡터에 내적)
-            // 원래는 비교할때 각 꼭짓점 + 그 강체의 좌표를 해서 월드 절대좌표를 얻어야 제대로된 비교가 가능하지만, 결국에는 비교기 때문에 강체좌표의 차를 이용해 구할 수 있음.
-            // 이 방식은 간단하지만, 강체의 꼭짓점이 변 위에 놓여있으면 안됨. (그럼 위 감지 코드에서 contactPoints의 길이가 3이 넘어버려서 문제가 발생함.)
+            // 강체의 꼭짓점이 변 위에 놓여있으면 안됨. (그럼 위 감지 코드에서 contactPoints의 길이가 3이 넘어버려서 문제가 발생함.)
             let checkNormal = new Vector2(-normal.y, normal.x);
             let min1 = 0, min2 = 0, max1 = 0, max2 = 0;
             if (contactPoints1.length === 2)
@@ -115,17 +119,17 @@ class RigidBody {
             if (contactPoints2.length === 2)
                 if (checkNormal.dot(contactPoints2[0]) > checkNormal.dot(contactPoints2[1])) min2 = 1;
             
-            if (checkNormal.dot(contactPoints1[min1]) > checkNormal.dot(relativePos.plus(contactPoints2[min2]))) contactPoints2.splice(min2, 1);
+            if (checkNormal.dot(contactPoints1[min1]) > checkNormal.dot(contactPoints2[min2])) contactPoints2.splice(min2, 1);
             else contactPoints1.splice(min1, 1);
 
             if (contactPoints1.length === 2)
                 if (checkNormal.dot(contactPoints1[0]) < checkNormal.dot(contactPoints1[1])) max1 = 1;
             if (contactPoints2.length === 2)
                 if (checkNormal.dot(contactPoints2[0]) < checkNormal.dot(contactPoints2[1])) max2 = 1;
-            console.log(contactPoints1[max1], contactPoints2[max2]);
-            if (checkNormal.dot(contactPoints1[max1]) < checkNormal.dot(relativePos.plus(contactPoints2[max2]))) contactPoints2.splice(max2, 1);
+            if (checkNormal.dot(contactPoints1[max1]) < checkNormal.dot(contactPoints2[max2])) contactPoints2.splice(max2, 1);
             else contactPoints1.splice(max1, 1);
 
+            contactPoints = [...contactPoints1, ...contactPoints2];
             rigidBody1.shape.contacts = contactPoints1;
             rigidBody2.shape.contacts = contactPoints2;
 
@@ -164,7 +168,6 @@ class RigidBody {
             
         }
 
-        RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration) // 충돌 보정
         RigidBody.resolveCollision(rigidBody1, rigidBody2, normal, contactPoints, fps); // 충돌 해결
 
 
@@ -209,18 +212,34 @@ class RigidBody {
     }
 
     // 충돌 해결
-    static resolveCollision(rigidBody1, rigidBody2, normal, contactPoint, fps) {
-        const relativeV = rigidBody2.v.minus(rigidBody1.v);
-        if (normal.dot(relativeV) > 0) return; // 서로 멀어지고 있는가?
+    static resolveCollision(rigidBody1, rigidBody2, normal, contactPoints, fps) {
         const e = Math.min(rigidBody1.restitution, rigidBody2.restitution);
-        let j = -(1 + e) * normal.dot(relativeV);
-        if (rigidBody1.isStatic) j /= rigidBody2.invMass;
-        else if (rigidBody2.isStatic) j /= rigidBody1.invMass;
-        else j /= rigidBody1.invMass + rigidBody2.invMass;
+        const contacts1 = [], contacts2 = [];
+        const impulses = [];
+        for (let i = 0; i < contactPoints.length; i++) {
+            contacts1.push(contactPoints[i].minus(rigidBody1.pos)); // 접촉점에 대해 각 강체를 원점으로 한 벡터
+            contacts2.push(contactPoints[i].minus(rigidBody2.pos));
+            let normal1 = new Vector2(-contacts1[i].y, contacts1[i].x); // 접촉점 벡터의 수직 벡터 (각속도니까)
+            let normal2 = new Vector2(-contacts2[i].y, contacts2[i].x);
+            let angV1 = normal1.multiply(rigidBody1.angV); // 수직 벡터에 속도를 곱함
+            let angV2 = normal2.multiply(rigidBody2.angV);
+            let relativeV = normal.dot(rigidBody2.v.plus(angV2).minus(rigidBody1.v.plus(angV1))); // 각 접촉점의 법선벡터 기준 속도 차
+            if (relativeV > 0) continue; // 접촉점이 서로 멀어지고 있는가?
 
-        const impulse = normal.multiply(j);
-        rigidBody1.f = rigidBody1.f.minus(impulse.multiply(fps));
-        rigidBody2.f = rigidBody2.f.plus(impulse.multiply(fps));
+            let f1 = normal.dot(normal1);
+            let f2 = normal.dot(normal2);
+            let j = -(1 + e) * relativeV;
+            j /= rigidBody1.invMass + rigidBody2.invMass + f1 * f1 * rigidBody1.invInertia + f2 * f2 * rigidBody2.invInertia;
+            j /= contactPoints.length;
+            impulses.push(normal.multiply(j));
+        }
+
+        for (let i = 0; i < impulses.length; i++) {
+            rigidBody1.f = rigidBody1.f.minus(impulses[i].multiply(fps));
+            rigidBody1.t -= contacts1[i].cross(impulses[i]) * fps;
+            rigidBody2.f = rigidBody2.f.plus(impulses[i].multiply(fps));
+            rigidBody2.t += contacts2[i].cross(impulses[i]) * fps;
+        }
     }
 }
 
