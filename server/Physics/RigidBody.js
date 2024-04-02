@@ -5,7 +5,7 @@
 class RigidBody {
     #_angle; // 각도
 
-    constructor(type, isStatic, shape, mass, pos, angle = 0, restitution = 0.5, friction = 1, damping = 1) {
+    constructor(type, isStatic, shape, mass, pos, angle = 0, restitution = 1, friction = 1, damping = 1) {
         this.type = type; // 강체의 종류 (벽, 플레이어 등)
         this.isStatic = isStatic; // 고정된 강체인가?
         this.shape = shape; // 모양
@@ -20,9 +20,10 @@ class RigidBody {
         this.v = new Vector2(); // 속도
         this.a = new Vector2(); // 가속도
         this.f = new Vector2(); // 힘
+        this.totalF; // accumulated impulse를 위함.
 
-        this.inertia = this.mass * this.mass * 0.2; // 회전 관성
-        this.invInertia = 1 / this.inertia // 회전관성의 역수 (계산에 이용됨);
+        this.inertia = this.mass * 1000; // 회전 관성. 관성이란 기존것을 유지하려는 성질이기에, 이 값이 커질수록 더 안 회전함.
+        isStatic? this.invInertia = 0 : this.invInertia = 1 / this.inertia; // 회전관성의 역수 (계산에 이용됨);
         this.angle = angle; // 각도
         this.angV = 0; // angular velocity. 각속도
         this.angA = 0; // 각가속도
@@ -126,8 +127,12 @@ class RigidBody {
                 if (checkNormal.dot(contactPoints1[0]) < checkNormal.dot(contactPoints1[1])) max1 = 1;
             if (contactPoints2.length === 2)
                 if (checkNormal.dot(contactPoints2[0]) < checkNormal.dot(contactPoints2[1])) max2 = 1;
-            if (checkNormal.dot(contactPoints1[max1]) < checkNormal.dot(contactPoints2[max2])) contactPoints2.splice(max2, 1);
-            else contactPoints1.splice(max1, 1);
+            try {
+                if (checkNormal.dot(contactPoints1[max1]) < checkNormal.dot(contactPoints2[max2])) contactPoints2.splice(max2, 1);
+                else contactPoints1.splice(max1, 1);
+            } catch {
+                console.log(contactPoints1, contactPoints2);
+            }
 
             contactPoints = [...contactPoints1, ...contactPoints2];
             rigidBody1.shape.contacts = contactPoints1;
@@ -214,6 +219,7 @@ class RigidBody {
     // 충돌 해결
     static resolveCollision(rigidBody1, rigidBody2, normal, contactPoints, fps) {
         const e = Math.min(rigidBody1.restitution, rigidBody2.restitution);
+        const contactIndexes = []
         const contacts1 = [], contacts2 = [];
         const impulses = [];
         for (let i = 0; i < contactPoints.length; i++) {
@@ -240,6 +246,16 @@ class RigidBody {
             rigidBody2.f = rigidBody2.f.plus(impulses[i].multiply(fps));
             rigidBody2.t += contacts2[i].cross(impulses[i]) * fps;
         }
+        console.log(rigidBody2.invMass);
+        
+        /**
+        let temp = rigidBody1.totalF;
+        rigidBody1.totalF = Math.min(rigidBody1.totalF + normal.dot(rigidBody1.f), 0);
+        if (!rigidBody1.totalF) rigidBody1.f.set(0, 0);
+        //rigidBody1.f = totalF - temp
+        rigidBody2.totalF = Math.max(rigidBody2.totalF + normal.dot(rigidBody2.f), 0);
+        if (!rigidBody2.totalF) rigidBody2.f.set(0, 0);
+        */
     }
 }
 

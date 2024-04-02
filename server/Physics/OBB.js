@@ -3,10 +3,10 @@
 
 
 class OBB extends Convex {
-    constructor(width2, height2) {
-        super([new Vector2(width2, height2), new Vector2(-width2, height2), new Vector2(-width2, -height2), new Vector2(width2, -height2)]);
-        this.width2 = width2; // 절반
-        this.height2 = height2; // 절반
+    constructor(width, height) {
+        super([new Vector2(width * 0.5, height * 0.5), new Vector2(-width * 0.5, height * 0.5), new Vector2(-width * 0.5, -height * 0.5), new Vector2(width * 0.5, -height * 0.5)]);
+        this.width2 = width * 0.5; // 절반
+        this.height2 = height * 0.5; // 절반
     }
 
     /** 최적화를 위한 오버라이드 나중에
