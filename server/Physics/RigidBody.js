@@ -18,15 +18,13 @@ class RigidBody {
 
         this.pos = pos; // 중심, 위치
         this.v = new Vector2(); // 속도
-        this.a = new Vector2(); // 가속도
         this.f = new Vector2(); // 힘
         this.totalF; // accumulated impulse를 위함.
 
-        this.inertia = this.mass * 1000; // 회전 관성. 관성이란 기존것을 유지하려는 성질이기에, 이 값이 커질수록 더 안 회전함.
+        this.inertia = this.mass * this.mass; // 회전 관성. 관성이란 기존것을 유지하려는 성질이기에, 이 값이 커질수록 더 안 회전함.
         isStatic? this.invInertia = 0 : this.invInertia = 1 / this.inertia; // 회전관성의 역수 (계산에 이용됨);
         this.angle = angle; // 각도
         this.angV = 0; // angular velocity. 각속도
-        this.angA = 0; // 각가속도
         this.t = 0; // 토크
     }
 
@@ -219,7 +217,6 @@ class RigidBody {
     // 충돌 해결
     static resolveCollision(rigidBody1, rigidBody2, normal, contactPoints, fps) {
         const e = Math.min(rigidBody1.restitution, rigidBody2.restitution);
-        const contactIndexes = []
         const contacts1 = [], contacts2 = [];
         const impulses = [];
         for (let i = 0; i < contactPoints.length; i++) {
@@ -241,13 +238,23 @@ class RigidBody {
         }
 
         for (let i = 0; i < impulses.length; i++) {
+            rigidBody1.v = rigidBody1.v.minus(impulses[i].multiply(rigidBody1.invMass));
+            rigidBody1.angV -= contacts1[i].cross(impulses[i]) * rigidBody1.invInertia;
+            rigidBody2.v = rigidBody2.v.plus(impulses[i].multiply(rigidBody2.invMass));
+            rigidBody2.angV += contacts2[i].cross(impulses[i]) * rigidBody2.invInertia;
+            // box2d lite는 (여타 다른 강의들 포함) v를 바로 바꾸지만(이러면 fps 변수 안 써도 됨), 이러면 충돌 체크 순서에 따라 값이 다르게 나옴.
+            // (왜 그렇게 하는지는 모르겠음) 그래서 나는 f랑 t를 바꿈
+            // !!!! 이게 충격량을 한꺼번에 계산하고 그 뒤에 속도를 이동시키는 방법은 다중물체 충돌시 힘의 분산 (이것도 연속적이지 않기에 발생하는 문제)을 처리 할 수 없어서,
+            // 이를 v가 아닌 f를 바꾸면 힘이 증폭하게 됨 (터지는 현상. 회전관성값의 문제가 아니었음.)
+            /**
             rigidBody1.f = rigidBody1.f.minus(impulses[i].multiply(fps));
             rigidBody1.t -= contacts1[i].cross(impulses[i]) * fps;
             rigidBody2.f = rigidBody2.f.plus(impulses[i].multiply(fps));
             rigidBody2.t += contacts2[i].cross(impulses[i]) * fps;
+            */
         }
-        console.log(rigidBody2.invMass);
         
+        // accumulated impulse??? 조사하기
         /**
         let temp = rigidBody1.totalF;
         rigidBody1.totalF = Math.min(rigidBody1.totalF + normal.dot(rigidBody1.f), 0);
