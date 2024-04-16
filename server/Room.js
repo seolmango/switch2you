@@ -1,10 +1,11 @@
-const Map2d = require('./Map2d.js');
+const {World} = require('./server/Physics.index.js');
 
 class Room {
     static MaxCount = 0;
     static #_Count = 0;
-    static #_Instances = {};
-    static #_Publics = {};
+    static #_Instances = {}; // 방들
+    static #_Publics = {}; // 공개 방들
+    static #_Playings = {}; // 게임중인 방들
     #_id;
 
     static get Count() {
@@ -17,6 +18,10 @@ class Room {
 
     static get Publics() {
         return Room.#_Publics;
+    }
+
+    static get Playings() {
+        return Room.#_Playings;
     }
 
     constructor(owner, roomName = false, public_ = true, password = false) {
@@ -35,7 +40,7 @@ class Room {
         if (roomName) this.name = roomName; // 방 이름
         else this.name = owner.name + '\'s Room';
         this.numbers = [0, 0, 0, 0, 0, 0, 0, 0]; // 번호 안 썼는지 여부들. 0이면 안썼고, 0이 아니면 썼음. 0이 아닌 숫자는 그 번호에 해당하는 player의 id.
-        this.map2d; // 방의 맵 (1대1 대응)
+        this.world; // 방의 월드
         owner.joinRoom(this, password);
         owner.role = 'owner';
     }
@@ -46,6 +51,7 @@ class Room {
 
     delete() {
         if (this.public) delete Room.#_Publics[this.id];
+        if (this.playing) delete Room.#_Playings[this.id];
         delete Room.#_Instances[this.id];
         Room.#_Count--;
     }
@@ -62,8 +68,14 @@ class Room {
         })
         if (!readyCheck) return 'not all ready';
 
+        Room.#_Playings[this.id] = this;
         this.playing = true;
-        this.map2d = new Map2d();
+        this.world = new World();
+    }
+
+    endGame() {
+        delete Room.#_Playings[this.id];
+        this.playing = false;
     }
 }
 

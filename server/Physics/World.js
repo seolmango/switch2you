@@ -38,7 +38,7 @@ class World {
             for (let i = 0; i < this.rigidBodies.length - 1; i++)
                 for (let j = i + 1; j < this.rigidBodies.length; j++) {
                     if (this.rigidBodies[i].isStatic && this.rigidBodies[j].isStatic) continue;
-                    RigidBody.checkCollision(fps, this.rigidBodies[i], this.rigidBodies[j]);
+                    RigidBody.checkCollision(this.rigidBodies[i], this.rigidBodies[j]);
                 }
         }
     }

@@ -39,7 +39,7 @@ class RigidBody {
 
 
     // 충돌 감지와 보정, 모든 벡터량은 rigidBody1 기준으로
-    static checkCollision(fps, rigidBody1, rigidBody2) {
+    static checkCollision(rigidBody1, rigidBody2) {
         // 사전 충돌 검사
         if ((Math.max((rigidBody2.pos.x - rigidBody2.shape.checkLeft) - (rigidBody1.pos.x + rigidBody1.shape.checkRight), (rigidBody1.pos.x - rigidBody1.shape.checkLeft) - (rigidBody2.pos.x + rigidBody2.shape.checkRight)) >= 0) || (Math.max((rigidBody2.pos.y - rigidBody2.shape.checkDown) - (rigidBody1.pos.y + rigidBody1.shape.checkUp), (rigidBody1.pos.y - rigidBody1.shape.checkDown) - (rigidBody2.pos.y + rigidBody2.shape.checkUp)) >= 0)) return;
 
@@ -171,7 +171,7 @@ class RigidBody {
             
         }
 
-        RigidBody.resolveCollision(rigidBody1, rigidBody2, normal, contactPoints, fps); // 충돌 해결
+        RigidBody.resolveCollision(rigidBody1, rigidBody2, normal, contactPoints); // 충돌 해결
 
 
         /*
@@ -215,7 +215,7 @@ class RigidBody {
     }
 
     // 충돌 해결
-    static resolveCollision(rigidBody1, rigidBody2, normal, contactPoints, fps) {
+    static resolveCollision(rigidBody1, rigidBody2, normal, contactPoints) {
         const e = Math.min(rigidBody1.restitution, rigidBody2.restitution);
         const contacts1 = [], contacts2 = [];
         const impulses = [];

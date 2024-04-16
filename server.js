@@ -8,7 +8,6 @@ const io = require('socket.io')(http);
 const Config = require('./server/config.json');
 const Player = require('./server/Player.js');
 const Room = require('./server/Room.js');
-const Map2d = require('./server/Map2d.js');
 const Vector2 = require('./server/Physics/Vector2.js');
 
 
@@ -48,17 +47,11 @@ function getRoomInfo(rooms) {
 
 function getRigidBodyInfos(rigidBodys) {
     const infoFilter = (rigidBody) => {
-        let info = {
-            'type': rigidBody.shape.type, 'checkWidth2': rigidBody.shape.checkWidth2, 'checkHeight2': rigidBody.shape.checkHeight2,
-            'x': rigidBody.pos.x, 'y': rigidBody.pos.y, 'vx': rigidBody.v.x, 'vy': rigidBody.v.y,
-            'rotation': rigidBody.rotation
-        };
-        if (rigidBody.shape.type === 'Circle') {
+        let info = {'type': rigidBody.shape.type, 'x': rigidBody.pos.x, 'y': rigidBody.pos.y, 'angle': rigidBody.angle};
+        if (rigidBody.shape.type === 'Circle')
             info['radius'] = rigidBody.shape.radius;
-        } else if (rigidBody.shape.type === 'OBB') {
-            info['width2'] = rigidBody.shape.width2;
-            info['height2'] = rigidBody.shape.height2;
-        }
+        else if (rigidBody.shape.type === 'Convex')
+            info['points'] = rigidBody.shape.rotationedPoints;
         return info;
     }
     if (Array.isArray(rigidBodys))
@@ -341,18 +334,21 @@ io.on('connection', (socket) => {
             return;
         }
         callback({'status': 200});
-        io.to(player.room.id).emit('game started');
+        io.to(player.room.id).emit('game started', getRigidBodyInfos(player.room.world.rigidBodies));
     })
 
 
     // 플레이어 이동
-    socket.on('move', (doing, direction) => {
+    socket.on('move player', (doing, direction) => {
         if (!checkData([doing, 'boolean'], [direction, 'number'])) {
             if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
             return;
         }
-        if (!player.map2d) player.map2d = new Map2d(player);
-        player.actions.move = {'doing': doing, 'direction': direction};
+        const result = player.move(doing, direction);
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
     })
 
 
@@ -398,10 +394,16 @@ io.on('connection', (socket) => {
 });
 
 function ingameLoop() {
-    for (let key in Map2d.Instances) {
-        const map2d = Map2d.Instances[key];
-        map2d.update(30);
-        io.to(Object.values(Player.Instances)[0]?.socketId).emit('ingame updated', getRigidBodyInfos(map2d.rigidBodys));
+    for (let room in Room.Playings) {
+        const world = room.world;
+
+        for (let player of room.players) {
+            const actions = player.actions;
+            if (actions.move.doing) 
+                world.rigidBodies[player.number - 1].pos.plus((new Vector2(Math.cos(actions.move.direction), Math.cos(actions.move.directoin))).multiply(player.stat.moveSpeed));
+        }
+        world.update(30, 10);
+        io.to(room.id).emit('world updated', getRigidBodyInfos(world.rigidBodies));
     }
 }
 
