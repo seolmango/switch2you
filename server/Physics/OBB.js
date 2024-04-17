@@ -9,6 +9,10 @@ class OBB extends Convex {
         this.height2 = height * 0.5; // 절반
     }
 
+    getArea() {
+        return this.width2 * this.height2 * 4;
+    }
+
     /** 최적화를 위한 오버라이드 나중에
     updateCheckSize(angle) {
         const CosR = Math.abs(Math.cos(angle));

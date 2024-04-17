@@ -5,7 +5,28 @@
 class RigidBody {
     #_angle; // 각도
 
-    constructor(type, isStatic, shape, mass, pos, angle = 0, restitution = 1, friction = 1, damping = 1) {
+    // 필수 - shape (구조체가 아닌 객체라, 참조 관리의 편의성을 위해 따로 매개변수로 작성)
+    // 선택 - collisionType, density/mass, inertia, pos, angle, restiution, friction, damping
+    constructor(shape, setting) {
+        this.shape = shape; // 모양
+        let area;
+        
+        // 충돌 처리 4종류 (충돌감지를 해야하는건 무조건 World에서 처리. 안해도되면 World에서 처리안하는게 좋음. (최적화))
+        // only-collide: 충돌하고 반응 안함. / 풀, 아이템
+        // dynamic: 충돌하고 반응 함. / 일반적인 물체
+        // static: 충돌하고 반응 함. 반응 시 밀리지 않음. / 벽
+        // 그 외 모든 type: 같은 type끼리는 충돌하고 반응 안함. 다른 type과는 충돌하고 반응 함. / 플레이어
+        setting.collisionType ? this.collisionType = setting.collisionType : this.collisionType = 'dynamic'; // 충돌 타입
+        if (setting.density) {
+            
+        } ? this.density = setting.density : (
+            setting.mass ? this.mass = setting.mass : null;
+        );
+        if (!(setting.density || setting.mass)) {}
+
+        setting. ? this.inertia : this. = 1;
+        setting. ? this. : this. = 1;
+        setting. ? this. : this. = 1;
         this.type = type; // 강체의 종류 (벽, 플레이어 등)
         this.isStatic = isStatic; // 고정된 강체인가?
         this.shape = shape; // 모양
@@ -21,7 +42,7 @@ class RigidBody {
         this.f = new Vector2(); // 힘
         this.totalF; // accumulated impulse를 위함.
 
-        this.inertia = this.mass * this.mass; // 회전 관성. 관성이란 기존것을 유지하려는 성질이기에, 이 값이 커질수록 더 안 회전함.
+        this.inertia = this.mass * this.mass * 100; // 회전 관성. 관성이란 기존것을 유지하려는 성질이기에, 이 값이 커질수록 더 안 회전함.
         isStatic? this.invInertia = 0 : this.invInertia = 1 / this.inertia; // 회전관성의 역수 (계산에 이용됨);
         this.angle = angle; // 각도
         this.angV = 0; // angular velocity. 각속도

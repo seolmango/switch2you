@@ -27,6 +27,13 @@ class Convex extends Shape {
         return this.#_rotationedPoints;
     }
 
+    getArea() {
+        let area = 0;
+        for (let i = 0; i < this.points.length; i++)
+            area += Math.abs(this.points[i].cross(this.points[(i + 1) % this.points.length]));
+        return area * 0.5;
+    }
+
     // 여러 작업을 할때, angle이 필요한데, 그때그때 받으면 불편해서 RigidBody의 angle이 바뀔때마다 angle을 저장함.
     updateCheckSize(angle) {
         this.#_angle = angle;

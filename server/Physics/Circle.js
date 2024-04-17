@@ -7,6 +7,10 @@ class Circle extends Shape {
         this.radius = radius;
     }
 
+    getArea() {
+        return this.radius * this.radius * Math.PI;
+    }
+
     updateCheckSize(angle) {
         this.checkRight = this.radius;
         this.checkLeft = this.radius;

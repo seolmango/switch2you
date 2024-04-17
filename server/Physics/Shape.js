@@ -10,6 +10,9 @@ class Shape {
         this.checkDown;
     }
 
+    // 넓이 구하기
+    getArea() {}
+
     // 사전 검사 사각형 업데이트
     updateCheckSize(angle) {}
 }
