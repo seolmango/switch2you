@@ -2,7 +2,7 @@
 
 
 class Convex extends Shape {
-    #_angle; #_points; #_rotationedPoints;
+    #_angle; #_points; #_rotationedPoints; #_triDivArea; // 삼각형으로 분할
 
     constructor(points = []) {
         super('Convex');
@@ -28,10 +28,18 @@ class Convex extends Shape {
     }
 
     getArea() {
-        let area = 0;
         for (let i = 0; i < this.points.length; i++)
-            area += Math.abs(this.points[i].cross(this.points[(i + 1) % this.points.length]));
-        return area * 0.5;
+            this.#_triDivArea.push(Math.abs(this.points[i].cross(this.points[(i + 1) % this.points.length])) * 0.5);
+        return this.#_triDivArea.reduce((a, b) => a + b);
+    }
+
+    getInertia(density, mass) {
+        let inertia = 0;
+        for (let i = 0; i < this.points.length; i++) {
+            let point1 = this.points[i], point2 = this.points[(i + 1) % this.points.lengnth];
+            inertia += this.#_triDivArea * density * (Math.sqrt(point1.magnitude) + Math.sqrt(point2.magnitude) + point1.dot(point2)) / 6;
+        }
+        return inertia;
     }
 
     // 여러 작업을 할때, angle이 필요한데, 그때그때 받으면 불편해서 RigidBody의 angle이 바뀔때마다 angle을 저장함.

@@ -13,6 +13,9 @@ class Shape {
     // 넓이 구하기
     getArea() {}
 
+    // 회전관성 구하기
+    getInertia(density, mass) {}
+
     // 사전 검사 사각형 업데이트
     updateCheckSize(angle) {}
 }

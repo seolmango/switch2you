@@ -6,10 +6,25 @@ class RigidBody {
     #_angle; // 각도
 
     // 필수 - shape (구조체가 아닌 객체라, 참조 관리의 편의성을 위해 따로 매개변수로 작성)
-    // 선택 - collisionType, density/mass, inertia, pos, angle, restiution, friction, damping
+    // 선택 - collisionType, area, density/mass, inertia, pos, angle, restiution, friction, damping
+    // 항상 각 강체마다 Shape를 여러개 가질 수 있다는 걸 고려하고 필드를 만들어야 함.
+    // Shapes가 묶여서 한 물체로 인식되려면, 모양에 대한 정보말고는 가지고 있으면 안됨.
+
+    // area, density, mass, inertia 중 없어도 되는 값은 area, density.
+    // density는 입력받으면 area 구해서 mass로 변환. density와 mass 둘 중 하나만 들어옴.
+    // inertia는 입력받지 않으면 구하는 과정에서 area와 mass를 필요
+    // 그러면 구조를 어떻게?
+    // area가 필요한 때는? density를 입력 받았을때 (mass도 같이 입력받았을때는 고려하지 않음), inertia를 입력받지 못했을때
     constructor(shape, setting) {
         this.shape = shape; // 모양
-        let area;
+
+        // 입력받은 density 또는 mass 정리하고 mass로 변환
+        setting.mass ? this.mass = setting.mass : (
+            setting.density ? null : setting.density = 1;
+        )
+        setting.density || !setting.inertia ? setting.area = this.shape.getArea() : null;
+        setting.density ? this.mass = setting.area * setting.density : null;
+        !setting.inertia ? setting.inertia = this.shape.getInertia() : null;
         
         // 충돌 처리 4종류 (충돌감지를 해야하는건 무조건 World에서 처리. 안해도되면 World에서 처리안하는게 좋음. (최적화))
         // only-collide: 충돌하고 반응 안함. / 풀, 아이템
