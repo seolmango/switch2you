@@ -6,60 +6,36 @@ class RigidBody {
     #_angle; // 각도
 
     // 필수 - shape (구조체가 아닌 객체라, 참조 관리의 편의성을 위해 따로 매개변수로 작성)
-    // 선택 - collisionType, area, density/mass, inertia, pos, angle, restiution, friction, damping
+    // 선택 - collisionType, pos, angle, restitution, friction, damping, density/mass, area, inertia
     // 항상 각 강체마다 Shape를 여러개 가질 수 있다는 걸 고려하고 필드를 만들어야 함.
     // Shapes가 묶여서 한 물체로 인식되려면, 모양에 대한 정보말고는 가지고 있으면 안됨.
-
-    // area, density, mass, inertia 중 없어도 되는 값은 area, density.
-    // density는 입력받으면 area 구해서 mass로 변환. density와 mass 둘 중 하나만 들어옴.
-    // inertia는 입력받지 않으면 구하는 과정에서 area와 mass를 필요
-    // 그러면 구조를 어떻게?
-    // area가 필요한 때는? density를 입력 받았을때 (mass도 같이 입력받았을때는 고려하지 않음), inertia를 입력받지 못했을때
     constructor(shape, setting) {
         this.shape = shape; // 모양
 
-        // 입력받은 density 또는 mass 정리하고 mass로 변환
-        setting.mass ? this.mass = setting.mass : (
-            setting.density ? null : setting.density = 1;
-        )
-        setting.density || !setting.inertia ? setting.area = this.shape.getArea() : null;
-        setting.density ? this.mass = setting.area * setting.density : null;
-        !setting.inertia ? setting.inertia = this.shape.getInertia() : null;
-        
         // 충돌 처리 4종류 (충돌감지를 해야하는건 무조건 World에서 처리. 안해도되면 World에서 처리안하는게 좋음. (최적화))
         // only-collide: 충돌하고 반응 안함. / 풀, 아이템
         // dynamic: 충돌하고 반응 함. / 일반적인 물체
         // static: 충돌하고 반응 함. 반응 시 밀리지 않음. / 벽
         // 그 외 모든 type: 같은 type끼리는 충돌하고 반응 안함. 다른 type과는 충돌하고 반응 함. / 플레이어
-        setting.collisionType ? this.collisionType = setting.collisionType : this.collisionType = 'dynamic'; // 충돌 타입
-        if (setting.density) {
-            
-        } ? this.density = setting.density : (
-            setting.mass ? this.mass = setting.mass : null;
-        );
-        if (!(setting.density || setting.mass)) {}
+        setting.collisionType ? this.collisionType = setting.collisionType : this.collisionType = 'dynamic';
+        setting.pos ? this.pos = setting.pos : this.pos = new Vector2();
+        setting.angle ? this.angle = setting.angle : this.angle = 0;
+        setting.restitution ? this.restitution = setting.restitution : this.restitution = 0; // 복원력 (탄성계수)
+        setting.friction ? this.friction = setting.friction : this.friction = 1; // 마찰력
+        setting.damping ? this.damping = setting.damping : this.damping = 1; // 저항력 (공기저항 등)
 
-        setting. ? this.inertia : this. = 1;
-        setting. ? this. : this. = 1;
-        setting. ? this. : this. = 1;
-        this.type = type; // 강체의 종류 (벽, 플레이어 등)
-        this.isStatic = isStatic; // 고정된 강체인가?
-        this.shape = shape; // 모양
-        this.mass = mass; // 질량
-        isStatic ? this.invMass = 0 : this.invMass = 1 / mass; // 질량의 역수 (계산에 이용됨)
+        // 입력받은 density 또는 mass 정리하고 mass로 변환, area와 inertia 구하기
+        setting.mass ? this.mass = setting.mass : (
+            setting.density ? null : setting.density = 1;
+        )
+        setting.density || !setting.inertia ? (setting.area ? null : setting.area = this.shape.getArea()) : null;
+        setting.density ? this.mass = setting.area * setting.density : null;
+        setting.inertia ? this.inertia = setting.inertia : this.inertia = this.shape.getInertia();
 
-        this.restitution = restitution; // 복원력 (탄성계수)
-        this.friction = friction; // 마찰력
-        this.damping = damping; // 저항력 (공기저항 등)
-
-        this.pos = pos; // 중심, 위치
+        this.collisionType === 'static' ? (this.invMass = 0; this.invInertia = 0) : (this.invMass = 1 / mass, this.invInertia = 1 / this.inertia); // 질량과 회전관성의 역수 (계산에 이용됨)
         this.v = new Vector2(); // 속도
         this.f = new Vector2(); // 힘
         this.totalF; // accumulated impulse를 위함.
-
-        this.inertia = this.mass * this.mass * 100; // 회전 관성. 관성이란 기존것을 유지하려는 성질이기에, 이 값이 커질수록 더 안 회전함.
-        isStatic? this.invInertia = 0 : this.invInertia = 1 / this.inertia; // 회전관성의 역수 (계산에 이용됨);
-        this.angle = angle; // 각도
         this.angV = 0; // angular velocity. 각속도
         this.t = 0; // 토크
     }
