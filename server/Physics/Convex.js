@@ -43,9 +43,9 @@ class Convex extends Shape {
         let inertia = 0;
         for (let i = 0; i < this.points.length; i++) {
             let point1 = this.points[i], point2 = this.points[(i + 1) % this.points.length];
-            inertia += this.#triDivArea[i] * (Math.sqrt(point1.magnitude) + Math.sqrt(point2.magnitude) + point1.dot(point2)) / 6;
+            inertia += this.#triDivArea[i] * (point1.dot(point1) + point2.dot(point2) + point1.dot(point2)); // 자기자신 내적은 크기의 제곱
         }
-        return inertia * mass / this.#area; // 원래는 density인데 코드 꼬여서 mass로 통일함
+        return inertia * (mass / this.#area) / 6; // 원래는 density인데 코드 꼬여서 mass로 통일함
     }
 
     // 여러 작업을 할때, angle이 필요한데, 그때그때 받으면 불편해서 RigidBody의 angle이 바뀔때마다 angle을 저장함.
