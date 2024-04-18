@@ -13,7 +13,7 @@ class World {
         for (let rep = 0; rep < repetition; rep++) {
             // move
             for (const rigidBody of this.rigidBodies) {
-                if (rigidBody.isStatic) continue;
+                if (rigidBody.collisionType === 'static') continue;
                 // calc v
                 rigidBody.v = rigidBody.v.plus(rigidBody.f.multiply(rigidBody.invMass * dt)); // dv = F/m(=a) * dt
                 rigidBody.v = rigidBody.v.multiply(0.999);
@@ -37,7 +37,7 @@ class World {
             // calc f
             for (let i = 0; i < this.rigidBodies.length - 1; i++)
                 for (let j = i + 1; j < this.rigidBodies.length; j++) {
-                    if (this.rigidBodies[i].isStatic && this.rigidBodies[j].isStatic) continue;
+                    if (this.rigidBodies[i].collisionType === 'static' && this.rigidBodies[j].collisionType === 'static') continue;
                     RigidBody.checkCollision(this.rigidBodies[i], this.rigidBodies[j]);
                 }
         }

@@ -11,7 +11,7 @@ class Circle extends Shape {
         return this.radius * this.radius * Math.PI;
     }
 
-    getInertia(density, mass) {
+    getInertia(mass) {
         return this.radius * this.radius * mass * 0.5;
     }
 

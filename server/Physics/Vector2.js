@@ -8,6 +8,10 @@ class Vector2 {
         this.y = y;
     }
 
+    deepCopy() {
+        return new Vector2(this.x, this.y);
+    }
+
     plus(vector2) {
         return new Vector2(this.x + vector2.x, this.y + vector2.y);
     }

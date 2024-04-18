@@ -2,13 +2,16 @@
 
 
 class Convex extends Shape {
-    #_angle; #_points; #_rotationedPoints; #_triDivArea; // 삼각형으로 분할
+    #angle; #_points; #_rotationedPoints; #area; #triDivArea; // 삼각형으로 분할
 
     constructor(points = []) {
         super('Convex');
-        this.#_angle = 0;
+        this.#angle = 0;
+        // updateCheckSize는 rigidBody일때만 의미 있으므로 여기서 업데이트 안해도 됨.
         this.#_points = points; // point 와 normal(법선 벡터)의 변은 반드시 인접해야함.즉, 이걸 고려해서 getNormals 만들기. 방향과의 통일을 위해 반시계방향으로 저장
         this.#_rotationedPoints = []; // 회전된 points
+        this.#area = 0;
+        this.#triDivArea = [];
         this.contacts = []; // 접촉한 점들의 좌표 (리스트의 인덱스로 할 수 있으나, 이 방법이 더 편함)
     }
 
@@ -19,7 +22,7 @@ class Convex extends Shape {
     // points가 바뀌면 바로 rotationPoints 업데이트하고 checkSize 변경
     set points(value) {
         this.#_points = value;
-        this.#updateCheckSize();
+        this.updateCheckSize(this.#angle);
     }
 
     // rotationedPoints는 points에 결속돼있기 때문에 수정이 불가능함. 그때 그때 계산해서 반환하면 최적화문제가 생기니 private 변수 따로 만들어서 보관함.
@@ -28,27 +31,28 @@ class Convex extends Shape {
     }
 
     getArea() {
-        for (let i = 0; i < this.points.length; i++)
-            this.#_triDivArea.push(Math.abs(this.points[i].cross(this.points[(i + 1) % this.points.length])) * 0.5);
-        return this.#_triDivArea.reduce((a, b) => a + b);
+        for (let i = 0; i < this.points.length; i++) {
+            let triDivArea = Math.abs(this.points[i].cross(this.points[(i + 1) % this.points.length])) * 0.5
+            this.#triDivArea.push(triDivArea);
+            this.#area += triDivArea;
+        }
+        return this.#area;
     }
 
-    getInertia(density, mass) {
+    getInertia(mass) {
         let inertia = 0;
         for (let i = 0; i < this.points.length; i++) {
-            let point1 = this.points[i], point2 = this.points[(i + 1) % this.points.lengnth];
-            inertia += this.#_triDivArea * density * (Math.sqrt(point1.magnitude) + Math.sqrt(point2.magnitude) + point1.dot(point2)) / 6;
+            let point1 = this.points[i], point2 = this.points[(i + 1) % this.points.length];
+            inertia += this.#triDivArea[i] * (Math.sqrt(point1.magnitude) + Math.sqrt(point2.magnitude) + point1.dot(point2)) / 6;
         }
-        return inertia;
+        return inertia * mass / this.#area; // 원래는 density인데 코드 꼬여서 mass로 통일함
     }
 
     // 여러 작업을 할때, angle이 필요한데, 그때그때 받으면 불편해서 RigidBody의 angle이 바뀔때마다 angle을 저장함.
     updateCheckSize(angle) {
-        this.#_angle = angle;
-        if (this.points.length !== 0) this.#updateCheckSize(); // 특수한 방식으로 rigidBody를 생성할때 updateCheckSize를 2번을 하지 않기 위함
-    }
+        this.#angle = angle;
 
-    #updateCheckSize() {
+        // 각도 받는김에 회전된 꼭짓점도 업데이트
         this.#rotationPoints();
         [this.checkLeft, this.checkRight] = this.getProjections(new Vector2(1, 0));
         [this.checkDown, this.checkUp] = this.getProjections(new Vector2(0, 1));
@@ -56,7 +60,7 @@ class Convex extends Shape {
 
     // rotationedPoints 업데이트
     #rotationPoints() {
-        this.#_rotationedPoints = this.points.map(point => point.rotationConversion(this.#_angle));
+        this.#_rotationedPoints = this.points.map(point => point.rotationConversion(this.#angle));
     }
 
     getNormals() {

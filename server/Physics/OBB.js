@@ -14,8 +14,8 @@ class OBB extends Convex {
     }
 
     // 관성 모멘트 목록 https://en.wikipedia.org/wiki/List_of_moments_of_inertia
-    getInertia(density, mass) {
-        return (this.width2 * this.widht2 + this.height2 * this.height2) * mass / 3;
+    getInertia(mass) {
+        return (this.width2 * this.width2 + this.height2 * this.height2) * mass / 3;
     }
 
     /** 최적화를 위한 오버라이드 나중에

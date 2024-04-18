@@ -18,26 +18,24 @@ class RigidBody {
         // static: 충돌하고 반응 함. 반응 시 밀리지 않음. / 벽
         // 그 외 모든 type: 같은 type끼리는 충돌하고 반응 안함. 다른 type과는 충돌하고 반응 함. / 플레이어
         setting.collisionType ? this.collisionType = setting.collisionType : this.collisionType = 'dynamic';
-        setting.pos ? this.pos = setting.pos : this.pos = new Vector2();
+        setting.pos ? this.pos = setting.pos.deepCopy() : this.pos = new Vector2();
         setting.angle ? this.angle = setting.angle : this.angle = 0;
         setting.restitution ? this.restitution = setting.restitution : this.restitution = 0; // 복원력 (탄성계수)
-        setting.friction ? this.friction = setting.friction : this.friction = 1; // 마찰력
-        setting.damping ? this.damping = setting.damping : this.damping = 1; // 저항력 (공기저항 등)
+        setting.friction ? this.friction = setting.friction : this.friction = 0; // 마찰력
+        setting.damping ? this.damping = setting.damping : this.damping = 0; // 저항력 (공기저항 등)
 
         // 입력받은 density 또는 mass 정리하고 mass로 변환, area와 inertia 구하기
-        setting.mass ? this.mass = setting.mass : (
-            setting.density ? null : setting.density = 1;
-        )
+        setting.mass ? this.mass = setting.mass : (setting.density ? null : setting.density = 1);
         setting.density || !setting.inertia ? (setting.area ? null : setting.area = this.shape.getArea()) : null;
         setting.density ? this.mass = setting.area * setting.density : null;
-        setting.inertia ? this.inertia = setting.inertia : this.inertia = this.shape.getInertia();
+        setting.inertia ? this.inertia = setting.inertia : this.inertia = this.shape.getInertia(this.mass);
 
-        this.collisionType === 'static' ? (this.invMass = 0; this.invInertia = 0) : (this.invMass = 1 / mass, this.invInertia = 1 / this.inertia); // 질량과 회전관성의 역수 (계산에 이용됨)
+        this.collisionType === 'static' ? (this.invMass = 0, this.invInertia = 0) : (this.invMass = 1 / this.mass, this.invInertia = 1 / this.inertia); // 질량과 회전관성의 역수 (계산에 이용됨)
         this.v = new Vector2(); // 속도
         this.f = new Vector2(); // 힘
-        this.totalF; // accumulated impulse를 위함.
         this.angV = 0; // angular velocity. 각속도
         this.t = 0; // 토크
+        this.totalF; // accumulated impulse를 위함.
     }
 
     get angle() {
@@ -218,8 +216,8 @@ class RigidBody {
     static correctionCollision(rigidBody1, rigidBody2, normal, penetration) {
         let distance = normal.multiply(penetration); // 총 보정 거리
 
-        if (rigidBody1.isStatic) rigidBody2.pos = rigidBody2.pos.plus(distance);
-        else if (rigidBody2.isStatic) rigidBody1.pos = rigidBody1.pos.minus(distance);
+        if (rigidBody1.collisionType === "static") rigidBody2.pos = rigidBody2.pos.plus(distance);
+        else if (rigidBody2.collisionType === "static") rigidBody1.pos = rigidBody1.pos.minus(distance);
         else {
             rigidBody1.pos = rigidBody1.pos.minus(distance.multiply(rigidBody2.mass / (rigidBody1.mass + rigidBody2.mass))); // 질량을 이용해 조금 더 정확한 보정
             rigidBody2.pos = rigidBody2.pos.plus(distance.multiply(rigidBody1.mass / (rigidBody1.mass + rigidBody2.mass)));
