@@ -7,8 +7,8 @@ class World {
         fps *= repetition;
         const dt = 1 / fps; // delta time
 
-        for (const rigidBody of this.rigidBodies)
-            rigidBody.totalF = new Array(rigidBody.shape.points.length);
+        //for (const rigidBody of this.rigidBodies)
+            //rigidBody.totalF = new Array(rigidBody.shape.points.length);
 
         for (let rep = 0; rep < repetition; rep++) {
             // move

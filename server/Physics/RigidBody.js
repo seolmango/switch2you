@@ -66,8 +66,12 @@ class RigidBody {
             penetration = (circle1.shape.radius + circle2.shape.radius) - Math.abs(relativePos.magnitude); // 충돌 정도
 
             if (penetration <= 0) return; // 충돌안함
-            
+
             normal = relativePos.normalize(); // 접촉면의 법선벡터
+
+            RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration)
+
+            contactPoints.push(circle1.pos.plus(normal.multiply(circle1.shape.radius)));
 
         } else if ((rigidBody1.shape.type === 'Circle' && rigidBody2.shape.type === 'Convex') || (rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Circle')) {
             const circle = rigidBody1;
