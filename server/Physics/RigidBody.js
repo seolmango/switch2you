@@ -26,7 +26,7 @@ class RigidBody {
 
         // 입력받은 density 또는 mass 정리하고 mass로 변환, area와 inertia 구하기
         setting.mass ? this.mass = setting.mass : (setting.density ? null : setting.density = 1);
-        setting.density || !setting.inertia ? (setting.area ? null : setting.area = this.shape.getArea()) : null;
+        setting.density || !setting.inertia && !setting.area ? setting.area = this.shape.getArea() : null;
         setting.density ? this.mass = setting.area * setting.density : null;
         setting.inertia ? this.inertia = setting.inertia : this.inertia = this.shape.getInertia(this.mass);
 

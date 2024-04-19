@@ -45,11 +45,10 @@ class World {
 
                     if (RigidBody.isPreCollision(rigidBody1, rigidBody2)) continue;
                     let checkType; // 충돌 체크 타입
-                    rigidBody1.shape.type === 'Circle' && rigidBody2.shape.type === 'Circle' ? checkType = 'Circle-Circle' : (
-                        (rigidBody1.shape.type === 'Circle' && rigidBody2.shape.type === 'Convex') || (rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Circle') ? checkType = 'Circle-Convex' : (
-                            rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Convex' ? checkType = 'Convex-Convex' : null
-                        )
-                    );
+                    rigidBody1.shape.type === 'Circle' && rigidBody2.shape.type === 'Circle' ? checkType = 'Circle-Circle'
+                        : (rigidBody1.shape.type === 'Circle' && rigidBody2.shape.type === 'Convex') || (rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Circle') ? checkType = 'Circle-Convex'
+                        : rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Convex' ? checkType = 'Convex-Convex'
+                        : null;
                     const result = RigidBody.isCollision(checkType, rigidBody1, rigidBody2);
                     let normal, penetration;
                     if (result === undefined) continue;
