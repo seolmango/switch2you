@@ -31,15 +31,38 @@ class World {
             for (const rigidBody of this.rigidBodies) {
                 rigidBody.f.set(0, 0); // 중력은 0, 9.8 * fps * rigidBody.mass
                 rigidBody.t = 0;
-                rigidBody.shape.contacts = [];
             }
 
             // calc f
-            for (let i = 0; i < this.rigidBodies.length - 1; i++)
+            for (let i = 0; i < this.rigidBodies.length - 1; i++) {
+                const rigidBody1 = this.rigidBodies[i];
                 for (let j = i + 1; j < this.rigidBodies.length; j++) {
-                    if (this.rigidBodies[i].collisionType === 'static' && this.rigidBodies[j].collisionType === 'static') continue;
-                    RigidBody.checkCollision(this.rigidBodies[i], this.rigidBodies[j]);
+                    const rigidBody2 = this.rigidBodies[j];
+
+                    // 완료 - 이 world 절차대로 각 rigidBody 정적메서드 분리하고 알맞게 변수얻고 수정하면 됨
+                    // 이 뒤에는 jittering해결 + repitition 추가, friction, damping 추가하고 circle-convex 충돌 개발 하면 됨 (가능하면 OBB 최적화도)
+                    if (rigidBody1.collisionType === 'static' && rigidBody2.collisionType === 'static') continue;
+
+                    if (RigidBody.isPreCollision(rigidBody1, rigidBody2)) continue;
+                    let checkType; // 충돌 체크 타입
+                    rigidBody1.shape.type === 'Circle' && rigidBody2.shape.type === 'Circle' ? checkType = 'Circle-Circle' : (
+                        (rigidBody1.shape.type === 'Circle' && rigidBody2.shape.type === 'Convex') || (rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Circle') ? checkType = 'Circle-Convex' : (
+                            rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Convex' ? checkType = 'Convex-Convex' : null
+                        )
+                    );
+                    const result = RigidBody.isCollision(checkType, rigidBody1, rigidBody2);
+                    let normal, penetration;
+                    if (result === undefined) continue;
+                    else [normal, penetration] = result;
+
+                    if (rigidBody1.collisionType === 'only-collide' || rigidBody2.collisionType === 'only-collide') continue;
+                    if (rigidBody1.collisionType !== 'dynamic' && rigidBody1.collisionType !== 'static' && rigidBody1.collisionType === rigidBody2.collisionType) continue;
+                    
+                    RigidBody.CorrectionCollision(rigidBody1, rigidBody2, normal, penetration);
+                    const contactPoints = RigidBody.GetContactPoints(checkType, rigidBody1, rigidBody2, normal);
+                    RigidBody.ResolveCollision(rigidBody1, rigidBody2, normal, contactPoints);
                 }
+            }
         }
     }
 }

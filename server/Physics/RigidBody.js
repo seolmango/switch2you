@@ -48,37 +48,29 @@ class RigidBody {
     }
 
 
-    // 충돌 감지와 보정, 모든 벡터량은 rigidBody1 기준으로
-    static checkCollision(rigidBody1, rigidBody2) {
-        // 사전 충돌 검사
-        if ((Math.max((rigidBody2.pos.x - rigidBody2.shape.checkLeft) - (rigidBody1.pos.x + rigidBody1.shape.checkRight), (rigidBody1.pos.x - rigidBody1.shape.checkLeft) - (rigidBody2.pos.x + rigidBody2.shape.checkRight)) >= 0) || (Math.max((rigidBody2.pos.y - rigidBody2.shape.checkDown) - (rigidBody1.pos.y + rigidBody1.shape.checkUp), (rigidBody1.pos.y - rigidBody1.shape.checkDown) - (rigidBody2.pos.y + rigidBody2.shape.checkUp)) >= 0)) return;
+    // 사전 충돌 검사
+    static isPreCollision(rigidBody1, rigidBody2) {
+        return (Math.max((rigidBody2.pos.x - rigidBody2.shape.checkLeft) - (rigidBody1.pos.x + rigidBody1.shape.checkRight), (rigidBody1.pos.x - rigidBody1.shape.checkLeft) - (rigidBody2.pos.x + rigidBody2.shape.checkRight)) >= 0) || (Math.max((rigidBody2.pos.y - rigidBody2.shape.checkDown) - (rigidBody1.pos.y + rigidBody1.shape.checkUp), (rigidBody1.pos.y - rigidBody1.shape.checkDown) - (rigidBody2.pos.y + rigidBody2.shape.checkUp)) >= 0);
+    }
 
+    // 정확한 충돌 검사, 모든 벡터량은 rigidBody1 기준으로
+    static isCollision(checkType, rigidBody1, rigidBody2) {
         let normal; // 접촉면의 법선벡터
         let penetration = 0; // 침투(충돌) 정도
-        let contactPoints = []; // 접촉점들 (토크 계산시 필요)
         let relativePos = rigidBody2.pos.minus(rigidBody1.pos); // 거리 차
 
         // 정확한 충돌 검사
-        if (rigidBody1.shape.type === 'Circle' && rigidBody2.shape.type === 'Circle') {
-            const circle1 = rigidBody1;
-            const circle2 = rigidBody2;
-
-            penetration = (circle1.shape.radius + circle2.shape.radius) - Math.abs(relativePos.magnitude); // 충돌 정도
-
+        if (checkType === 'Circle-Circle') {
+            penetration = (rigidBody1.shape.radius + rigidBody2.shape.radius) - Math.abs(relativePos.magnitude); // 충돌 정도
             if (penetration <= 0) return; // 충돌안함
-
             normal = relativePos.normalize(); // 접촉면의 법선벡터
 
-            RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration)
-
-            contactPoints.push(circle1.pos.plus(normal.multiply(circle1.shape.radius)));
-
-        } else if ((rigidBody1.shape.type === 'Circle' && rigidBody2.shape.type === 'Convex') || (rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Circle')) {
+        } else if (checkType === 'Circle-Convex') {
             const circle = rigidBody1;
             const obb = rigidBody2;
             // 나중에
 
-        } else if (rigidBody1.shape.type === 'Convex' && rigidBody2.shape.type === 'Convex') {
+        } else if (checkType === 'Convex-Convex') {
             const normals = [...rigidBody1.shape.getNormals(), ...rigidBody2.shape.getNormals()];
 
             for (let checkNormal of normals) {
@@ -102,8 +94,81 @@ class RigidBody {
                 normal = normal.multiply(-1); // 하지만, 강체 구분 외에 평행한 법선벡터들의 방향 구분의 역할도 수행해서 이걸로 온전한 강체 구분은 불가능함.
 
 
-            RigidBody.correctionCollision(rigidBody1, rigidBody2, normal, penetration) // 충돌 보정. 접촉점을 찾기 전에 보정을 해야 정확해짐.
+            // 잘못된 강좌가 코드를 망친 예 ㅠㅠ
+            // 이 방법은 모든 변의 법선벡터를 통하여 점이 다른 도형안에 들어가있는지 확인하는거지, 법선벡터에 투영된 거리차이로 감지하는게 아님.
+            // 이 방식은 SAT와는 다름! 완전히 달라서 일부경우 충돌감지가 안됨. 즉, 처음에 했던 SAT방식이 더 나음...
+            // 이렇게하면 예각 삼각형끼리 닿았을때 변과 변의 충돌을 감지할 수가 없기 때문에 감지가 불가능함.
+            // 이런강좌를 왜 했는지 의문이고, 자신도 어떻게 해결했는지 모르는게 당연함.
+            // 2024.03.12 내가 강좌글을 뛰어넘은 순간
+            /**
+            for (let i = 0; i < points1.length; i++) {
+                let point1 = rigidBody1.pos.plus(points1[i]);
 
+                isCollide = true;
+                for (let j = 0; j < points2.length; j++) {
+                    let point2 = rigidBody2.pos.plus(points2[j]);
+                    let r = normals2[j].dot(point1.minus(point2)) // 침투정도
+                    if (r >= 0) {
+                        isCollide = false;
+                        break;
+                    }
+                    if (penetration === undefined || penetration > -r) {
+                        penetration = -r; // 가장 얕은 침투 거리
+                        normal = normals2[j];
+                    }
+                }
+
+                if (isCollide) {
+                    let temp = rigidBody1;
+                    rigidBody1 = rigidBody2;
+                    rigidBody2 = temp;
+                    break;
+                }
+            }*/
+        }
+
+        return [normal, penetration];
+
+
+        // 원-다각형 충돌 옛날꺼(참고용)
+        /*
+        } else if ((this.type === "Circle" && polygon.type === "OBB") || (polygon.type === "Circle" && this.type === "OBB")) {
+            let circle, obb;
+            if (this.type === "Circle") {
+                circle = this;
+                obb = polygon;
+            } else {
+                circle = polygon;
+                obb = this;
+            }
+            // OBB를 중점으로 좌표계 회전 후, Circle-AABB 감지
+            let dpos = circle.pos.minus(obb.pos)
+            let drotation = Math.atan2(dpos.y, dpos.x) - obb.rotation;
+            dpos = new Vector2(Math.cos(drotation) * dpos.magnitude, Math.sin(drotation) * dpos.magnitude);
+            let x, y;
+            // Circle-OBB 의 최단점 찾기
+            if (dpos.x > obb.pos.x + obb.width2) x = obb.pos.x + obb.width2;
+            else if (dpos.x < obb.pos.x - obb.width2) x = obb.pos.x - obb.width2;
+            else x = dpos.x;
+            if (dpos.y > obb.pos.y + obb.height2) y = obb.pos.y + obb.height2;
+            else if (dpos.y < obb.pos.y - obb.height2) y = obb.pos.y - obb.height2;
+            else y = dpos.y;
+            const check = dpos.minus(new Vector2(x, y)) < circle.radius;
+            
+            return check;
+        }*/
+    }
+
+    static GetContactPoints(checkType, rigidBody1, rigidBody2, normal) {
+        let contactPoints = []; // 접촉점들 (토크 계산시 필요)
+
+        if (checkType === 'Circle-Circle')
+            contactPoints.push(rigidBody1.pos.plus(normal.multiply(rigidBody1.shape.radius)));
+
+        else if (checkType === 'Circle-Convex') {
+            // 나중에
+
+        } else if (checkType === 'Convex-Convex') {
             // 접촉점들 찾기. 각 강체에서 법선벡터의 변에 가장 가까운 점들을 찾고, 수직으로 돌려 각 양 끝점(충돌하지 않은 꼭짓점)을 제거함.
             // 강체의 무게중심(위치)가 강체 안에 존재해야 함.
             let contactPoints1 = [];
@@ -147,89 +212,20 @@ class RigidBody {
             }
 
             contactPoints = [...contactPoints1, ...contactPoints2];
-            rigidBody1.shape.contacts = contactPoints1;
-            rigidBody2.shape.contacts = contactPoints2;
-
-
-            // 잘못된 강좌가 코드를 망친 예 ㅠㅠ
-            // 이 방법은 모든 변의 법선벡터를 통하여 점이 다른 도형안에 들어가있는지 확인하는거지, 법선벡터에 투영된 거리차이로 감지하는게 아님.
-            // 이 방식은 SAT와는 다름! 완전히 달라서 일부경우 충돌감지가 안됨. 즉, 처음에 했던 SAT방식이 더 나음...
-            // 이렇게하면 예각 삼각형끼리 닿았을때 변과 변의 충돌을 감지할 수가 없기 때문에 감지가 불가능함.
-            // 이런강좌를 왜 했는지 의문이고, 자신도 어떻게 해결했는지 모르는게 당연함.
-            // 2024.03.12 내가 강좌글을 뛰어넘은 순간
-            /**
-            for (let i = 0; i < points1.length; i++) {
-                let point1 = rigidBody1.pos.plus(points1[i]);
-
-                isCollide = true;
-                for (let j = 0; j < points2.length; j++) {
-                    let point2 = rigidBody2.pos.plus(points2[j]);
-                    let r = normals2[j].dot(point1.minus(point2)) // 침투정도
-                    if (r >= 0) {
-                        isCollide = false;
-                        break;
-                    }
-                    if (penetration === undefined || penetration > -r) {
-                        penetration = -r; // 가장 얕은 침투 거리
-                        normal = normals2[j];
-                    }
-                }
-
-                if (isCollide) {
-                    let temp = rigidBody1;
-                    rigidBody1 = rigidBody2;
-                    rigidBody2 = temp;
-                    break;
-                }
-            }*/
-            
         }
 
-        RigidBody.resolveCollision(rigidBody1, rigidBody2, normal, contactPoints); // 충돌 해결
-
-
-        /*
-        } else if ((this.type === "Circle" && polygon.type === "OBB") || (polygon.type === "Circle" && this.type === "OBB")) {
-            let circle, obb;
-            if (this.type === "Circle") {
-                circle = this;
-                obb = polygon;
-            } else {
-                circle = polygon;
-                obb = this;
-            }
-            // OBB를 중점으로 좌표계 회전 후, Circle-AABB 감지
-            let dpos = circle.pos.minus(obb.pos)
-            let drotation = Math.atan2(dpos.y, dpos.x) - obb.rotation;
-            dpos = new Vector2(Math.cos(drotation) * dpos.magnitude, Math.sin(drotation) * dpos.magnitude);
-            let x, y;
-            // Circle-OBB 의 최단점 찾기
-            if (dpos.x > obb.pos.x + obb.width2) x = obb.pos.x + obb.width2;
-            else if (dpos.x < obb.pos.x - obb.width2) x = obb.pos.x - obb.width2;
-            else x = dpos.x;
-            if (dpos.y > obb.pos.y + obb.height2) y = obb.pos.y + obb.height2;
-            else if (dpos.y < obb.pos.y - obb.height2) y = obb.pos.y - obb.height2;
-            else y = dpos.y;
-            const check = dpos.minus(new Vector2(x, y)) < circle.radius;
-            
-            return check;
-        }*/
+        return contactPoints;
     }
 
     // 충돌 보정
-    static correctionCollision(rigidBody1, rigidBody2, normal, penetration) {
+    static CorrectionCollision(rigidBody1, rigidBody2, normal, penetration) {
         let distance = normal.multiply(penetration); // 총 보정 거리
-
-        if (rigidBody1.collisionType === "static") rigidBody2.pos = rigidBody2.pos.plus(distance);
-        else if (rigidBody2.collisionType === "static") rigidBody1.pos = rigidBody1.pos.minus(distance);
-        else {
-            rigidBody1.pos = rigidBody1.pos.minus(distance.multiply(rigidBody2.mass / (rigidBody1.mass + rigidBody2.mass))); // 질량을 이용해 조금 더 정확한 보정
-            rigidBody2.pos = rigidBody2.pos.plus(distance.multiply(rigidBody1.mass / (rigidBody1.mass + rigidBody2.mass)));
-        }
+        rigidBody1.pos = rigidBody1.pos.minus(distance.multiply(rigidBody1.invMass / (rigidBody1.invMass + rigidBody2.invMass))); // 질량을 이용해 조금 더 정확한 보정
+        rigidBody2.pos = rigidBody2.pos.plus(distance.multiply(rigidBody2.invMass / (rigidBody1.invMass + rigidBody2.invMass)));
     }
 
     // 충돌 해결
-    static resolveCollision(rigidBody1, rigidBody2, normal, contactPoints) {
+    static ResolveCollision(rigidBody1, rigidBody2, normal, contactPoints) {
         const e = Math.min(rigidBody1.restitution, rigidBody2.restitution);
         const contacts1 = [], contacts2 = [];
         const impulses = [];
