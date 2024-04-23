@@ -6,11 +6,12 @@ class RigidBody {
     #_angle; // 각도
 
     // 필수 - shape (구조체가 아닌 객체라, 참조 관리의 편의성을 위해 따로 매개변수로 작성)
-    // 선택 - collisionType, pos, angle, restitution, friction, damping, density/mass, area, inertia
+    // 선택 - collisionType, angle, restitution, friction, damping, density/mass, area, inertia
     // 항상 각 강체마다 Shape를 여러개 가질 수 있다는 걸 고려하고 필드를 만들어야 함.
     // Shapes가 묶여서 한 물체로 인식되려면, 모양에 대한 정보말고는 가지고 있으면 안됨.
-    constructor(shape, setting) {
+    constructor(shape, pos, setting) {
         this.shape = shape; // 모양
+        this.pos = pos;
 
         // 충돌 처리 4종류 (충돌감지를 해야하는건 무조건 World에서 처리. 안해도되면 World에서 처리안하는게 좋음. (최적화))
         // only-collide: 충돌하고 반응 안함. / 풀, 아이템
@@ -18,10 +19,9 @@ class RigidBody {
         // static: 충돌하고 반응 함. 반응 시 밀리지 않음. / 벽
         // 그 외 모든 type: 같은 type끼리는 충돌하고 반응 안함. 다른 type과는 충돌하고 반응 함. / 플레이어
         setting.collisionType ? this.collisionType = setting.collisionType : this.collisionType = 'dynamic';
-        setting.pos ? this.pos = setting.pos.deepCopy() : this.pos = new Vector2();
         setting.angle ? this.angle = setting.angle : this.angle = 0;
         setting.restitution ? this.restitution = setting.restitution : this.restitution = 0; // 복원력 (탄성계수)
-        setting.friction ? this.friction = setting.friction : this.friction = 0; // 마찰력
+        setting.friction ? this.friction = setting.friction : this.friction = 1000000000; // 마찰력
         setting.damping ? this.damping = setting.damping : this.damping = 0; // 저항력 (공기저항 등)
 
         // 입력받은 density 또는 mass 정리하고 mass로 변환, area와 inertia 구하기
@@ -224,44 +224,52 @@ class RigidBody {
         rigidBody2.pos = rigidBody2.pos.plus(distance.multiply(rigidBody2.invMass / (rigidBody1.invMass + rigidBody2.invMass)));
     }
 
-    // 충돌 해결
+    // 충돌 해결. 위치 이동을 normal, 회전 이동을 tangent라 말하는것 같음.
     static ResolveCollision(rigidBody1, rigidBody2, normal, contactPoints) {
         const e = Math.min(rigidBody1.restitution, rigidBody2.restitution);
-        const contacts1 = [], contacts2 = [];
-        const impulses = [];
+        const friction = (rigidBody1.friction + rigidBody2.friction) * 0.5;
         for (let i = 0; i < contactPoints.length; i++) {
-            contacts1.push(contactPoints[i].minus(rigidBody1.pos)); // 접촉점에 대해 각 강체를 원점으로 한 벡터
-            contacts2.push(contactPoints[i].minus(rigidBody2.pos));
-            let normal1 = new Vector2(-contacts1[i].y, contacts1[i].x); // 접촉점 벡터의 수직 벡터 (각속도니까)
-            let normal2 = new Vector2(-contacts2[i].y, contacts2[i].x);
+            let contact1 = contactPoints[i].minus(rigidBody1.pos); // 접촉점에 대해 각 강체를 원점으로 한 벡터
+            let contact2 = contactPoints[i].minus(rigidBody2.pos);
+            let normal1 = new Vector2(-contact1.y, contact1.x); // 접촉점 벡터의 수직 벡터 (각속도니까)
+            let normal2 = new Vector2(-contact2.y, contact2.x); // ?? 둘이 코드가 다름 1. mass normal이 뭐지 2. 각 코드의 차이가 뭐지
             let angV1 = normal1.multiply(rigidBody1.angV); // 수직 벡터에 속도를 곱함
             let angV2 = normal2.multiply(rigidBody2.angV);
-            let relativeV = normal.dot(rigidBody2.v.plus(angV2).minus(rigidBody1.v.plus(angV1))); // 각 접촉점의 법선벡터 기준 속도 차
-            if (relativeV > 0) continue; // 접촉점이 서로 멀어지고 있는가?
+            let relativeV = rigidBody2.v.plus(angV2).minus(rigidBody1.v.plus(angV1)); // 각 접촉점의 법선벡터 기준 속도 차
+            let relativeVN = normal.dot(relativeV);
+            if (relativeVN > 0) continue; // 접촉점이 서로 멀어지고 있는가?
 
             let f1 = normal.dot(normal1);
             let f2 = normal.dot(normal2);
-            let j = -(1 + e) * relativeV;
+            let j = -(1 + e) * relativeVN;
+            // mass normal?? box2d-lite에서 사용한 방식대로 하면 이상하게 움직이는데 왜 그런지 모르겠음. 이거는 다른 방법
             j /= rigidBody1.invMass + rigidBody2.invMass + f1 * f1 * rigidBody1.invInertia + f2 * f2 * rigidBody2.invInertia;
             j /= contactPoints.length;
-            impulses.push(normal.multiply(j));
-        }
+            let impulse = normal.multiply(j);
 
-        for (let i = 0; i < impulses.length; i++) {
-            rigidBody1.v = rigidBody1.v.minus(impulses[i].multiply(rigidBody1.invMass));
-            rigidBody1.angV -= contacts1[i].cross(impulses[i]) * rigidBody1.invInertia;
-            rigidBody2.v = rigidBody2.v.plus(impulses[i].multiply(rigidBody2.invMass));
-            rigidBody2.angV += contacts2[i].cross(impulses[i]) * rigidBody2.invInertia;
-            // box2d lite는 (여타 다른 강의들 포함) v를 바로 바꾸지만(이러면 fps 변수 안 써도 됨), 이러면 충돌 체크 순서에 따라 값이 다르게 나옴.
-            // (왜 그렇게 하는지는 모르겠음) 그래서 나는 f랑 t를 바꿈
-            // !!!! 이게 충격량을 한꺼번에 계산하고 그 뒤에 속도를 이동시키는 방법은 다중물체 충돌시 힘의 분산 (이것도 연속적이지 않기에 발생하는 문제)을 처리 할 수 없어서,
+            // 이게 충격량을 한꺼번에 계산하고 그 뒤에 속도를 이동시키는 방법은 다중물체 충돌시 힘의 분산 (이것도 연속적이지 않기에 발생하는 문제)을 처리 할 수 없어서,
             // 이를 v가 아닌 f를 바꾸면 힘이 증폭하게 됨 (터지는 현상. 회전관성값의 문제가 아니었음.)
-            /**
-            rigidBody1.f = rigidBody1.f.minus(impulses[i].multiply(fps));
-            rigidBody1.t -= contacts1[i].cross(impulses[i]) * fps;
-            rigidBody2.f = rigidBody2.f.plus(impulses[i].multiply(fps));
-            rigidBody2.t += contacts2[i].cross(impulses[i]) * fps;
-            */
+            rigidBody1.v = rigidBody1.v.minus(impulse.multiply(rigidBody1.invMass));
+            rigidBody1.angV -= contact1.cross(impulse) * rigidBody1.invInertia;
+            rigidBody2.v = rigidBody2.v.plus(impulse.multiply(rigidBody2.invMass));
+            rigidBody2.angV += contact2.cross(impulse) * rigidBody2.invInertia;
+
+            let tangent = relativeV.minus(normal.multiply(normal.dot(relativeV))).normalize(); // 이제 충돌 마찰력 만들면 됨.
+            let f1t = normal1.dot(tangent);
+            let f2t = normal2.dot(tangent);
+
+            let jt = -tangent.dot(relativeV);
+            // mass tanget??
+            jt /= rigidBody1.invMass + rigidBody2.invMass + f1t * f1t * rigidBody1.invInertia + f2t * f2t * rigidBody2.invInertia;
+            jt /= contactPoints.length;
+            let frictionImpulse;
+            if (Math.abs(jt) <= j * friction) frictionImpulse = tangent.multiply(jt); // 정적마찰력. 움직이지 않음.
+            else frictionImpulse = tangent.multiply(-j * friction); // 동적 마찰력
+
+            rigidBody1.v = rigidBody1.v.minus(frictionImpulse.multiply(rigidBody1.invMass));
+            rigidBody1.angV -= contact1.cross(frictionImpulse) * rigidBody1.invInertia;
+            rigidBody2.v = rigidBody2.v.plus(frictionImpulse.multiply(rigidBody2.invMass));
+            rigidBody2.angV += contact2.cross(frictionImpulse) * rigidBody2.invInertia;
         }
         
         // accumulated impulse??? 조사하기

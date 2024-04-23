@@ -13,23 +13,22 @@ class World {
         for (let rep = 0; rep < repetition; rep++) {
             // move
             for (const rigidBody of this.rigidBodies) {
-                if (rigidBody.collisionType === 'static') continue;
+                if (rigidBody.collisionType === 'static' || rigidBody.collisionType === 'only-collide') continue;
                 // calc v
                 rigidBody.v = rigidBody.v.plus(rigidBody.f.multiply(rigidBody.invMass * dt)); // dv = F/m(=a) * dt
-                rigidBody.v = rigidBody.v.multiply(0.999);
+                //rigidBody.v.y += 9.8; // 중력
+                //rigidBody.v = rigidBody.v.multiply(0.999);
                 //if (rigidBody.v.magnitude < 1) rigidBody.v.set(0, 0);
                 //else rigidBody.v.minus(rigidBody.v.normalize() * 1);
                 rigidBody.angV += rigidBody.t * rigidBody.invInertia * dt;
-                rigidBody.angV *= 0.999;
+                //rigidBody.angV *= 0.999;
                 // move x
                 rigidBody.pos = rigidBody.pos.plus(rigidBody.v.multiply(dt)); // dx = v * dt
                 if (rigidBody.angV * dt !== 0) // 자동 updateCheckSize 최적화를 위함.
                     rigidBody.angle += rigidBody.angV * dt;
-            }
 
-            // init f
-            for (const rigidBody of this.rigidBodies) {
-                rigidBody.f.set(0, 0); // 중력은 0, 9.8 * fps * rigidBody.mass
+                // init f
+                rigidBody.f.set(0, 0);
                 rigidBody.t = 0;
             }
 
