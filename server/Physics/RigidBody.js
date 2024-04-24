@@ -237,7 +237,7 @@ class RigidBody {
             }
             
             contactPoints.splice(maxI, 1);
-            if(maxI < minI) minI - 1;
+            if(maxI < minI) minI--;
             contactPoints.splice(minI, 1);
         }
 
@@ -246,7 +246,7 @@ class RigidBody {
 
     // 충돌 보정
     static CorrectionCollision(rigidBody1, rigidBody2, normal, penetration) {
-        let distance = normal.multiply(penetration * 0.9); // 총 보정 거리
+        let distance = normal.multiply(penetration); // 총 보정 거리
         rigidBody1.pos = rigidBody1.pos.minus(distance.multiply(rigidBody1.invMass / (rigidBody1.invMass + rigidBody2.invMass))); // 질량을 이용해 조금 더 정확한 보정
         rigidBody2.pos = rigidBody2.pos.plus(distance.multiply(rigidBody2.invMass / (rigidBody1.invMass + rigidBody2.invMass)));
     }
@@ -281,7 +281,7 @@ class RigidBody {
             rigidBody2.v = rigidBody2.v.plus(impulse.multiply(rigidBody2.invMass));
             rigidBody2.angV += contact2.cross(impulse) * rigidBody2.invInertia;
 
-            let tangent = relativeV.minus(normal.multiply(normal.dot(relativeV))).normalize(); // 이제 충돌 마찰력 만들면 됨.
+            let tangent = relativeV.minus(normal.multiply(normal.dot(relativeV))).normalize();
             let f1t = normal1.dot(tangent);
             let f2t = normal2.dot(tangent);
 
