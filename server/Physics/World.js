@@ -17,12 +17,14 @@ class World {
                 if (rigidBody.collisionType === 'static' || rigidBody.collisionType === 'only-collide') continue;
                 // calc v
                 rigidBody.v = rigidBody.v.plus(rigidBody.f.multiply(rigidBody.invMass * dt)); // dv = F/m(=a) * dt
-                rigidBody.v.y += 9.8; // 중력
-                //rigidBody.v = rigidBody.v.multiply(0.999);
+                //rigidBody.v.y += 9.8; // 중력
+                rigidBody.v = rigidBody.v.multiply(1 - rigidBody.damping * dt); // 공기저항
+                rigidBody.v = rigidBody.v.minus(rigidBody.v.multiply(rigidBody.friction * dt)); // 마찰력
                 //if (rigidBody.v.magnitude < 1) rigidBody.v.set(0, 0);
                 //else rigidBody.v.minus(rigidBody.v.normalize() * 1);
                 rigidBody.angV += rigidBody.t * rigidBody.invInertia * dt;
-                //rigidBody.angV *= 0.999;
+                rigidBody.angV *= 1 - rigidBody.damping * dt; // 공기저항
+                rigidBody.angV -= rigidBody.angV * rigidBody.friction * dt; // 마찰력
                 // move x
                 rigidBody.pos = rigidBody.pos.plus(rigidBody.v.multiply(dt)); // dx = v * dt
                 if (rigidBody.angV * dt !== 0) // 자동 updateCheckSize 최적화를 위함.

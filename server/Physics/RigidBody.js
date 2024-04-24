@@ -21,8 +21,8 @@ class RigidBody {
         setting.collisionType ? this.collisionType = setting.collisionType : this.collisionType = 'dynamic';
         setting.angle ? this.angle = setting.angle : this.angle = 0;
         setting.restitution ? this.restitution = setting.restitution : this.restitution = 0; // 복원력 (탄성계수)
-        setting.friction ? this.friction = setting.friction : this.friction = 1000000000; // 마찰력
-        setting.damping ? this.damping = setting.damping : this.damping = 0; // 저항력 (공기저항 등)
+        setting.friction ? this.friction = setting.friction : this.friction = 1; // 마찰력
+        setting.damping ? this.damping = setting.damping : this.damping = 1; // 저항력 (공기저항 등)
 
         // 질량과 회전관성의 역수 (계산에 이용됨) static의 경우 mass와 inertia는 무한으로 간주되기에 계산시 역수만 사용함.
         if (this.collisionType === 'static') {
