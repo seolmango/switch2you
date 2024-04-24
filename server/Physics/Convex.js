@@ -54,8 +54,8 @@ class Convex extends Shape {
 
         // 각도 받는김에 회전된 꼭짓점도 업데이트
         this.#rotationPoints();
-        [this.checkLeft, this.checkRight] = this.getProjections(new Vector2(1, 0));
-        [this.checkDown, this.checkUp] = this.getProjections(new Vector2(0, 1));
+        [this.checkLeft, this.checkRight] = this.getProjection(new Vector2(1, 0));
+        [this.checkDown, this.checkUp] = this.getProjection(new Vector2(0, 1));
     }
 
     // rotationedPoints 업데이트
@@ -72,7 +72,7 @@ class Convex extends Shape {
         return normals;
     }
 
-    getProjections(normal) {
+    getProjection(normal) {
         let points = this.rotationedPoints.map(point => normal.dot(point));
         let min = 0;
         let max = 0;

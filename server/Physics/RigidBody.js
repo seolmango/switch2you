@@ -68,21 +68,66 @@ class RigidBody {
 
         // 정확한 충돌 검사
         if (checkType === 'Circle-Circle') {
-            penetration = (rigidBody1.shape.radius + rigidBody2.shape.radius) - Math.abs(relativePos.magnitude); // 충돌 정도
+            penetration = (rigidBody1.shape.radius + rigidBody2.shape.radius) - relativePos.magnitude; // 충돌 정도
             if (penetration <= 0) return; // 충돌안함
             normal = relativePos.normalize(); // 접촉면의 법선벡터
 
         } else if (checkType === 'Circle-Convex') {
-            const circle = rigidBody1;
-            const obb = rigidBody2;
-            // 나중에
+            let circle, convex;
+            if (rigidBody1.shape.type === 'Circle') {
+                circle = rigidBody1;
+                convex = rigidBody2;
+            } else {
+                circle = rigidBody2;
+                convex = rigidBody1;
+            }
+            
+            const normals = convex.shape.getNormals();
+
+            let isSAT = true; // circle의 좌표에 따라 충돌을 SAT 아니면 꼭짓점으로 부터의 거리 차로 감지할건지 나뉨.
+            let points = convex.shape.rotationedPoints;
+            for (let i = 0; i < points.length; i++) {
+                let point = points[(i + 1) % points.length]
+                let axis1 = point.minus(points[i]);
+                let axis2 = point.minus(points[(i + 2) % points.length]);
+                let dPos = circle.pos.minus(convex.pos.plus(point));
+                if ((axis1.dot(dPos) > 0) && (axis2.dot(dPos) > 0)) { // SAT로 감지 불가능한 circle 좌표 판별
+                    // SAT가 아닌 꼭짓점으로 부터의 거리의 차를 이용해 감지
+                    if (dPos.magnitude >= circle.shape.radius) return; // 충돌안함
+                    isSAT = false;
+                    normal = dPos.normalize().multiply(-1);
+                    penetration = circle.shape.radius + normal.dot(dPos);
+                    break;
+                }
+            }
+
+            if (isSAT) {
+                for (let checkNormal of normals) {
+                    let [left1, right1] = convex.shape.getProjection(checkNormal);
+                    let pos1 = checkNormal.dot(convex.pos);
+                    let pos2 = checkNormal.dot(circle.pos);
+                    left1 = pos1 - left1;
+                    right1 = pos1 + right1;
+                    let left2 = pos2 - circle.shape.radius;
+                    let right2 = pos2 + circle.shape.radius;
+                    if ((left2 >= right1) || (left1 >= right2)) return; // 충돌안함
+                    let r = Math.min(right1 - left2, right2 - left1);
+                    if (penetration === 0 || penetration > r) {
+                        penetration = r;
+                        normal = checkNormal;
+                    }
+                }
+            }
+
+            if (normal.dot(relativePos) < 0)
+                normal = normal.multiply(-1);
 
         } else if (checkType === 'Convex-Convex') {
             const normals = [...rigidBody1.shape.getNormals(), ...rigidBody2.shape.getNormals()];
 
             for (let checkNormal of normals) {
-                let [left1, right1] = rigidBody1.shape.getProjections(checkNormal);
-                let [left2, right2] = rigidBody2.shape.getProjections(checkNormal);
+                let [left1, right1] = rigidBody1.shape.getProjection(checkNormal);
+                let [left2, right2] = rigidBody2.shape.getProjection(checkNormal);
                 let pos1 = checkNormal.dot(rigidBody1.pos);
                 let pos2 = checkNormal.dot(rigidBody2.pos);
                 left1 = pos1 - left1; // rigidBody 중심기준인 좌표를 월드맵 절대좌표로 변환
@@ -135,35 +180,6 @@ class RigidBody {
         }
 
         return [normal, penetration];
-
-
-        // 원-다각형 충돌 옛날꺼(참고용)
-        /*
-        } else if ((this.type === "Circle" && polygon.type === "OBB") || (polygon.type === "Circle" && this.type === "OBB")) {
-            let circle, obb;
-            if (this.type === "Circle") {
-                circle = this;
-                obb = polygon;
-            } else {
-                circle = polygon;
-                obb = this;
-            }
-            // OBB를 중점으로 좌표계 회전 후, Circle-AABB 감지
-            let dpos = circle.pos.minus(obb.pos)
-            let drotation = Math.atan2(dpos.y, dpos.x) - obb.rotation;
-            dpos = new Vector2(Math.cos(drotation) * dpos.magnitude, Math.sin(drotation) * dpos.magnitude);
-            let x, y;
-            // Circle-OBB 의 최단점 찾기
-            if (dpos.x > obb.pos.x + obb.width2) x = obb.pos.x + obb.width2;
-            else if (dpos.x < obb.pos.x - obb.width2) x = obb.pos.x - obb.width2;
-            else x = dpos.x;
-            if (dpos.y > obb.pos.y + obb.height2) y = obb.pos.y + obb.height2;
-            else if (dpos.y < obb.pos.y - obb.height2) y = obb.pos.y - obb.height2;
-            else y = dpos.y;
-            const check = dpos.minus(new Vector2(x, y)) < circle.radius;
-            
-            return check;
-        }*/
     }
 
     static GetContactPoints(checkType, rigidBody1, rigidBody2, normal) {
@@ -173,7 +189,13 @@ class RigidBody {
             contactPoints.push(rigidBody1.pos.plus(normal.multiply(rigidBody1.shape.radius)));
 
         else if (checkType === 'Circle-Convex') {
-            // 나중에
+            let circle;
+            if (rigidBody1.shape.type === 'Circle') circle = rigidBody1
+            else {
+                circle = rigidBody2;
+                normal = normal.multiply(-1);
+            }
+            contactPoints.push(circle.pos.plus(normal.multiply(circle.shape.radius)));
 
         } else if (checkType === 'Convex-Convex') {
             // 접촉점들 찾기. 각 강체에서 법선벡터의 변에 가장 가까운 점들을 찾고, 수직으로 돌려 각 양 끝점(충돌하지 않은 꼭짓점)을 제거함.
@@ -217,8 +239,6 @@ class RigidBody {
             contactPoints.splice(maxI, 1);
             if(maxI < minI) minI - 1;
             contactPoints.splice(minI, 1);
-            rigidBody1.contacts = [...rigidBody1.contacts, ...contactPoints];
-            rigidBody2.contacts = [...rigidBody2.contacts, ...contactPoints];
         }
 
         return contactPoints;

@@ -13,11 +13,10 @@ class World {
         for (let rep = 0; rep < repetition; rep++) {
             // move
             for (const rigidBody of this.rigidBodies) {
-                rigidBody.contacts = [];
                 if (rigidBody.collisionType === 'static' || rigidBody.collisionType === 'only-collide') continue;
                 // calc v
                 rigidBody.v = rigidBody.v.plus(rigidBody.f.multiply(rigidBody.invMass * dt)); // dv = F/m(=a) * dt
-                //rigidBody.v.y += 9.8; // 중력
+                //rigidBody.v.y += 9.8 / repetition * 2; // 중력
                 rigidBody.v = rigidBody.v.multiply(1 - rigidBody.damping * dt); // 공기저항
                 rigidBody.v = rigidBody.v.minus(rigidBody.v.multiply(rigidBody.friction * dt)); // 마찰력
                 //if (rigidBody.v.magnitude < 1) rigidBody.v.set(0, 0);
