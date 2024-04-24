@@ -187,31 +187,30 @@ class RigidBody {
             }
             contactPoints1 = contactPoints1.map(e => rigidBody1.pos.plus(e));
             contactPoints2 = contactPoints2.map(e => rigidBody2.pos.plus(e));
+            contactPoints = [...contactPoints1, ...contactPoints2];
 
             // 수직으로 돌려 양 끝점 제거 (수직 단위 벡터에 내적)
             // 강체의 꼭짓점이 변 위에 놓여있으면 안됨. (그럼 위 감지 코드에서 contactPoints의 길이가 3이 넘어버려서 문제가 발생함.)
             let checkNormal = new Vector2(-normal.y, normal.x);
-            let min1 = 0, min2 = 0, max1 = 0, max2 = 0;
-            if (contactPoints1.length === 2)
-                if (checkNormal.dot(contactPoints1[0]) > checkNormal.dot(contactPoints1[1])) min1 = 1;
-            if (contactPoints2.length === 2)
-                if (checkNormal.dot(contactPoints2[0]) > checkNormal.dot(contactPoints2[1])) min2 = 1;
-            
-            if (checkNormal.dot(contactPoints1[min1]) > checkNormal.dot(contactPoints2[min2])) contactPoints2.splice(min2, 1);
-            else contactPoints1.splice(min1, 1);
 
-            if (contactPoints1.length === 2)
-                if (checkNormal.dot(contactPoints1[0]) < checkNormal.dot(contactPoints1[1])) max1 = 1;
-            if (contactPoints2.length === 2)
-                if (checkNormal.dot(contactPoints2[0]) < checkNormal.dot(contactPoints2[1])) max2 = 1;
-            try {
-                if (checkNormal.dot(contactPoints1[max1]) < checkNormal.dot(contactPoints2[max2])) contactPoints2.splice(max2, 1);
-                else contactPoints1.splice(max1, 1);
-            } catch {
-                console.log(contactPoints1, contactPoints2);
+            let maxI = 0, minI = 0
+            for (let i = 0; i < contactPoints.length; i++) {
+                let dot = checkNormal.dot(contactPoints[i]);
+                let maxDot = checkNormal.dot(contactPoints[maxI]);
+                if (dot > maxDot) {
+                    maxI = i;
+                    continue;
+                }
+                let minDot = checkNormal.dot(contactPoints[minI]);
+                if (dot < minDot) {
+                    minI = i;
+                }
             }
-
-            contactPoints = [...contactPoints1, ...contactPoints2];
+            
+            contactPoints.splice(maxI, 1);
+            if(maxI < minI) minI - 1;
+            contactPoints.splice(minI, 1);
+            rigidBody1.contacts = [...rigidBody1.contacts, ...contactPoints];
         }
 
         return contactPoints;

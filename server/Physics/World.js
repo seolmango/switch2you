@@ -13,10 +13,11 @@ class World {
         for (let rep = 0; rep < repetition; rep++) {
             // move
             for (const rigidBody of this.rigidBodies) {
+                rigidBody.contacts = [];
                 if (rigidBody.collisionType === 'static' || rigidBody.collisionType === 'only-collide') continue;
                 // calc v
                 rigidBody.v = rigidBody.v.plus(rigidBody.f.multiply(rigidBody.invMass * dt)); // dv = F/m(=a) * dt
-                //rigidBody.v.y += 9.8; // 중력
+                rigidBody.v.y += 9.8; // 중력
                 //rigidBody.v = rigidBody.v.multiply(0.999);
                 //if (rigidBody.v.magnitude < 1) rigidBody.v.set(0, 0);
                 //else rigidBody.v.minus(rigidBody.v.normalize() * 1);
