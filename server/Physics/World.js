@@ -18,8 +18,6 @@ class World {
                 rigidBody.v = rigidBody.v.plus(rigidBody.f.multiply(rigidBody.invMass * dt)); // dv = F/m(=a) * dt
                 //rigidBody.v.y += 9.8 / repetition * 2; // 중력
                 rigidBody.v = rigidBody.v.multiply(1 - rigidBody.damping * dt); // 공기저항
-                // 마찰력 비율로 빼는게 아닌 절대량을 빼는거 만들고, only-collide callback 함수만 만들며 됨
-                //if (rigidBody.v.mag)
                 rigidBody.v = rigidBody.v.minus(rigidBody.v.multiply(rigidBody.friction * dt)); // 마찰력
                 rigidBody.angV += rigidBody.t * rigidBody.invInertia * dt;
                 rigidBody.angV *= 1 - rigidBody.damping * dt; // 공기저항
@@ -39,9 +37,6 @@ class World {
                 const rigidBody1 = this.rigidBodies[i];
                 for (let j = i + 1; j < this.rigidBodies.length; j++) {
                     const rigidBody2 = this.rigidBodies[j];
-
-                    // 완료 - 이 world 절차대로 각 rigidBody 정적메서드 분리하고 알맞게 변수얻고 수정하면 됨
-                    // 이 뒤에는 jittering해결 + repitition 추가, friction, damping 추가하고 circle-convex 충돌 개발 하면 됨 (가능하면 OBB 최적화도)
                     if (rigidBody1.collisionType === 'static' && rigidBody2.collisionType === 'static') continue;
 
                     if (RigidBody.isPreCollision(rigidBody1, rigidBody2)) continue;
