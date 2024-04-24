@@ -24,13 +24,20 @@ class RigidBody {
         setting.friction ? this.friction = setting.friction : this.friction = 1000000000; // 마찰력
         setting.damping ? this.damping = setting.damping : this.damping = 0; // 저항력 (공기저항 등)
 
-        // 입력받은 density 또는 mass 정리하고 mass로 변환, area와 inertia 구하기
-        setting.mass ? this.mass = setting.mass : (setting.density ? null : setting.density = 1);
-        setting.density || !setting.inertia && !setting.area ? setting.area = this.shape.getArea() : null;
-        setting.density ? this.mass = setting.area * setting.density : null;
-        setting.inertia ? this.inertia = setting.inertia : this.inertia = this.shape.getInertia(this.mass);
+        // 질량과 회전관성의 역수 (계산에 이용됨) static의 경우 mass와 inertia는 무한으로 간주되기에 계산시 역수만 사용함.
+        if (this.collisionType === 'static') {
+            this.invMass = 0;
+            this.invInertia = 0;
+        } else {
+            // 입력받은 density 또는 mass 정리하고 mass로 변환, area와 inertia 구하기
+            setting.mass ? this.mass = setting.mass : (setting.density ? null : setting.density = 1);
+            setting.density || !setting.inertia && !setting.area ? setting.area = this.shape.getArea() : null;
+            setting.density ? this.mass = setting.area * setting.density : null;
+            setting.inertia ? this.inertia = setting.inertia : this.inertia = this.shape.getInertia(this.mass);
+            this.invMass = 1 / this.mass;
+            this.invInertia = 1 / this.inertia;
+        }
 
-        this.collisionType === 'static' ? (this.invMass = 0, this.invInertia = 0) : (this.invMass = 1 / this.mass, this.invInertia = 1 / this.inertia); // 질량과 회전관성의 역수 (계산에 이용됨)
         this.v = new Vector2(); // 속도
         this.f = new Vector2(); // 힘
         this.angV = 0; // angular velocity. 각속도
@@ -56,7 +63,7 @@ class RigidBody {
     // 정확한 충돌 검사, 모든 벡터량은 rigidBody1 기준으로
     static isCollision(checkType, rigidBody1, rigidBody2) {
         let normal; // 접촉면의 법선벡터
-        let penetration = 0; // 침투(충돌) 정도
+        let penetration = 0; // 침투(충돌) 정도 (mtv)
         let relativePos = rigidBody2.pos.minus(rigidBody1.pos); // 거리 차
 
         // 정확한 충돌 검사
@@ -211,6 +218,7 @@ class RigidBody {
             if(maxI < minI) minI - 1;
             contactPoints.splice(minI, 1);
             rigidBody1.contacts = [...rigidBody1.contacts, ...contactPoints];
+            rigidBody2.contacts = [...rigidBody2.contacts, ...contactPoints];
         }
 
         return contactPoints;
@@ -218,7 +226,7 @@ class RigidBody {
 
     // 충돌 보정
     static CorrectionCollision(rigidBody1, rigidBody2, normal, penetration) {
-        let distance = normal.multiply(penetration); // 총 보정 거리
+        let distance = normal.multiply(penetration * 0.9); // 총 보정 거리
         rigidBody1.pos = rigidBody1.pos.minus(distance.multiply(rigidBody1.invMass / (rigidBody1.invMass + rigidBody2.invMass))); // 질량을 이용해 조금 더 정확한 보정
         rigidBody2.pos = rigidBody2.pos.plus(distance.multiply(rigidBody2.invMass / (rigidBody1.invMass + rigidBody2.invMass)));
     }
