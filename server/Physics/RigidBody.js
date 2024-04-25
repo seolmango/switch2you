@@ -38,7 +38,8 @@ class RigidBody {
             this.invMass = 1 / this.mass;
             this.invInertia = 1 / this.inertia;
 
-            if (this.collisionType === 'only-collide')
+            // collisionType이 only-collide 또는 커스텀 type 이라면 충돌시 callback 추가
+            if (this.collisionType !== 'dynamic' && this.collisionType !== 'static')
                 setting.callback ? this.callback = setting.callback : this.callback = () => {};
         }
 
