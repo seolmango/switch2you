@@ -50,7 +50,11 @@ class World {
                     if (result === undefined) continue;
                     else [normal, penetration] = result;
 
-                    if (rigidBody1.collisionType === 'only-collide' || rigidBody2.collisionType === 'only-collide') continue;
+                    if (rigidBody1.collisionType === 'only-collide' || rigidBody2.collisionType === 'only-collide') {
+                        if (rigidBody1.collisionType !== 'only-collide') rigidBody2.callback(rigidBody2, rigidBody1, penetration);
+                        if (rigidBody2.collisionType !== 'only-collide') rigidBody1.callback(rigidBody1, rigidBody2, penetration);
+                        continue;
+                    }
                     if (rigidBody1.collisionType !== 'dynamic' && rigidBody1.collisionType !== 'static' && rigidBody1.collisionType === rigidBody2.collisionType) continue;
                     
                     RigidBody.CorrectionCollision(rigidBody1, rigidBody2, normal, penetration);

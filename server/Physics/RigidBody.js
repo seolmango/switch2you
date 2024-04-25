@@ -5,8 +5,8 @@
 class RigidBody {
     #_angle; // 각도
 
-    // 필수 - shape (구조체가 아닌 객체라, 참조 관리의 편의성을 위해 따로 매개변수로 작성)
-    // 선택 - collisionType, angle, restitution, friction, damping, density/mass, area, inertia
+    // 필수 - shape (구조체가 아닌 객체라, 참조 관리의 편의성을 위해 따로 매개변수로 작성) / only-collide에 한정해 callback 필수
+    // 선택 - name, collisionType, angle, restitution, friction, damping, density/mass, area, inertia
     // 항상 각 강체마다 Shape를 여러개 가질 수 있다는 걸 고려하고 필드를 만들어야 함.
     // Shapes가 묶여서 한 물체로 인식되려면, 모양에 대한 정보말고는 가지고 있으면 안됨.
     constructor(shape, pos, setting) {
@@ -18,6 +18,7 @@ class RigidBody {
         // dynamic: 충돌하고 반응 함. / 일반적인 물체
         // static: 충돌하고 반응 함. 반응 시 밀리지 않음. / 벽
         // 그 외 모든 type: 같은 type끼리는 충돌하고 반응 안함. 다른 type과는 충돌하고 반응 함. / 플레이어
+        setting.name ? this.name = setting.name : null;
         setting.collisionType ? this.collisionType = setting.collisionType : this.collisionType = 'dynamic';
         setting.angle ? this.angle = setting.angle : this.angle = 0;
         setting.restitution ? this.restitution = setting.restitution : this.restitution = 0; // 복원력 (탄성계수)
@@ -36,6 +37,9 @@ class RigidBody {
             setting.inertia ? this.inertia = setting.inertia : this.inertia = this.shape.getInertia(this.mass);
             this.invMass = 1 / this.mass;
             this.invInertia = 1 / this.inertia;
+
+            if (this.collisionType === 'only-collide')
+                setting.callback ? this.callback = setting.callback : this.callback = () => {};
         }
 
         this.v = new Vector2(); // 속도
