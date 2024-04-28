@@ -8,6 +8,7 @@ const io = require('socket.io')(http);
 const Config = require('./server/config.json');
 const Player = require('./server/Player.js');
 const Room = require('./server/Room.js');
+const Vector2 = require('./server/Physics/Vector2.js');
 
 
 // 설정 불러오기
@@ -17,7 +18,7 @@ Room.MaxCount = Config.roomMaxNum;
 
 const port = process.env.PORT || 3000;
 app.disable('x-powered-by');
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'test')));
 http.listen(port, function (){
     console.log('listening on : http://localhost:' + port);
 });
@@ -42,6 +43,21 @@ function getRoomInfo(rooms) {
         return rooms.map(infoFilter);
     else
         return infoFilter(rooms);
+}
+
+function getRigidBodyInfos(rigidBodys) {
+    const infoFilter = (rigidBody) => {
+        let info = {'type': rigidBody.shape.type, 'x': rigidBody.pos.x, 'y': rigidBody.pos.y, 'angle': rigidBody.angle};
+        if (rigidBody.shape.type === 'Circle')
+            info['radius'] = rigidBody.shape.radius;
+        else if (rigidBody.shape.type === 'Convex')
+            info['points'] = rigidBody.shape.rotationedPoints;
+        return info;
+    }
+    if (Array.isArray(rigidBodys))
+        return rigidBodys.map(infoFilter);
+    else
+        return infoFilter(rigidBodys);
 }
 
 function checkData(...args) {
@@ -140,7 +156,7 @@ io.on('connection', (socket) => {
             callback({'status': 400, 'message': 'server full'});
             return;
         }
-        player.update(playerName);
+        player.changeName(playerName);
         const room = new Room(player, roomName, public, password); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
         socket.join(room.id); // 4. room 관련 처리하고 소켓신호 보내기
         callback({'status': 200, 'roomInfo': getRoomInfo(room)});
@@ -159,7 +175,7 @@ io.on('connection', (socket) => {
             callback({'status': 400, 'message': result});
             return;
         }
-        player.update(playerName);
+        player.changeName(playerName);
         socket.join(player.room.id);
         socket.to(player.room.id).emit('player joined', getPlayerInfo(player));
         callback({'status': 200, 'roomInfo': getRoomInfo(player.room), 'playerInfos': getPlayerInfo(player.room.players), 'playerNumber': player.number});
@@ -179,7 +195,7 @@ io.on('connection', (socket) => {
         // 공개 빈 방 탐색
         for (const room of Object.values(Room.Publics)) {
             if (room.password || room.players.length > 8 || room.playing) continue; // 비공개거나, 비밀번호가 있거나, 꽉찾거나, 게임중이면 건너뛰기
-            player.update(playerName);
+            player.changeName(playerName);
             player.joinRoom(room);
             socket.join(room.id);
             socket.to(room.id).emit('player joined', getPlayerInfo(player));
@@ -193,7 +209,7 @@ io.on('connection', (socket) => {
                 callback({'status': 400, 'message': 'server full'});
                 return;
             }
-            player.update(playerName);
+            player.changeName(playerName);
             const room = new Room(player);
             socket.join(room.id);
             callback({'status': 200, 'roomInfo': getRoomInfo(room)});
@@ -203,9 +219,7 @@ io.on('connection', (socket) => {
 
     // 방 퇴장
     socket.on('leave room', (callback) => {
-        if (typeof callback !== 'function') {
-            return;
-        }
+        if (typeof callback !== 'function') return;
 
         const room = player.room;
         const number = player.number;
@@ -293,6 +307,51 @@ io.on('connection', (socket) => {
     })
 
 
+    // 플레이어 게임 준비 여부 변경
+    socket.on('change player ready', (ready, callback) => {
+        if (!checkData([ready, 'boolean'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        }
+
+        const result = player.changeReady(ready);
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
+        callback({'status': 200});
+        io.to(player.room.id).emit('player readied', player.number, player.ready);
+    })
+
+
+    // 게임 시작
+    socket.on('start game', (callback) => {
+        if (typeof callback !== 'function') return;
+
+        const result = player.startGame();
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
+        callback({'status': 200});
+        io.to(player.room.id).emit('game started', getRigidBodyInfos(player.room.world.rigidBodies));
+    })
+
+
+    // 플레이어 이동
+    socket.on('move player', (doing, direction) => {
+        if (!checkData([doing, 'boolean'], [direction, 'number'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        }
+        const result = player.move(doing, direction);
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
+    })
+
+
     /**
     
 
@@ -333,3 +392,19 @@ io.on('connection', (socket) => {
     */
 
 });
+
+function ingameLoop() {
+    for (let room in Room.Playings) {
+        const world = room.world;
+
+        for (let player of room.players) {
+            const actions = player.actions;
+            if (actions.move.doing) 
+                world.rigidBodies[player.number - 1].pos.plus((new Vector2(Math.cos(actions.move.direction), Math.cos(actions.move.directoin))).multiply(player.stat.moveSpeed));
+        }
+        world.update(30, 10);
+        io.to(room.id).emit('world updated', getRigidBodyInfos(world.rigidBodies));
+    }
+}
+
+setInterval(ingameLoop, 33);

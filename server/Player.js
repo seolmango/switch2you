@@ -2,20 +2,25 @@ class Player {
     static MaxCount = 0;
     static #_Count = 0;
     static #_Id = 1;
-    static Instances = {};
+    static #_Instances = {};
+    #_id;
 
     static get Count() {
-        return Player._Count;
+        return Player.#_Count;
     }
 
     static get Id() {
-        return Player._Id;
+        return Player.#_Id;
+    }
+
+    static get Instances() {
+        return Player.#_Instances;
     }
 
     constructor(socketId) {
         // Player 객체 기초 설정
-        this._id = Player.#_Id++;
-        Player.Instances[this.id] = this;
+        this.#_id = Player.#_Id++;
+        Player.#_Instances[this.id] = this;
         Player.#_Count++;
 
         this.socketId = socketId; // 유저의 소켓 id
@@ -24,20 +29,28 @@ class Player {
         this.name; // 유저 이름
         this.role; // 유저 역할
         this.number; // 방에서 유저 번호
-        this.skill; // 유저의 스킬
+        this.ready; // 게임 준비 여부
+        this.initStat();
+        this.actions = []; // 유저가 취하고 있는 행동들 (fps를 맞추기 위함임)
     }
 
     get id() {
-        return this._id;
+        return this.#_id;
     }
 
     delete() {
-        delete Player.Instances[this.id];
+        delete Player.#_Instances[this.id];
         Player.#_Count--;
     }
 
-    update(name) {
+    // 이름 변경
+    changeName(name) {
         this.name = name;
+    }
+
+    // 스탯 초기화
+    initStat() {
+        this.stat = {'skill': 'dash', 'moveSpeed': 10};
     }
 
     // 방 참가
@@ -53,7 +66,6 @@ class Player {
         this.number = room.numbers.indexOf(0) + 1;
         room.numbers[this.number - 1] = this.id;
         room.players.push(this);
-        this.skill = 'dash';
     }
 
     // 방 퇴장
@@ -72,7 +84,8 @@ class Player {
         this.name = null;
         this.role = null;
         this.number = null;
-        this.skill = null;
+        this.ready = null;
+        this.initStat();
         return ownerChange;
     }
 
@@ -81,6 +94,7 @@ class Player {
         if (!this.room) return 'must join room';
         if (!target || this === target) return 'wrong player'; // 없거나 자신이거나
         if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
+
         this.role = 'user';
         target.role = 'owner';
         this.room.owner = target;
@@ -91,6 +105,7 @@ class Player {
         if (!this.room) return 'must join room';
         if (!target || this === target) return 'wrong player';
         if (this.role !== 'owner' || this.room !== target.room) return 'no permission';
+
         target.leaveRoom();
     }
 
@@ -99,6 +114,7 @@ class Player {
         if (!this.room) return 'must join room';
         if (number < 1 || 8 < number) return 'wrong number';
         if (this.room.numbers[number - 1]) return 'already exist number';
+
         this.room.numbers[this.number - 1] = 0;
         this.number = number;
         this.room.numbers[number - 1] = this.id;
@@ -107,8 +123,32 @@ class Player {
     // 스킬 변경
     changeSkill(skill) {
         if (!this.room) return 'must join room';
-        if (this.skill === skill || !['dash', 'teleport'].includes(skill)) return 'wrong skill'; // 존재하지 않는 스킬이거나 이미 사용하는 스킬이거나
-        this.skill = skill;
+        if (this.stat.skill === skill || !['dash', 'teleport'].includes(skill)) return 'wrong skill'; // 존재하지 않는 스킬이거나 이미 사용하는 스킬이거나
+
+        this.stat.skill = skill;
+    }
+
+    // 게임 준비 변경
+    changeReady(ready) {
+        if (!this.room) return 'must join room';
+        
+        this.ready = ready;
+    }
+
+    // 게임 시작
+    startGame() {
+        if (!this.room) return 'must join room';
+        if (this.role !== 'owner') return 'no permission';
+
+        const result = this.room.startGame();
+        if (result) return result;
+    }
+
+    // 플레이어 이동
+    move(doing, direction) {
+        if (!this.room) return 'just join room';
+        if (!this.room.playing) return 'must playing game';
+        this.actions.move = {'doing': doing, 'direction': direction};
     }
 }
 
