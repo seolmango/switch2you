@@ -8,7 +8,7 @@ const io = require('socket.io')(http);
 const Config = require('./server/config.json');
 const Player = require('./server/Player.js');
 const Room = require('./server/Room.js');
-const Vector2 = require('./server/Physics/Vector2.js');
+const { Vector2 } = require('./server/Physics/index.js');
 
 
 // 설정 불러오기

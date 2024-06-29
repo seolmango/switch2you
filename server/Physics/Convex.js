@@ -1,4 +1,4 @@
-//const Shape = require('./Shape.js');
+const Shape = require('./Shape.js');
 
 
 class Convex extends Shape {
@@ -83,4 +83,4 @@ class Convex extends Shape {
     }
 }
 
-//module.exports = Convex;
+module.exports = Convex;

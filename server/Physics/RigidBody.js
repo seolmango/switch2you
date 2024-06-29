@@ -1,4 +1,4 @@
-//const Vector2 = require('./Vector2.js');
+const Vector2 = require('./Vector2.js');
 
 
 // 강체
@@ -331,4 +331,4 @@ class RigidBody {
     }
 }
 
-//exports = RigidBody;
+module.exports = RigidBody;

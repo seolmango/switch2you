@@ -1,4 +1,4 @@
-const {World} = require('./server/Physics.index.js');
+const { World } = require('./Physics/index.js');
 
 class Room {
     static MaxCount = 0;
