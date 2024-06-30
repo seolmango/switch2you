@@ -96,7 +96,7 @@ window.onload = function () {
         }
         Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
         Screen.alert.draw();
-        Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList)
+        Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList, DPI);
     }, (1000 / Screen.Settings.Display.fps));
     if(Screen.mobile){
         Screen.alert.add_Data("mobile", `The screen automatically fits!`, 5);
