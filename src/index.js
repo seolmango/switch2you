@@ -286,7 +286,7 @@ function canvasResize() {
     UI_ctx.scale(Screen.scale, Screen.scale);
     Screen.currentScreen.redrawBackground(Background_ctx);
     for(let i = 0; i < Screen.activatedHtmlElement.length; i++){
-        Screen.activatedHtmlElement[i].resize(Screen.scale, window.innerWidth, window.innerHeight);
+        Screen.activatedHtmlElement[i].resize(Screen.scale, window.innerWidth, window.innerHeight, DPI);
     }
     Screen.X0real = (window.innerWidth - (1920 * DPI * Screen.scale)) / 2;
     Screen.Y0real = (window.innerHeight - (1080 * DPI * Screen.scale)) / 2;

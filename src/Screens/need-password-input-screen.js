@@ -70,7 +70,7 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     })
     needPasswordInputScreen.password_input.show(Screen.activatedHtmlElement);
-    needPasswordInputScreen.password_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    needPasswordInputScreen.password_input.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
 }
 
 needPasswordInputScreen.draw = function (Background_ctx, UI_ctx, Screen) {

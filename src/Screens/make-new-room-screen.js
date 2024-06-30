@@ -114,7 +114,7 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     });
     makeNewRoomScreen.nickname_input.show(Screen.activatedHtmlElement);
-    makeNewRoomScreen.nickname_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    makeNewRoomScreen.nickname_input.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
     makeNewRoomScreen.roomname_input = new textInputElement('room_name_input', 1360, 444, 700, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
         Background_ctx.font = "40px GmarketSansMedium";
         let text = Background_ctx.measureText(value);
@@ -125,7 +125,7 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     });
     makeNewRoomScreen.roomname_input.show(Screen.activatedHtmlElement);
-    makeNewRoomScreen.roomname_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    makeNewRoomScreen.roomname_input.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
     makeNewRoomScreen.password_input = new textInputElement('make_room_password_input', 1380, 748, 670, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
         if(makeNewRoomScreen.password_checkbox.get_value()){
             if(value.length > 0 && value.length < 11){
@@ -138,11 +138,11 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     });
     makeNewRoomScreen.password_input.show(Screen.activatedHtmlElement);
-    makeNewRoomScreen.password_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    makeNewRoomScreen.password_input.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
     makeNewRoomScreen.password_input.lock();
     makeNewRoomScreen.visibility_checkbox = new checkboxElement('make_room_visibility_checkbox', 775, 580, 80, 80, Color_list.button_gray_1_hex, function () {});
     makeNewRoomScreen.visibility_checkbox.show(Screen.activatedHtmlElement);
-    makeNewRoomScreen.visibility_checkbox.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    makeNewRoomScreen.visibility_checkbox.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
     makeNewRoomScreen.password_checkbox = new checkboxElement('make_room_password_checkbox', 1500, 580, 80, 80, Color_list.button_gray_1_hex, function () {
         if(makeNewRoomScreen.password_checkbox.get_value()){
             makeNewRoomScreen.password_input.unlock();
@@ -152,7 +152,7 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     });
     makeNewRoomScreen.password_checkbox.show(Screen.activatedHtmlElement);
-    makeNewRoomScreen.password_checkbox.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    makeNewRoomScreen.password_checkbox.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
 };
 
 makeNewRoomScreen.draw = function (Background_ctx, UI_ctx, Screen) {

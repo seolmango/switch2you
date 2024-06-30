@@ -14,11 +14,11 @@ class checkboxElement {
         this.DOM.style.borderColor = Color_list.button_gray_3_hex;
     }
 
-    resize(scale, innerWidth, innerHeight) {
-        this.DOM.style.width = this.width * scale + 'px';
-        this.DOM.style.height = this.height * scale + 'px';
-        this.DOM.style.left = ((innerWidth - (1920*scale)) / 2) + (this.x * scale) + 'px';
-        this.DOM.style.top = ((innerHeight - (1080*scale)) / 2) + (this.y * scale) + 'px';
+    resize(scale, innerWidth, innerHeight, DPI) {
+        this.DOM.style.width = this.width * scale * DPI + 'px';
+        this.DOM.style.height = this.height * scale * DPI + 'px';
+        this.DOM.style.left = ((innerWidth - (1920*scale*DPI)) / 2) + (this.x * scale * DPI) + 'px';
+        this.DOM.style.top = ((innerHeight - (1080*scale*DPI)) / 2) + (this.y * scale * DPI) + 'px';
         this.DOM.style.transform = 'translate(-50%, -50%)';
     }
 

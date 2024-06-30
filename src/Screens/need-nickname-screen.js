@@ -81,7 +81,7 @@ needNicknameScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     })
     needNicknameScreen.nickname_input.show(Screen.activatedHtmlElement);
-    needNicknameScreen.nickname_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
+    needNicknameScreen.nickname_input.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
 }
 
 needNicknameScreen.draw = function (Background_ctx, UI_ctx, Screen) {
