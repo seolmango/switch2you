@@ -1,5 +1,5 @@
-//const Vector2 = require('./Vector2.js');
-//const Convex = require('./Convex.js');
+const Vector2 = require('./Vector2.js');
+const Convex = require('./Convex.js');
 
 
 class OBB extends Convex {
@@ -39,4 +39,4 @@ class OBB extends Convex {
     }*/
 }
 
-//module.exports = OBB;
+module.exports = OBB;

@@ -1,4 +1,4 @@
-//const Vector2 = require('./Vector2.js');
+const Vector2 = require('./Vector2.js');
 
 
 class Shape {
@@ -20,4 +20,4 @@ class Shape {
     updateCheckSize(angle) {}
 }
 
-//module.exports = Shape;
+module.exports = Shape;
