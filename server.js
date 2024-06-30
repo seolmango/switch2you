@@ -38,7 +38,7 @@ function getPlayerInfo(players) {
 }
 
 function getRoomInfo(rooms) {
-    const infoFilter = (room) => {return {'id': room.id, 'name': room.name, 'ownerName': room.owner.name, 'passwordExist': room.password ? true : false, 'playerCount': room.players.length, 'playing': room.playing}}
+    const infoFilter = (room) => {return {'id': room.id, 'name': room.name, 'ownerName': room.owner.name, 'passwordExist': room.password ? true : false, 'playerCount': room.players.length, 'playing': room.playing, 'mapIndex': room.mapIndex, 'mapName': room.mapName}}
     if (Array.isArray(rooms))
         return rooms.map(infoFilter);
     else
@@ -324,6 +324,23 @@ io.on('connection', (socket) => {
     })
 
 
+    // 방에서 플레이할 월드 변경
+    socket.on('change room map', (mapIndex, callback) => {
+        if (!checkData([roomIndex, 'int'], [callback, 'function'])) {
+            if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
+            return;
+        }
+
+        const result = player.changeRoomMap(mapIndex);
+        if (result) {
+            callback({'status': 400, 'message': result});
+            return;
+        }
+        callback({'status': 200});
+        io.to(player.room.id).emit('room map changed', player.room.mapIndex, player.room.mapName); // index랑 name을 같이 보내는건 유지보수성과 편의성을 위해서임.
+    })
+
+
     // 게임 시작
     socket.on('start game', (callback) => {
         if (typeof callback !== 'function') return;
@@ -338,6 +355,7 @@ io.on('connection', (socket) => {
     })
 
 
+    /** 작동은 되는데 임시로 끄기
     // 플레이어 이동
     socket.on('move player', (doing, direction) => {
         if (!checkData([doing, 'boolean'], [direction, 'number'])) {
@@ -349,7 +367,11 @@ io.on('connection', (socket) => {
             callback({'status': 400, 'message': result});
             return;
         }
-    })
+    })*/
+
+
+    // 해야할꺼: start game 이후 인게임 만들기
+    // 일단 맵 데이터 부터 만들기 World 객체로 하는게 나은듯
 
 
     /**
@@ -403,7 +425,7 @@ function ingameLoop() {
                 world.rigidBodies[player.number - 1].pos.plus((new Vector2(Math.cos(actions.move.direction), Math.cos(actions.move.directoin))).multiply(player.stat.moveSpeed));
         }
         world.update(30, 10);
-        io.to(room.id).emit('world updated', getRigidBodyInfos(world.rigidBodies));
+        io.to(room.id).emit('map updated', getRigidBodyInfos(world.rigidBodies));
     }
 }
 

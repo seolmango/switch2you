@@ -1,4 +1,4 @@
-const { World } = require('./Physics/index.js');
+const MapFactory = require('./MapFactory');
 
 class Room {
     static MaxCount = 0;
@@ -6,7 +6,7 @@ class Room {
     static #_Instances = {}; // 방들
     static #_Publics = {}; // 공개 방들
     static #_Playings = {}; // 게임중인 방들
-    #_id;
+    #_id; #_mapName;
 
     static get Count() {
         return Room.#_Count;
@@ -24,6 +24,9 @@ class Room {
         return Room.#_Playings;
     }
 
+    mapFactory = new MapFactory();
+    map;
+
     constructor(owner, roomName = false, public_ = true, password = false) {
         // Room 객체 기초 설정
         do this.#_id = randomString(8); // 방 id. 중복되지 않음. 경우의 수가 64^8이라 중복검사를 이 방법으로 하는게 좋음.
@@ -40,7 +43,8 @@ class Room {
         if (roomName) this.name = roomName; // 방 이름
         else this.name = owner.name + '\'s Room';
         this.numbers = [0, 0, 0, 0, 0, 0, 0, 0]; // 번호 안 썼는지 여부들. 0이면 안썼고, 0이 아니면 썼음. 0이 아닌 숫자는 그 번호에 해당하는 player의 id.
-        this.world; // 방의 월드
+        this.mapIndex = 0; // 방에서 플레이할 월드 번호
+        this.#_mapName = 'park'; // 방에서 플레이할 월드 이름
         owner.joinRoom(this, password);
         owner.role = 'owner';
     }
@@ -49,11 +53,25 @@ class Room {
         return this.#_id;
     }
 
+    get mapName() {
+        return this.#_mapName;
+    }
+
     delete() {
         if (this.public) delete Room.#_Publics[this.id];
         if (this.playing) delete Room.#_Playings[this.id];
+
         delete Room.#_Instances[this.id];
         Room.#_Count--;
+    }
+
+    changeMap(mapIndex) {
+        if (this.playing) return 'already play game';
+        let mapName = this.mapFactory.mapNames[mapIndex];
+        if (mapName === undefined) return 'wrong map';
+
+        this.mapIndex = mapIndex;
+        this.#_mapName = mapName;
     }
 
     startGame() {
@@ -70,7 +88,7 @@ class Room {
 
         Room.#_Playings[this.id] = this;
         this.playing = true;
-        this.world = new World();
+        this.map = mapFactory(this.mapName);
     }
 
     endGame() {

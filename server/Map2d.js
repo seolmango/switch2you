@@ -1,7 +1,4 @@
-const Vector2 = require('./Physics/Vector2.js');
-const RigidBody = require('./Physics/RigidBody.js');
-const Circle = require('./Physics/Circle.js');
-const OBB = require('./Physics/OBB.js');
+const { Vector2, RigidBody, Circle, OBB } = require('./Physics/index.js');
 
 
 class Map2d {
