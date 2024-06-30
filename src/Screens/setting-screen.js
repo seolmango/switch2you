@@ -95,7 +95,8 @@ settingScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
                     }
                     Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
                     Screen.alert.draw();
-                    Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList)
+                    Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
+                    Screen.userMouse.click = false;
                 }, (1000 / Screen.Settings.Display.fps));
                 Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
                 Screen.currentScreen.page = 'Display';
@@ -194,9 +195,9 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
         drawText(UI_ctx, 960, 300, 60, 0, Color_list.text_default_hex, undefined, undefined, `BGM : ${Screen.Settings.Sound.BGM}`, "center", "GmarketSansMedium");
         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 400, 1400, 100)){
             drawRangeSlider(UI_ctx, 960, 400, {
-                lenght: 1200,
+                width: 1200,
                 color: Color_list.button_gray_2_hex,
-                width: 10,
+                stroke_width: 10,
             }, {
                 radius: 40,
                 color: Color_list.button_gray_2_hex,
@@ -205,9 +206,9 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
             }, 0, 100, Screen.Settings.Sound.BGM);
         }else {
             drawRangeSlider(UI_ctx, 960, 400, {
-                lenght: 1200,
+                width: 1200,
                 color: Color_list.button_gray_2_hex,
-                width: 10,
+                stroke_width: 10,
             }, {
                 radius: 30,
                 color: Color_list.button_gray_2_hex,
@@ -236,9 +237,9 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
         drawText(UI_ctx, 960, 300, 60, 0, (settingScreen.before[0] === settingScreen.new[0]) ? Color_list.text_default_hex : Color_list.button_blue_2_hex, undefined, undefined, `FPS : ${settingScreen.new[0]}`, "center", "GmarketSansMedium");
         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 400, 1400, 100)){
             drawRangeSlider(UI_ctx, 960, 400, {
-                lenght: 1200,
+                width: 1200,
                 color: Color_list.button_gray_2_hex,
-                width: 10,
+                stroke_width: 10,
             }, {
                 radius: 40,
                 color: Color_list.button_gray_2_hex,
@@ -247,9 +248,9 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
             }, 30, 300, settingScreen.new[0]);
         }else {
             drawRangeSlider(UI_ctx, 960, 400, {
-                lenght: 1200,
+                width: 1200,
                 color: Color_list.button_gray_2_hex,
-                width: 10,
+                stroke_width: 10,
             }, {
                 radius: 30,
                 color: Color_list.button_gray_2_hex,
