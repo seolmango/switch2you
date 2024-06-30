@@ -162,9 +162,9 @@ settingScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 100,
         clicked: function () {
             if(settingScreen.page === 'Display') {
-                settingScreen.new[1] = Math.round((((Screen.userMouse.x / UI_ctx.displayDPI) - 960 + 600) / 1200 * 4.9 + 0.1)*10)/10;
-                settingScreen.new[1] = Math.max(0.1, settingScreen.new[1]);
-                settingScreen.new[1] = Math.min(5, settingScreen.new[1]);
+                settingScreen.new[1] = Math.round((((Screen.userMouse.x / UI_ctx.displayDPI) - 960 + 600) / 1200 * 1.5 + 0.5)*10)/10;
+                settingScreen.new[1] = Math.max(0.5, settingScreen.new[1]);
+                settingScreen.new[1] = Math.min(2, settingScreen.new[1]);
             }
         }
     })
@@ -345,7 +345,7 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
                 color: Color_list.button_gray_2_hex,
                 stroke_color: Color_list.button_gray_3_hex,
                 stroke_width: 10,
-            }, 0.1, 5, settingScreen.new[1]);
+            }, 0.5, 2, settingScreen.new[1]);
         }else {
             drawRangeSlider(UI_ctx, 960, 700, {
                 lenght: 1200,
@@ -356,7 +356,7 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
                 color: Color_list.button_gray_2_hex,
                 stroke_color: Color_list.button_gray_3_hex,
                 stroke_width: 10,
-            }, 0.1, 5, settingScreen.new[1]);
+            }, 0.5, 2, settingScreen.new[1]);
         }
     }
 }

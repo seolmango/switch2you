@@ -29,7 +29,7 @@ Screen.userMouse = {
     click: false,
     press: false,
 };
-Screen.DPI = window.devicePixelRatio;
+Screen.DPI = 1;
 UI_ctx.displayDPI = Screen.DPI;
 Background_ctx.displayDPI = Screen.DPI;
 Screen.userKeyboard = new Array(100).fill(false);
