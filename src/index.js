@@ -20,6 +20,9 @@ const Background_canvas = document.getElementById('background');
 const Background_ctx = Background_canvas.getContext('2d');
 const UI_canvas = document.getElementById('ui');
 const UI_ctx = UI_canvas.getContext('2d');
+const DPI = window.devicePixelRatio;
+UI_ctx.displayDPI = DPI;
+Background_ctx.displayDPI = DPI;
 
 // Set Data
 const Screen = {};
@@ -260,19 +263,19 @@ window.addEventListener("doSocketConnect", function () {
 // functions
 function canvasResize() {
     if (window.innerWidth * 9 < window.innerHeight * 16) {
-        Screen.scale = window.innerWidth / 1920 * 0.9;
+        Screen.scale = window.innerWidth / (1920 * DPI) * 0.9;
     } else {
-        Screen.scale = window.innerHeight / 1080 * 0.9;
+        Screen.scale = window.innerHeight / (1080 * DPI) * 0.9;
     }
     Screen.joyStickCanvas.width = window.innerWidth;
     Screen.joyStickCanvas.height = window.innerHeight;
     Screen.joyStickCanvas.style.top = '50%';
     Screen.joyStickCanvas.style.left = '50%';
     Screen.joyStickCanvas.style.transform = 'translate(-50%, -50%)';
-    Background_canvas.width = 1920 * Screen.scale;
-    Background_canvas.height = 1080 * Screen.scale;
-    UI_canvas.width = 1920 * Screen.scale;
-    UI_canvas.height = 1080 * Screen.scale;
+    Background_canvas.width = 1920 * DPI * Screen.scale;
+    Background_canvas.height = 1080 * DPI * Screen.scale;
+    UI_canvas.width = 1920 * DPI * Screen.scale;
+    UI_canvas.height = 1080 * DPI * Screen.scale;
     Background_canvas.style.top = '50%';
     Background_canvas.style.left = '50%';
     Background_canvas.style.transform = 'translate(-50%, -50%)';
@@ -285,6 +288,6 @@ function canvasResize() {
     for(let i = 0; i < Screen.activatedHtmlElement.length; i++){
         Screen.activatedHtmlElement[i].resize(Screen.scale, window.innerWidth, window.innerHeight);
     }
-    Screen.X0real = (window.innerWidth - (1920 * Screen.scale)) / 2;
-    Screen.Y0real = (window.innerHeight - (1080 * Screen.scale)) / 2;
+    Screen.X0real = (window.innerWidth - (1920 * DPI * Screen.scale)) / 2;
+    Screen.Y0real = (window.innerHeight - (1080 * DPI * Screen.scale)) / 2;
 }
