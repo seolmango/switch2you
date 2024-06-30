@@ -29,6 +29,9 @@ Screen.userMouse = {
     click: false,
     press: false,
 };
+Screen.DPI = window.devicePixelRatio;
+UI_ctx.displayDPI = Screen.DPI;
+Background_ctx.displayDPI = Screen.DPI;
 Screen.userKeyboard = new Array(100).fill(false);
 Screen.scale = 1;
 Screen.currentScreen = {};
@@ -93,7 +96,7 @@ window.onload = function () {
         }
         Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
         Screen.alert.draw();
-        Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList)
+        Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList, Screen.DPI);
     }, (1000 / Screen.Settings.Display.fps));
     if(Screen.mobile){
         Screen.alert.add_Data("mobile", `The screen automatically fits!`, 5);
@@ -260,31 +263,35 @@ window.addEventListener("doSocketConnect", function () {
 // functions
 function canvasResize() {
     if (window.innerWidth * 9 < window.innerHeight * 16) {
-        Screen.scale = window.innerWidth / 1920 * 0.9;
+        Screen.scale = window.innerWidth / (1920 * Screen.DPI) * 0.9;
     } else {
-        Screen.scale = window.innerHeight / 1080 * 0.9;
+        Screen.scale = window.innerHeight / (1080 * Screen.DPI) * 0.9;
     }
     Screen.joyStickCanvas.width = window.innerWidth;
     Screen.joyStickCanvas.height = window.innerHeight;
     Screen.joyStickCanvas.style.top = '50%';
     Screen.joyStickCanvas.style.left = '50%';
     Screen.joyStickCanvas.style.transform = 'translate(-50%, -50%)';
-    Background_canvas.width = 1920 * Screen.scale;
-    Background_canvas.height = 1080 * Screen.scale;
-    UI_canvas.width = 1920 * Screen.scale;
-    UI_canvas.height = 1080 * Screen.scale;
+    Background_canvas.width = 1920 * Screen.DPI;
+    Background_canvas.height = 1080 * Screen.DPI;
+    Background_canvas.style.width = `${1920 * Screen.DPI * Screen.scale}px`;
+    Background_canvas.style.height = `${1080 * Screen.DPI * Screen.scale}px`;
+    UI_canvas.width = 1920 * Screen.DPI;
+    UI_canvas.height = 1080 * Screen.DPI;
+    UI_canvas.style.width = `${1920 * Screen.DPI * Screen.scale}px`;
+    UI_canvas.style.height = `${1080 * Screen.DPI * Screen.scale}px`;
     Background_canvas.style.top = '50%';
     Background_canvas.style.left = '50%';
     Background_canvas.style.transform = 'translate(-50%, -50%)';
     UI_canvas.style.top = '50%';
     UI_canvas.style.left = '50%';
     UI_canvas.style.transform = 'translate(-50%, -50%)';
-    Background_ctx.scale(Screen.scale, Screen.scale);
-    UI_ctx.scale(Screen.scale, Screen.scale);
     Screen.currentScreen.redrawBackground(Background_ctx);
     for(let i = 0; i < Screen.activatedHtmlElement.length; i++){
-        Screen.activatedHtmlElement[i].resize(Screen.scale, window.innerWidth, window.innerHeight);
+        Screen.activatedHtmlElement[i].resize(Screen.scale, window.innerWidth, window.innerHeight, Screen.DPI);
     }
-    Screen.X0real = (window.innerWidth - (1920 * Screen.scale)) / 2;
-    Screen.Y0real = (window.innerHeight - (1080 * Screen.scale)) / 2;
+    Screen.X0real = (window.innerWidth - (1920 * Screen.DPI * Screen.scale)) / 2;
+    Screen.Y0real = (window.innerHeight - (1080 * Screen.DPI * Screen.scale)) / 2;
 }
+
+Screen.CanvasResize = canvasResize;

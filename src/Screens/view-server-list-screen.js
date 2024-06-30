@@ -9,6 +9,7 @@ import {makeNewRoomScreen} from "./make-new-room-screen";
 import {joinRoomWithIdScreen} from "./join-room-with-id-screen";
 import {needNicknameScreen} from "./need-nickname-screen";
 import {drawCircle} from "./tools/drawCircle";
+import {clearCtx} from "./tools/clearCtx";
 
 let refresh_1 = `rgba(${Color_list.button_red_1_rgb[0]}, ${Color_list.button_red_1_rgb[1]}, ${Color_list.button_red_1_rgb[2]}, 0.5)`;
 let refresh_2 = `rgba(${Color_list.button_red_2_rgb[0]}, ${Color_list.button_red_2_rgb[1]}, ${Color_list.button_red_2_rgb[2]}, 0.5)`;
@@ -50,7 +51,7 @@ function get_room_data (socket, index) {
 
 viewServerListScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     viewServerListScreen.redrawBackground(Background_ctx);
-    UI_ctx.clearRect(0,0,1920,1080);
+    clearCtx(UI_ctx);
     viewServerListScreen.checkUIList = [];
     viewServerListScreen.checkUIList.push({
         tag: "view-server-list-screen-back",
@@ -243,29 +244,29 @@ viewServerListScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
 };
 
 viewServerListScreen.draw = function (Background_ctx, UI_ctx, Screen) {
-    UI_ctx.clearRect(0,0,1920,1080);
-    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 180, 72, 240, 96)){
+    clearCtx(UI_ctx);
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 180, 72, 240, 96, UI_ctx.displayDPI)){
         drawRoundBox(UI_ctx, 180, 72, 240*1.05, 96*1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10*1.05, 25*1.05);
         drawText(UI_ctx, 180, 72, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Back", "center", "GmarketSansMedium");
     }else{
         drawRoundBox(UI_ctx, 180, 72, 240, 96, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
         drawText(UI_ctx, 180, 72, 60, 0, Color_list.text_default_hex, undefined, undefined, "Back", "center", "GmarketSansMedium");
     }
-    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 320, 990, 600, 120)){
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 320, 990, 600, 120, UI_ctx.displayDPI)){
         drawRoundBox(UI_ctx, 320, 990, 600*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
         drawText(UI_ctx, 320, 990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Make New Room", "center", "GmarketSansMedium");
     }else{
         drawRoundBox(UI_ctx, 320, 990, 600, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
         drawText(UI_ctx, 320, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Make New Room", "center", "GmarketSansMedium");
     }
-    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 600, 120)){
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 600, 120, UI_ctx.displayDPI)){
         drawRoundBox(UI_ctx, 960, 990, 600*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
         drawText(UI_ctx, 960, 990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Quick Join", "center", "GmarketSansMedium");
     }else{
         drawRoundBox(UI_ctx, 960, 990, 600, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
         drawText(UI_ctx, 960, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Quick Join", "center", "GmarketSansMedium");
     }
-    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1600, 990, 600, 120)){
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1600, 990, 600, 120, UI_ctx.displayDPI)){
         drawRoundBox(UI_ctx, 1600, 990, 600*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
         drawText(UI_ctx, 1600, 990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Join Room with ID", "center", "GmarketSansMedium");
     }else{
@@ -276,7 +277,7 @@ viewServerListScreen.draw = function (Background_ctx, UI_ctx, Screen) {
         drawRoundBox(UI_ctx, 1700, 72, 320, 96, refresh_1, refresh_2, 10, 25);
         drawText(UI_ctx, 1700, 72, 60, 0, refresh_text, undefined, undefined, "Refresh", "center", "GmarketSansMedium");
     }else{
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1700, 72, 320, 96)){
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1700, 72, 320, 96, UI_ctx.displayDPI)){
             drawRoundBox(UI_ctx, 1700, 72, 320*1.05, 96*1.05, Color_list.button_red_2_hex, Color_list.button_red_3_hex, 10*1.05, 25*1.05);
             drawText(UI_ctx, 1700, 72, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Refresh", "center", "GmarketSansMedium");
         }else{
@@ -300,7 +301,7 @@ viewServerListScreen.draw = function (Background_ctx, UI_ctx, Screen) {
             drawRoundBox(UI_ctx, 1200, 850, 80, 80, refresh_1, refresh_2, 10, 25);
             drawText(UI_ctx, 1200, 850, 60, 0, refresh_text, undefined, undefined, ">", "center", "GmarketSansMedium");
         }else{
-            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1200, 850, 80, 80)) {
+            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1200, 850, 80, 80, UI_ctx.displayDPI)) {
                 drawRoundBox(UI_ctx, 1200, 850, 80 * 1.05, 80 * 1.05, Color_list.button_red_2_hex, Color_list.button_red_3_hex, 10 * 1.05, 25 * 1.05);
                 drawText(UI_ctx, 1200, 850, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
             }else{
@@ -312,7 +313,7 @@ viewServerListScreen.draw = function (Background_ctx, UI_ctx, Screen) {
             drawRoundBox(UI_ctx, 720, 850, 80, 80, refresh_1, refresh_2, 10, 25);
             drawText(UI_ctx, 720, 850, 60, 0, refresh_text, undefined, undefined, "<", "center", "GmarketSansMedium");
         }else{
-            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 720, 850, 80, 80)) {
+            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 720, 850, 80, 80, UI_ctx.displayDPI)) {
                 drawRoundBox(UI_ctx, 720, 850, 80 * 1.05, 80 * 1.05, Color_list.button_red_2_hex, Color_list.button_red_3_hex, 10 * 1.05, 25 * 1.05);
                 drawText(UI_ctx, 720, 850, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "<", "center", "GmarketSansMedium");
             }else{
@@ -328,7 +329,7 @@ viewServerListScreen.draw = function (Background_ctx, UI_ctx, Screen) {
                 let loc_y = Math.floor(i / 2);
                 let x = 960 + (loc_x * 800) - 400;
                 let y = 360 + (loc_y * 220) - 110;
-                if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, x, y, 750, 200)) {
+                if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, x, y, 750, 200, UI_ctx.displayDPI)) {
                     drawRoundBox(UI_ctx, x, y, 750 * 1.05, 200 * 1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10 * 1.05, 25 * 1.05);
                     drawText(UI_ctx, x-350*1.05, y-55*1.05, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${viewServerListScreen.room_data[i].name}`, "left", 'GmarketSansMedium');
                     drawText(UI_ctx, x+350*1.05, y-55*1.05, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${viewServerListScreen.room_data[i].playerCount}/8`, "right", 'GmarketSansMedium');
@@ -351,16 +352,16 @@ viewServerListScreen.draw = function (Background_ctx, UI_ctx, Screen) {
 };
 
 viewServerListScreen.redrawBackground = function (Background_ctx) {
-    Background_ctx.clearRect(0,0,1920,1080);
+    clearCtx(Background_ctx);
     drawText(Background_ctx, 960, 72, 80, 0, Color_list.text_default_hex, undefined, undefined, "Room List", "center", "GmarketSansMedium");
     drawRoundBox(Background_ctx, 960, 520, 1600, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 50);
     drawLine(Background_ctx, 950, 875, 970, 825, Color_list.button_gray_3_hex, 10);
 };
 
-viewServerListScreen.check = function (userMouse, userKeyboard, checkUIList) {
+viewServerListScreen.check = function (userMouse, userKeyboard, checkUIList, DPI) {
     if(userMouse.click === true) {
         for (let i = 0; i < checkUIList.length; i++) {
-            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height)) {
+            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height, DPI)) {
                 checkUIList[i].clicked();
             }
         }
