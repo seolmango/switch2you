@@ -8,7 +8,6 @@ import {textInputElement} from "./tools/textInputElement";
 import {checkboxElement} from "./tools/checkboxElement";
 import {joiningRoomScreen} from "./joining-room-screen";
 import {waitingRoomScreen} from "./waiting-room-screen";
-import {clearCtx} from "./tools/clearCtx";
 
 let make_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let make_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
@@ -16,7 +15,7 @@ let make_text = `rgba(${Color_list.text_default_rgb[0]}, ${Color_list.text_defau
 
 makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     makeNewRoomScreen.redrawBackground(Background_ctx);
-    clearCtx(UI_ctx);
+    UI_ctx.clearRect(0,0,1920,1080);
     makeNewRoomScreen.checkUIList = [];
     makeNewRoomScreen.checkUIList.push({
         tag: "make-new-room-screen-back",
@@ -114,7 +113,7 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     });
     makeNewRoomScreen.nickname_input.show(Screen.activatedHtmlElement);
-    makeNewRoomScreen.nickname_input.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
+    makeNewRoomScreen.nickname_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
     makeNewRoomScreen.roomname_input = new textInputElement('room_name_input', 1360, 444, 700, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
         Background_ctx.font = "40px GmarketSansMedium";
         let text = Background_ctx.measureText(value);
@@ -125,7 +124,7 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     });
     makeNewRoomScreen.roomname_input.show(Screen.activatedHtmlElement);
-    makeNewRoomScreen.roomname_input.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
+    makeNewRoomScreen.roomname_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
     makeNewRoomScreen.password_input = new textInputElement('make_room_password_input', 1380, 748, 670, 80, 60, Color_list.button_red_1_hex, Color_list.button_gray_1_hex, function (value) {
         if(makeNewRoomScreen.password_checkbox.get_value()){
             if(value.length > 0 && value.length < 11){
@@ -138,11 +137,11 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     });
     makeNewRoomScreen.password_input.show(Screen.activatedHtmlElement);
-    makeNewRoomScreen.password_input.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
+    makeNewRoomScreen.password_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
     makeNewRoomScreen.password_input.lock();
     makeNewRoomScreen.visibility_checkbox = new checkboxElement('make_room_visibility_checkbox', 775, 580, 80, 80, Color_list.button_gray_1_hex, function () {});
     makeNewRoomScreen.visibility_checkbox.show(Screen.activatedHtmlElement);
-    makeNewRoomScreen.visibility_checkbox.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
+    makeNewRoomScreen.visibility_checkbox.resize(Screen.scale, window.innerWidth, window.innerHeight);
     makeNewRoomScreen.password_checkbox = new checkboxElement('make_room_password_checkbox', 1500, 580, 80, 80, Color_list.button_gray_1_hex, function () {
         if(makeNewRoomScreen.password_checkbox.get_value()){
             makeNewRoomScreen.password_input.unlock();
@@ -152,12 +151,12 @@ makeNewRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     });
     makeNewRoomScreen.password_checkbox.show(Screen.activatedHtmlElement);
-    makeNewRoomScreen.password_checkbox.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
+    makeNewRoomScreen.password_checkbox.resize(Screen.scale, window.innerWidth, window.innerHeight);
 };
 
 makeNewRoomScreen.draw = function (Background_ctx, UI_ctx, Screen) {
-    clearCtx(UI_ctx);
-    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 180, 72, 240, 96, UI_ctx.displayDPI)){
+    UI_ctx.clearRect(0,0,1920,1080);
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 180, 72, 240, 96)){
         drawRoundBox(UI_ctx, 180,72, 240*1.05, 96*1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10*1.05, 25*1.05);
         drawText(UI_ctx, 180,72, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Back", "center", "GmarketSansMedium");
     }else{
@@ -168,7 +167,7 @@ makeNewRoomScreen.draw = function (Background_ctx, UI_ctx, Screen) {
         drawRoundBox(UI_ctx, 480,990, 720, 120, make_1, make_2, 10, 25);
         drawText(UI_ctx, 480,990, 60, 0, make_text, undefined, undefined, "Make", "center", "GmarketSansMedium");
     }else{
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 480, 990, 720, 120, UI_ctx.displayDPI)){
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 480, 990, 720, 120)){
             drawRoundBox(UI_ctx, 480,990, 720*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
             drawText(UI_ctx, 480,990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Make", "center", "GmarketSansMedium");
         }else{
@@ -176,7 +175,7 @@ makeNewRoomScreen.draw = function (Background_ctx, UI_ctx, Screen) {
             drawText(UI_ctx, 480,990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Make", "center", "GmarketSansMedium");
         }
     }
-    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120, UI_ctx.displayDPI)){
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120)){
         drawRoundBox(UI_ctx, 1440,990, 720*1.05, 120*1.05, Color_list.button_red_2_hex, Color_list.button_red_3_hex, 10*1.05, 25*1.05);
         drawText(UI_ctx, 1440,990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Cancel", "center", "GmarketSansMedium");
     }else{
@@ -186,7 +185,7 @@ makeNewRoomScreen.draw = function (Background_ctx, UI_ctx, Screen) {
 };
 
 makeNewRoomScreen.redrawBackground = function (Background_ctx) {
-    clearCtx(Background_ctx);
+    Background_ctx.clearRect(0,0,1920,1080);
     drawText(Background_ctx, 960, 72, 80, 0, Color_list.text_default_hex, undefined, undefined, "Make New Room", "center", "GmarketSansMedium");
     drawRoundBox(Background_ctx, 960, 520, 1600, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 50);
     drawText(Background_ctx, 200, 292, 80, 0, Color_list.text_default_hex, undefined, undefined, "Your Nickname >", "left", "GmarketSansMedium");
@@ -196,10 +195,10 @@ makeNewRoomScreen.redrawBackground = function (Background_ctx) {
     drawText(Background_ctx, 200, 748, 80, 0, Color_list.text_default_hex, undefined, undefined, "Room Password >", "left", "GmarketSansMedium");
 };
 
-makeNewRoomScreen.check = function (userMouse, userKeyboard, checkUIList, DPI) {
+makeNewRoomScreen.check = function (userMouse, userKeyboard, checkUIList) {
     if(userMouse.click === true) {
         for (let i = 0; i < checkUIList.length; i++) {
-            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height, DPI) && checkUIList[i].clickable <= 0) {
+            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height) && checkUIList[i].clickable <= 0) {
                 checkUIList[i].clicked();
             }
         }

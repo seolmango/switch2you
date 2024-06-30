@@ -8,7 +8,6 @@ import {viewServerListScreen} from "./view-server-list-screen";
 import {joiningRoomScreen} from "./joining-room-screen";
 import {joinRoomWithIdScreen} from "./join-room-with-id-screen";
 import {waitingRoomScreen} from "./waiting-room-screen";
-import {clearCtx} from "./tools/clearCtx";
 
 let blue_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let blue_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
@@ -16,7 +15,7 @@ let blue_text = `rgba(${Color_list.text_default_rgb[0]}, ${Color_list.text_defau
 
 needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     needPasswordInputScreen.redrawBackground(Background_ctx);
-    clearCtx(UI_ctx);
+    UI_ctx.clearRect(0,0,1920,1080);
     needPasswordInputScreen.checkUIList = [];
     needPasswordInputScreen.checkUIList.push({
         tag: "need-password-input-screen-submit",
@@ -57,6 +56,7 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 720,
         height: 120,
         clicked: function () {
+            needPasswordInputScreen.password_input.hide(Screen.activatedHtmlElement);
             Screen.currentScreen = viewServerListScreen;
             Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         },
@@ -70,16 +70,16 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         }
     })
     needPasswordInputScreen.password_input.show(Screen.activatedHtmlElement);
-    needPasswordInputScreen.password_input.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
+    needPasswordInputScreen.password_input.resize(Screen.scale, window.innerWidth, window.innerHeight);
 }
 
 needPasswordInputScreen.draw = function (Background_ctx, UI_ctx, Screen) {
-    clearCtx(UI_ctx);
+    UI_ctx.clearRect(0,0,1920,1080);
     if(Screen.currentScreen.checkUIList[0].clickable === -1){
         drawRoundBox(UI_ctx, 480,990, 720, 120, blue_1, blue_2, 10, 25);
         drawText(UI_ctx, 480,990, 60, 0, blue_text, undefined, undefined, "Submit", "center", "GmarketSansMedium");
     }else{
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 480, 990, 720, 120, UI_ctx.displayDPI)){
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 480, 990, 720, 120)){
             drawRoundBox(UI_ctx, 480,990, 720*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
             drawText(UI_ctx, 480,990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Submit", "center", "GmarketSansMedium");
         }else {
@@ -87,7 +87,7 @@ needPasswordInputScreen.draw = function (Background_ctx, UI_ctx, Screen) {
             drawText(UI_ctx, 480, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Submit", "center", "GmarketSansMedium");
         }
     }
-    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120, UI_ctx.displayDPI)){
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120)){
         drawRoundBox(UI_ctx, 1440,990, 720*1.05, 120*1.05, Color_list.button_red_2_hex, Color_list.button_red_3_hex, 10*1.05, 25*1.05);
         drawText(UI_ctx, 1440,990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Cancel", "center", "GmarketSansMedium");
     }else{
@@ -97,16 +97,16 @@ needPasswordInputScreen.draw = function (Background_ctx, UI_ctx, Screen) {
 }
 
 needPasswordInputScreen.redrawBackground = function (Background_ctx) {
-    clearCtx(Background_ctx);
+    Background_ctx.clearRect(0,0,1920,1080);
     drawText(Background_ctx, 960, 72, 80, 0, Color_list.text_default_hex, undefined, undefined, "Entering Room", "center", "GmarketSansMedium");
     drawRoundBox(Background_ctx, 960, 520, 1600, 760, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 50);
     drawText(Background_ctx, 200, 520, 80, 0, Color_list.text_default_hex, undefined, undefined, "Password > ", "left", "GmarketSansMedium");
 }
 
-needPasswordInputScreen.check = function (userMouse, userKeyboard, checkUIList, DPI) {
+needPasswordInputScreen.check = function (userMouse, userKeyboard, checkUIList) {
     if(userMouse.click === true){
         for (let i = 0; i < checkUIList.length; i++) {
-            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height, DPI) && checkUIList[i].clickable <= 0) {
+            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height) && checkUIList[i].clickable <= 0) {
                 checkUIList[i].clicked();
             }
         }

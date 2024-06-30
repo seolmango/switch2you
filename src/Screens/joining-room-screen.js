@@ -4,18 +4,17 @@ import {Color_list} from "../data/color_list";
 import {drawText} from "./tools/drawText";
 import {drawRoundBox} from "./tools/drawRoundBox";
 import {drawCircle} from "./tools/drawCircle";
-import {clearCtx} from "./tools/clearCtx";
 
 joiningRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     joiningRoomScreen.redrawBackground(Background_ctx);
-    clearCtx(UI_ctx);
+    UI_ctx.clearRect(0,0,1920,1080);
     joiningRoomScreen.checkUIList = [];
 }
 
 joiningRoomScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     let second = new Date().getSeconds();
     let millisecond = new Date().getMilliseconds();
-    clearCtx(UI_ctx);
+    UI_ctx.clearRect(0,0,1920,1080);
     drawRoundBox(UI_ctx, 960, 540, 1600, 900, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 20, 50)
     drawText(UI_ctx,960, 400, 70, 0, Color_list.button_gray_3_hex, undefined, undefined, "joining room" + ".".repeat((second%3)+1), "center", 'GmarketSansMedium');
     let rad_delta = 2 * Math.PI * (millisecond / 1000);
@@ -25,11 +24,11 @@ joiningRoomScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     }
 }
 
-joiningRoomScreen.check = function (userMouse, userKeyboard, checkUIList, DPI) {
+joiningRoomScreen.check = function (userMouse, userKeyboard, checkUIList) {
 }
 
 joiningRoomScreen.redrawBackground = function (Background_ctx) {
-    clearCtx(Background_ctx);
+    Background_ctx.clearRect(0,0,1920,1080);
 }
 
 export {joiningRoomScreen};
