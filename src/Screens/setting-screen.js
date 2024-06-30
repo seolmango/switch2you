@@ -154,10 +154,53 @@ settingScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
             }
         }
     })
+    settingScreen.checkUIList.push({
+        tag: 'setting-screen-resolution-slider',
+        center_x: 960,
+        center_y: 700,
+        width: 1250,
+        height: 100,
+        clicked: function () {
+            if(settingScreen.page === 'Display') {
+                settingScreen.new[1] = Math.round((((Screen.userMouse.x / UI_ctx.displayDPI) - 960 + 600) / 1200 * 4.9 + 0.1)*10)/10;
+                settingScreen.new[1] = Math.max(0.1, settingScreen.new[1]);
+                settingScreen.new[1] = Math.min(5, settingScreen.new[1]);
+            }
+        }
+    })
+    settingScreen.checkUIList.push({
+        tag: 'setting-screen-resolution-submit',
+        center_x: 1400,
+        center_y: 600,
+        width: 80,
+        height: 80,
+        clicked: function () {
+            if(settingScreen.page === 'Display') {
+                Screen.DPI = settingScreen.new[1];
+                UI_ctx.displayDPI = settingScreen.new[1];
+                Background_ctx.displayDPI = settingScreen.new[1];
+                Screen.CanvasResize();
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+                Screen.currentScreen.page = 'Display';
+            }
+        }
+    })
+    settingScreen.checkUIList.push({
+        tag: 'setting-screen-resolution-reset',
+        center_x: 1510,
+        center_y: 600,
+        width: 80,
+        height: 80,
+        clicked: function () {
+            if(settingScreen.page === 'Display') {
+                settingScreen.new[1] = settingScreen.before[1];
+            }
+        }
+    })
     settingScreen.page = 'Sound';
     settingScreen.settings = Screen.Settings;
-    settingScreen.before = [Screen.Settings.Display.fps];
-    settingScreen.new = [Screen.Settings.Display.fps];
+    settingScreen.before = [Screen.Settings.Display.fps, UI_ctx.displayDPI];
+    settingScreen.new = [Screen.Settings.Display.fps, UI_ctx.displayDPI];
 }
 
 settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
@@ -277,6 +320,44 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
                 drawText(UI_ctx, 1360, 500, 50, 0, Color_list.text_default_hex, undefined, undefined, "Exit FullScreen", "center", "GmarketSansMedium");
             }
         }
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1400, 600, 80, 80, UI_ctx.displayDPI)){
+            drawRoundBox(UI_ctx, 1400, 600, 80*1.05, 80*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
+            drawText(UI_ctx, 1400, 600, 50*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "✔", "center", "GmarketSansMedium");
+        }else{
+            drawRoundBox(UI_ctx, 1400, 600, 80, 80, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+            drawText(UI_ctx, 1400, 600, 50, 0, Color_list.text_default_hex, undefined, undefined, "✔", "center", "GmarketSansMedium");
+        }
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1510, 600, 80, 80, UI_ctx.displayDPI)){
+            drawRoundBox(UI_ctx, 1510, 600, 80*1.05, 80*1.05, Color_list.button_red_2_hex, Color_list.button_red_3_hex, 10*1.05, 25*1.05);
+            drawText(UI_ctx, 1510, 600, 50*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "↺", "center", "GmarketSansMedium");
+        }else{
+            drawRoundBox(UI_ctx, 1510, 600, 80, 80, Color_list.button_red_1_hex, Color_list.button_red_2_hex, 10, 25);
+            drawText(UI_ctx, 1510, 600, 50, 0, Color_list.text_default_hex, undefined, undefined, "↺", "center", "GmarketSansMedium");
+        }
+        drawText(UI_ctx, 960, 600, 60, 0, (settingScreen.before[1] === settingScreen.new[1]) ? Color_list.text_default_hex : Color_list.button_blue_2_hex, undefined, undefined, `Resolution : ${settingScreen.new[1]}`, "center", "GmarketSansMedium");
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 700, 1400, 100, UI_ctx.displayDPI)){
+            drawRangeSlider(UI_ctx, 960, 700, {
+                lenght: 1200,
+                color: Color_list.button_gray_2_hex,
+                width: 10,
+            }, {
+                radius: 40,
+                color: Color_list.button_gray_2_hex,
+                stroke_color: Color_list.button_gray_3_hex,
+                stroke_width: 10,
+            }, 0.1, 5, settingScreen.new[1]);
+        }else {
+            drawRangeSlider(UI_ctx, 960, 700, {
+                lenght: 1200,
+                color: Color_list.button_gray_2_hex,
+                width: 10,
+            }, {
+                radius: 30,
+                color: Color_list.button_gray_2_hex,
+                stroke_color: Color_list.button_gray_3_hex,
+                stroke_width: 10,
+            }, 0.1, 5, settingScreen.new[1]);
+        }
     }
 }
 
@@ -299,6 +380,8 @@ settingScreen.check = function (userMouse, userKeyboard, checkUIList, DPI) {
         if(checkTouch(userMouse.x, userMouse.y, 960, 400, 1400, 100, DPI)){
             checkUIList[4].clicked();
             checkUIList[5].clicked();
+        }else if(checkTouch(userMouse.x, userMouse.y, 960, 700, 1400, 100, DPI)){
+            checkUIList[9].clicked();
         }
     }
     BGM_Player.setVolume(settingScreen.settings.Sound.BGM);
