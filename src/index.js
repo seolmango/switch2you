@@ -272,18 +272,20 @@ function canvasResize() {
     Screen.joyStickCanvas.style.top = '50%';
     Screen.joyStickCanvas.style.left = '50%';
     Screen.joyStickCanvas.style.transform = 'translate(-50%, -50%)';
-    Background_canvas.width = 1920 * Screen.DPI * Screen.scale;
-    Background_canvas.height = 1080 * Screen.DPI * Screen.scale;
-    UI_canvas.width = 1920 * Screen.DPI * Screen.scale;
-    UI_canvas.height = 1080 * Screen.DPI * Screen.scale;
+    Background_canvas.width = 1920 * Screen.DPI;
+    Background_canvas.height = 1080 * Screen.DPI;
+    Background_canvas.style.width = `${1920 * Screen.DPI * Screen.scale}px`;
+    Background_canvas.style.height = `${1080 * Screen.DPI * Screen.scale}px`;
+    UI_canvas.width = 1920 * Screen.DPI;
+    UI_canvas.height = 1080 * Screen.DPI;
+    UI_canvas.style.width = `${1920 * Screen.DPI * Screen.scale}px`;
+    UI_canvas.style.height = `${1080 * Screen.DPI * Screen.scale}px`;
     Background_canvas.style.top = '50%';
     Background_canvas.style.left = '50%';
     Background_canvas.style.transform = 'translate(-50%, -50%)';
     UI_canvas.style.top = '50%';
     UI_canvas.style.left = '50%';
     UI_canvas.style.transform = 'translate(-50%, -50%)';
-    Background_ctx.scale(Screen.scale, Screen.scale);
-    UI_ctx.scale(Screen.scale, Screen.scale);
     Screen.currentScreen.redrawBackground(Background_ctx);
     for(let i = 0; i < Screen.activatedHtmlElement.length; i++){
         Screen.activatedHtmlElement[i].resize(Screen.scale, window.innerWidth, window.innerHeight, Screen.DPI);
