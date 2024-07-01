@@ -30,7 +30,7 @@ http.listen(port, function (){
  * @returns 
  */
 function getPlayerInfo(players) {
-    const infoFilter = (player) => { return {'number': player.number, 'name': player.name, 'role': player.role, 'device': player.device, 'skill': player.skill} }
+    const infoFilter = (player) => { return {'number': player.number, 'name': player.name, 'role': player.role, 'device': player.device, 'skill': player.stat.skill} }
     if (Array.isArray(players))
         return players.map(infoFilter);
     else
@@ -143,8 +143,8 @@ io.on('connection', (socket) => {
 
 
     // 방 생성
-    socket.on('create room', (playerName, roomName, public, password, callback) => { // 1. 방 참가 이벤트가 들어오면
-        if (!checkData([playerName, 'string'], [roomName, 'string'], [public, 'boolean'], [password, 'string', false], [callback, 'function'])) {
+    socket.on('create room', (playerName, roomName, publicWhether, password, callback) => { // 1. 방 참가 이벤트가 들어오면
+        if (!checkData([playerName, 'string'], [roomName, 'string'], [publicWhether, 'boolean'], [password, 'string', false], [callback, 'function'])) {
             if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
             return; // 2-1. 데이터의 자료형 확인 후
         } else if (player.room) {
@@ -157,7 +157,7 @@ io.on('connection', (socket) => {
             return;
         }
         player.changeName(playerName);
-        const room = new Room(player, roomName, public, password); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
+        const room = new Room(player, roomName, publicWhether, password); // 3. 입력한 (남에게 보여지는) 정보를 업데이트 + 실제 작업 진행
         socket.join(room.id); // 4. room 관련 처리하고 소켓신호 보내기
         callback({'status': 200, 'roomInfo': getRoomInfo(room)});
     })

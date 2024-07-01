@@ -34,7 +34,7 @@ class Room {
         Room.#_Instances[this.id] = this;
         Room.#_Count++;
         if (public_) Room.#_Publics[this.id] = this; // 공개방 딕셔너리 (리스트로 할시 장단점있음)
-
+        
         this.public = public_; // 공개방인가? 공개방은 퀵매칭 포함됨.
         this.password = password; // 방 비밀번호
         this.playing = false; // 게임중인가? 게임중인방은 퀵매칭에서 제외됨.
