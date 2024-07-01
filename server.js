@@ -320,7 +320,7 @@ io.on('connection', (socket) => {
             return;
         }
         callback({'status': 200});
-        io.to(player.room.id).emit('player readied', player.number, player.ready);
+        io.to(player.room.id).emit('player ready changed', player.number, player.ready);
     })
 
 
