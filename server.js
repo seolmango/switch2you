@@ -47,7 +47,7 @@ function getRoomInfo(rooms) {
 
 function getRigidBodyInfos(rigidBodys) {
     const infoFilter = (rigidBody) => {
-        let info = {'type': rigidBody.shape.type, 'x': rigidBody.pos.x, 'y': rigidBody.pos.y, 'angle': rigidBody.angle};
+        let info = {'name': rigidBody.name, 'type': rigidBody.shape.type, 'x': rigidBody.pos.x, 'y': rigidBody.pos.y, 'angle': rigidBody.angle};
         if (rigidBody.shape.type === 'Circle')
             info['radius'] = rigidBody.shape.radius;
         else if (rigidBody.shape.type === 'Convex')

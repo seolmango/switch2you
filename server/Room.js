@@ -1,4 +1,4 @@
-const MapFactory = require('./MapFactory');
+const MapDirector = require('./MapDirector');
 
 class Room {
     static MaxCount = 0;
@@ -24,7 +24,7 @@ class Room {
         return Room.#_Playings;
     }
 
-    mapFactory = new MapFactory();
+    mapDirector = new MapDirector();
     map;
 
     constructor(owner, roomName = false, public_ = true, password = false) {
@@ -92,7 +92,7 @@ class Room {
 
         Room.#_Playings[this.id] = this;
         this.playing = true;
-        this.map = mapFactory(this.mapName);
+        this.map = mapDirector(this.mapName, this.players.length);
     }
 
     endGame() {
