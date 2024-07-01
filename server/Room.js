@@ -6,7 +6,7 @@ class Room {
     static #_Instances = {}; // 방들
     static #_Publics = {}; // 공개 방들
     static #_Playings = {}; // 게임중인 방들
-    #_id; #_mapName;
+    #_id; #_mapIndex; #_mapName;
 
     static get Count() {
         return Room.#_Count;
@@ -34,7 +34,7 @@ class Room {
         Room.#_Instances[this.id] = this;
         Room.#_Count++;
         if (public_) Room.#_Publics[this.id] = this; // 공개방 딕셔너리 (리스트로 할시 장단점있음)
-        
+
         this.public = public_; // 공개방인가? 공개방은 퀵매칭 포함됨.
         this.password = password; // 방 비밀번호
         this.playing = false; // 게임중인가? 게임중인방은 퀵매칭에서 제외됨.
@@ -43,7 +43,7 @@ class Room {
         if (roomName) this.name = roomName; // 방 이름
         else this.name = owner.name + '\'s Room';
         this.numbers = [0, 0, 0, 0, 0, 0, 0, 0]; // 번호 안 썼는지 여부들. 0이면 안썼고, 0이 아니면 썼음. 0이 아닌 숫자는 그 번호에 해당하는 player의 id.
-        this.mapIndex = 0; // 방에서 플레이할 월드 번호
+        this.#_mapIndex = 0; // 방에서 플레이할 월드 번호
         this.#_mapName = 'park'; // 방에서 플레이할 월드 이름
         owner.joinRoom(this, password);
         owner.role = 'owner';
@@ -51,6 +51,10 @@ class Room {
 
     get id() {
         return this.#_id;
+    }
+
+    get mapIndex() {
+        return this.#_mapIndex;
     }
 
     get mapName() {
@@ -70,7 +74,7 @@ class Room {
         let mapName = this.mapFactory.mapNames[mapIndex];
         if (mapName === undefined) return 'wrong map';
 
-        this.mapIndex = mapIndex;
+        this.#_mapIndex = mapIndex;
         this.#_mapName = mapName;
     }
 
