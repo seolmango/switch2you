@@ -20,15 +20,30 @@ class MapBuilder {
         }
     }
 
-    setMagneticField() {
-
+    setMagneticField(width, height, minWidth, minHeight, speed) {
+        // 자기장은 rigidBody가 아닌 world 차원에서 따로 계산해줘야 할듯. 시간&맵크기 이용해서
+        // 닿는 블록 모두 파괴 & 플레이어만 밀려나기
+        // 여기서 플레이어는 모두 원이니, 복잡한 계산과정이 없어도 됨.
+        // 즉 world 차원에 가능한 작업
+        // 1. 자기장 정보 2. 자기장 업데이트 3. 플레이어와만 계산
+        // 이걸 어디서 어떻게 하지?
+        this.map.magneticField = {
+            maxWidth: width,
+            maxHeight: height,
+            width: width,
+            height: height,
+            minWidth: minWidth,
+            minHeight: minHeight,
+            speed: speed
+        }
     }
 
-    setWall() {
-
+    // 너무 당연한 작업을 builder가 전가받아서 수행하게 됨. 너무 비효율적인것 같음.
+    addWall() {
+        this.map.rigidBodies.push(new RigidBody())
     }
 
-    setObject() {
+    addObject() {
 
     }
 
