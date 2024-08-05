@@ -356,11 +356,46 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         },
         clickable: 5 * Screen.Settings.Display.fps
     })
+    waitingRoomScreen.checkUIList.push({
+        tag: 'waiting-room-screen-map-change',
+        center_x: 920,
+        center_y: 990,
+        width: 80,
+        height: 80,
+        clicked: function () {
+            if(waitingRoomScreen.active_slot === 0 && waitingRoomScreen.Client_owner){
+                if (waitingRoomScreen.checkUIList[20].clickable > 0) {
+                    Screen.alert.add_Data('cooldown', 'Please wait for cooldown', 5);
+                }else{
+                    Screen.socket.emit('change room map', waitingRoomScreen.gameroomInfo.mapIndex+1, (callback) => {
+                        if(callback.status === 200){
+                            waitingRoomScreen.checkUIList[20].clickable = 2 * Screen.Settings.Display.fps;
+                        }else{
+                            if(callback.message === 'wrong map'){
+                                Screen.socket.emit('change room map', 0, (callback) => {
+                                    if(callback.status === 200){
+                                        waitingRoomScreen.checkUIList[20].clickable = 2 * Screen.Settings.Display.fps;
+                                    }else{
+                                        Screen.alert.add_Data('server error', 'Something went wrong', 5);
+                                    }
+                                })
+                            }else{
+                                Screen.alert.add_Data('server error', 'Something went wrong', 5);
+                            }
+                        }
+                    })
+                }
+            }
+        },
+        clickable: 2 * Screen.Settings.Display.fps
+    })
+    console.log(waitingRoomScreen.gameroomInfo);
     waitingRoomScreen.redrawBackground(Background_ctx);
 }
 
 waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
     UI_ctx.clearRect(0, 0, 1920, 1080);
+    // 뒤로 가기 버튼
     if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 180, 72, 240, 96)) {
         drawRoundBox(UI_ctx, 180, 72, 240 * 1.05, 96 * 1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10 * 1.05, 25 * 1.05);
         drawText(UI_ctx, 180, 72, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Back", "center", "GmarketSansMedium");
@@ -368,6 +403,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         drawRoundBox(UI_ctx, 180, 72, 240, 96, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
         drawText(UI_ctx, 180, 72, 60, 0, Color_list.text_default_hex, undefined, undefined, "Back", "center", "GmarketSansMedium");
     }
+    // 방 ID 복사 버튼
     if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1740, 72, 300, 96)) {
         drawRoundBox(UI_ctx, 1740, 72, 300 * 1.05, 96 * 1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10 * 1.05, 25 * 1.05);
         drawText(UI_ctx, 1740, 72, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Copy ID", "center", "GmarketSansMedium");
@@ -375,6 +411,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         drawRoundBox(UI_ctx, 1740, 72, 300, 96, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
         drawText(UI_ctx, 1740, 72, 60, 0, Color_list.text_default_hex, undefined, undefined, "Copy ID", "center", "GmarketSansMedium");
     }
+    // 플레이어 슬롯 그리기
     for(let i = 0; i < waitingRoomScreen.playerInfos.length; i++){
         let index = waitingRoomScreen.playerInfos[i].number;
         let center_x = ((index > 4) ? index - 4 : index) * 400 - 40;
@@ -407,6 +444,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             }
         }
     }
+    // 빈 슬롯 그리기
     for(let i = 1; i < 9; i++){
         let center_x = ((i > 4) ? i - 4 : i) * 400 - 40;
         let center_y = (i > 4) ? 710 : 330;
@@ -420,7 +458,9 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             }
         }
     }
+    // UI 그리기
     if(waitingRoomScreen.Client_owner){
+        //방장 일때(게임 시작, 권한 넘기기, 킥, 자리 바꾸기, 맵 변경)
         if(waitingRoomScreen.active_slot === 0){
             if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120)) {
                 drawRoundBox(UI_ctx, 1440, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
@@ -428,6 +468,14 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             }else{
                 drawRoundBox(UI_ctx, 1440, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
                 drawText(UI_ctx, 1440, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Start Game", "center", "GmarketSansMedium");
+            }
+            drawText(UI_ctx, 185, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, `Map > ${waitingRoomScreen.gameroomInfo.mapName}`, "left", "GmarketSansMedium");
+            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 920, 990, 80, 80)) {
+                drawRoundBox(UI_ctx, 920, 990, 80 * 1.05, 80 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
+                drawText(UI_ctx, 920, 990, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
+            }else{
+                drawRoundBox(UI_ctx, 920, 990, 80, 80, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+                drawText(UI_ctx, 920, 990, 40, 0, Color_list.text_default_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
             }
         }else if(waitingRoomScreen.user_slot[waitingRoomScreen.active_slot] && waitingRoomScreen.active_slot !== waitingRoomScreen.Client_room_id){
             if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 480, 990, 720, 120)) {
@@ -459,6 +507,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             }
         }
     }else{
+        //방장이 아닐때(레디 버튼, 자리 바꾸기, 맵 표시)
         if(waitingRoomScreen.active_slot === 0){
             if(waitingRoomScreen.client_player.ready){
                 if(waitingRoomScreen.checkUIList[19].clickable > 0){
@@ -487,6 +536,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
                     }
                 }
             }
+            drawText(UI_ctx, 185, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, `Map > ${waitingRoomScreen.gameroomInfo.mapName}`, "left", "GmarketSansMedium");
         }else if(waitingRoomScreen.active_slot !== waitingRoomScreen.Client_room_id){
             if(waitingRoomScreen.checkUIList[12].clickable > 0) {
                 drawRoundBox(UI_ctx, 960, 990, 720, 120, blue_1, blue_2, 10, 25);
@@ -502,6 +552,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             }
         }
     }
+    // 스킬 셋 변경 UI
     if(waitingRoomScreen.active_slot === waitingRoomScreen.Client_room_id){
         drawText(UI_ctx, 185, 990, 60, 0, (waitingRoomScreen.temp_player_skill !== waitingRoomScreen.client_player.skill) ? Color_list.button_blue_2_hex : Color_list.text_default_hex, undefined, undefined, `Skill > ${waitingRoomScreen.temp_player_skill}`, "left", "GmarketSansMedium");
         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1100, 990, 120, 120)){
@@ -552,6 +603,9 @@ waitingRoomScreen.check = function (userMouse, userKeyboard, checkUIList){
     }
     if(waitingRoomScreen.checkUIList[12].clickable > 0){
         waitingRoomScreen.checkUIList[12].clickable -= 1;
+    }
+    if(waitingRoomScreen.checkUIList[20].clickable > 0){
+        waitingRoomScreen.checkUIList[20].clickable -= 1;
     }
 }
 

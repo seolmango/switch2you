@@ -287,6 +287,13 @@ window.addEventListener("doSocketConnect", function () {
             })
         }
     })
+
+    Screen.socket.on('room map changed', function (mapIndex, mapName) {
+        if(Screen.join_room){
+            waitingRoomScreen.gameroomInfo.mapIndex = mapIndex;
+            waitingRoomScreen.gameroomInfo.mapName = mapName;
+        }
+    })
 });
 
 // functions
