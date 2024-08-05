@@ -1,4 +1,4 @@
-const { Vector2 } = require('./Physcis/Vector2.js');
+const { Vector2 } = require('./Physics/Vector2.js');
 const MapBuilder = require('./MapBuilder.js');
 
 
