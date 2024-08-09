@@ -216,6 +216,9 @@ window.addEventListener("doSocketConnect", function () {
                 waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
             }
             Screen.alert.add_Data("player joined", `${data.name} joined!`, 5);
+            if(waitingRoomScreen.Client_owner){
+                waitingRoomScreen.checkUIList[13].clickable = 2 * Screen.Settings.Display.fps;
+            }
         }
     })
 
@@ -235,6 +238,9 @@ window.addEventListener("doSocketConnect", function () {
                 for(let i = 0; i < waitingRoomScreen.playerInfos.length; i++) {
                     waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
                 }
+            }
+            if(waitingRoomScreen.Client_owner){
+                waitingRoomScreen.checkUIList[13].clickable = 2 * Screen.Settings.Display.fps;
             }
         }
     })
