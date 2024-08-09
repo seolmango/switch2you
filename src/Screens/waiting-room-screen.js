@@ -470,12 +470,17 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
                 drawText(UI_ctx, 1440, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Start Game", "center", "GmarketSansMedium");
             }
             drawText(UI_ctx, 185, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, `Map > ${waitingRoomScreen.gameroomInfo.mapName}`, "left", "GmarketSansMedium");
-            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 920, 990, 80, 80)) {
-                drawRoundBox(UI_ctx, 920, 990, 80 * 1.05, 80 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
-                drawText(UI_ctx, 920, 990, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
+            if(waitingRoomScreen.checkUIList[20].clickable === 0) {
+                if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 920, 990, 80, 80)) {
+                    drawRoundBox(UI_ctx, 920, 990, 80 * 1.05, 80 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
+                    drawText(UI_ctx, 920, 990, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
+                } else {
+                    drawRoundBox(UI_ctx, 920, 990, 80, 80, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+                    drawText(UI_ctx, 920, 990, 40, 0, Color_list.text_default_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
+                }
             }else{
-                drawRoundBox(UI_ctx, 920, 990, 80, 80, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
-                drawText(UI_ctx, 920, 990, 40, 0, Color_list.text_default_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
+                drawRoundBox(UI_ctx, 920, 990, 80, 80, blue_1, blue_2, 10, 25);
+                drawText(UI_ctx, 920, 990, 40, 0, blue_text, undefined, undefined, ">", "center", "GmarketSansMedium");
             }
         }else if(waitingRoomScreen.user_slot[waitingRoomScreen.active_slot] && waitingRoomScreen.active_slot !== waitingRoomScreen.Client_room_id){
             if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 480, 990, 720, 120)) {

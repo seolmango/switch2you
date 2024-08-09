@@ -292,6 +292,7 @@ window.addEventListener("doSocketConnect", function () {
         if(Screen.join_room){
             waitingRoomScreen.gameroomInfo.mapIndex = mapIndex;
             waitingRoomScreen.gameroomInfo.mapName = mapName;
+            Screen.alert.add_Data("map changed", `Map changed to ${mapName}!`, 5);
         }
     })
 });
