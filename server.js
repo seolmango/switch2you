@@ -326,7 +326,7 @@ io.on('connection', (socket) => {
 
     // 방에서 플레이할 월드 변경
     socket.on('change room map', (mapIndex, callback) => {
-        if (!checkData([roomIndex, 'int'], [callback, 'function'])) {
+        if (!checkData([mapIndex, 'int'], [callback, 'function'])) {
             if (typeof callback === 'function') callback({'status': 400, 'message': 'wrong data'});
             return;
         }

@@ -3,7 +3,8 @@ const MapBuilder = require('./MapBuilder.js');
 
 
 class MapDirector {
-    mapNames = ['park'];
+    // 맵 변경 테스트를 위해서 이름만 추가해둠
+    mapNames = ['park', 'street'];
     mapBuilder = new MapBuilder();
 
     create(mapName, playerCount) {
