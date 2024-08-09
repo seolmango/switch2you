@@ -33,7 +33,9 @@ Screen.userMouse = {
     press: false,
 };
 
-Screen.userKeyboard = new Array(100).fill(false);
+// [w, s, a, d, up, down, left, right, space, shift, 1, 2, 3, 4, 5, 6, 7, 8, !, @, #, $, %, ^, &, *]
+Screen.userKeyMap = ['w', 's', 'a', 'd', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Shift', '1', '2', '3', '4', '5', '6', '7', '8', '!', '@', '#', '$', '%', '^', '&', '*'];
+Screen.userKeyboard = Array(26).fill(false);
 /**
  * scale of the window size compared to the original size (1920, 1080)
  * @type {number}
@@ -130,6 +132,13 @@ window.onload = function () {
         Screen.alert.draw();
         Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
         Screen.userMouse.click = false;
+        let nowkey = [];
+        for(let i=0; i<Screen.userKeyboard.length; i++){
+            if(Screen.userKeyboard[i]){
+                nowkey.push(Screen.userKeyMap[i]);
+            }
+        }
+        console.log(nowkey);
     }, (1000 / Screen.Settings.Display.fps));
     if(Screen.mobile){
         Screen.alert.add_Data("mobile", `The screen automatically fits!`, 5);
@@ -185,6 +194,18 @@ UI_canvas.addEventListener('touchmove', function(e) {
 UI_canvas.addEventListener('touchend', function(e) {
     Screen.userMouse.press = false;
 })
+
+window.addEventListener('keydown', function(e) {
+    if (Screen.userKeyMap.includes(e.key)) {
+        Screen.userKeyboard[Screen.userKeyMap.indexOf(e.key)] = true;
+    }
+});
+
+window.addEventListener('keyup', function(e) {
+    if (Screen.userKeyMap.includes(e.key)) {
+        Screen.userKeyboard[Screen.userKeyMap.indexOf(e.key)] = false;
+    }
+});
 
 // Socket Event Listeners
 window.addEventListener("doSocketConnect", function () {
