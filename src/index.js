@@ -132,13 +132,6 @@ window.onload = function () {
         Screen.alert.draw();
         Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
         Screen.userMouse.click = false;
-        let nowkey = [];
-        for(let i=0; i<Screen.userKeyboard.length; i++){
-            if(Screen.userKeyboard[i]){
-                nowkey.push(Screen.userKeyMap[i]);
-            }
-        }
-        console.log(nowkey);
     }, (1000 / Screen.Settings.Display.fps));
     if(Screen.mobile){
         Screen.alert.add_Data("mobile", `The screen automatically fits!`, 5);

@@ -1,8 +1,5 @@
-import {drawText} from "../Screens/tools/drawText";
 import {drawCircle} from "../Screens/tools/drawCircle";
-import {drawRoundBox} from "../Screens/tools/drawRoundBox";
 import {Color_list} from "../data/color_list";
-import {drawBox} from "../Screens/tools/drawBox";
 import {checkTouch} from "../Screens/tools/checkTouch";
 import {drawLine} from "../Screens/tools/drawLine";
 
@@ -30,6 +27,8 @@ class JoystickController {
         this.joyStickctx = this.joyStickCanvas.getContext("2d");
         this.touchPoint = [];
         this.click_point = [];
+        this.move_direction = 0;
+        this.switch_direction = 0;
         this.joyStickCanvas.addEventListener("touchstart", function (e) {
             e.preventDefault();
             this.touchPoint = [];
@@ -142,7 +141,6 @@ class JoystickController {
             this.switch_direction = 0;
         }
         if(this.switch_direction !== 0){
-            console.log(this.switch_direction);
             let switch_angle = Math.atan2((this.joyStickCanvas.height - switch_size * 0.6) - switch_touch_point[1], switch_touch_point[0] - (this.joyStickCanvas.width - switch_size * 0.6));
             let switch_distance = Math.min(switch_size * 0.5, Math.sqrt(Math.pow(switch_touch_point[0] - (this.joyStickCanvas.width - switch_size * 0.6), 2) + Math.pow(switch_touch_point[1] - (this.joyStickCanvas.height - switch_size * 0.6), 2)));
             for(let i=0; i<8; i++){
