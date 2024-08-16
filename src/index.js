@@ -12,6 +12,9 @@ import {waitingRoomScreen} from "./Screens/waiting-room-screen";
 import {viewServerListScreen} from "./Screens/view-server-list-screen";
 import {JoystickController} from "./joystick/joystick";
 import {checkMobile} from "./Screens/tools/checkMobile";
+import {settingScreen} from "./Screens/setting-screen";
+import {howToPlayScreen} from "./Screens/how-to-play-screen";
+import {creditScreen} from "./Screens/credit-screen";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -205,15 +208,36 @@ window.addEventListener("doSocketConnect", function () {
     Screen.socket = io();
 
     Screen.socket.on('connected', function () {
-        Screen.currentScreen = titleScreen;
-        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         Screen.socket.emit('set player info', (Screen.mobile) ? 'phone' : 'computer', (callback) => {
             if(callback.status === 200){
-
+                Screen.alert.add_Data('connected', 'Connected to server!', 5);
             }else{
                 Screen.alert.add_Data('error', 'error', 5);
             }
         })
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('page')){
+            const page = urlParams.get('page');
+            if(page === 'setting'){
+                Screen.currentScreen = settingScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page === 'howToPlay'){
+                Screen.currentScreen = howToPlayScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page === 'credit'){
+                Screen.currentScreen = creditScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page === 'serverList'){
+                Screen.currentScreen = viewServerListScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+        }else{
+            Screen.currentScreen = titleScreen;
+            Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+        }
     });
 
     Screen.socket.on('server full', function () {

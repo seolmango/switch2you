@@ -7,6 +7,12 @@ import {checkTouch} from "./tools/checkTouch";
 import {drawRangeSlider} from "./tools/drawRangeSlider";
 
 settingScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
+    if(typeof(history.pushState) != 'undefined'){
+        let url = new URL(window.location.href);
+        let urlParams = url.searchParams;
+        urlParams.set('page', 'setting');
+        history.pushState(null, null, url);
+    }
     settingScreen.redrawBackground(Background_ctx);
     UI_ctx.clearRect(0, 0, 1920, 1080);
     settingScreen.checkUIList = [];
