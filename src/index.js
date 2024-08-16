@@ -15,6 +15,7 @@ import {checkMobile} from "./Screens/tools/checkMobile";
 import {settingScreen} from "./Screens/setting-screen";
 import {howToPlayScreen} from "./Screens/how-to-play-screen";
 import {creditScreen} from "./Screens/credit-screen";
+import {joinRoomWithIdScreen} from "./Screens/join-room-with-id-screen";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -232,6 +233,10 @@ window.addEventListener("doSocketConnect", function () {
             }
             if(page === 'serverList'){
                 Screen.currentScreen = viewServerListScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page.length === 12 && page.startsWith('room')){
+                Screen.currentScreen = joinRoomWithIdScreen;
                 Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
             }
         }else{

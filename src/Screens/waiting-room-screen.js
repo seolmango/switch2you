@@ -16,6 +16,12 @@ let red_text = `rgba(${Color_list.text_default_rgb[0]}, ${Color_list.text_defaul
 waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     Screen.join_room = true;
     waitingRoomScreen.gameroomInfo = Screen.gameroomInfo;
+    if(typeof(history.pushState) != 'undefined'){
+        let url = new URL(window.location.href);
+        let urlParams = url.searchParams;
+        urlParams.set('page', `room${Screen.gameroomInfo.id}`);
+        history.pushState(null, null, url);
+    }
     waitingRoomScreen.playerInfos = Screen.playerInfos;
     waitingRoomScreen.Client_room_id = Screen.Client_room_id;
     waitingRoomScreen.temp_player_skill = Screen.playerInfos[waitingRoomScreen.Client_room_id-1].skill;
