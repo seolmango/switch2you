@@ -1,9 +1,10 @@
-const { Vector2 } = require('./Physcis/Vector2.js');
+const { Vector2 } = require('./Physics/Vector2.js');
 const MapBuilder = require('./MapBuilder.js');
 
 
 class MapDirector {
-    mapNames = ['park'];
+    // 맵 변경 테스트를 위해서 이름만 추가해둠
+    mapNames = ['park', 'street'];
     mapBuilder = new MapBuilder();
 
     create(mapName, playerCount) {

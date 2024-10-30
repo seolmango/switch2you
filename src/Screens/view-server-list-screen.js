@@ -49,6 +49,12 @@ function get_room_data (socket, index) {
 }
 
 viewServerListScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
+    if(typeof(history.pushState) != 'undefined'){
+        let url = new URL(window.location.href);
+        let urlParams = url.searchParams;
+        urlParams.set('page', 'serverList');
+        history.pushState(null, null, url);
+    }
     viewServerListScreen.redrawBackground(Background_ctx);
     UI_ctx.clearRect(0,0,1920,1080);
     viewServerListScreen.checkUIList = [];

@@ -12,6 +12,10 @@ import {waitingRoomScreen} from "./Screens/waiting-room-screen";
 import {viewServerListScreen} from "./Screens/view-server-list-screen";
 import {JoystickController} from "./joystick/joystick";
 import {checkMobile} from "./Screens/tools/checkMobile";
+import {settingScreen} from "./Screens/setting-screen";
+import {howToPlayScreen} from "./Screens/how-to-play-screen";
+import {creditScreen} from "./Screens/credit-screen";
+import {joinRoomWithIdScreen} from "./Screens/join-room-with-id-screen";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -33,7 +37,9 @@ Screen.userMouse = {
     press: false,
 };
 
-Screen.userKeyboard = new Array(100).fill(false);
+// [w, s, a, d, up, down, left, right, space, shift, 1, 2, 3, 4, 5, 6, 7, 8, !, @, #, $, %, ^, &, *]
+Screen.userKeyMap = ['w', 's', 'a', 'd', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Shift', '1', '2', '3', '4', '5', '6', '7', '8', '!', '@', '#', '$', '%', '^', '&', '*'];
+Screen.userKeyboard = Array(26).fill(false);
 /**
  * scale of the window size compared to the original size (1920, 1080)
  * @type {number}
@@ -186,20 +192,57 @@ UI_canvas.addEventListener('touchend', function(e) {
     Screen.userMouse.press = false;
 })
 
+window.addEventListener('keydown', function(e) {
+    if (Screen.userKeyMap.includes(e.key)) {
+        Screen.userKeyboard[Screen.userKeyMap.indexOf(e.key)] = true;
+    }
+});
+
+window.addEventListener('keyup', function(e) {
+    if (Screen.userKeyMap.includes(e.key)) {
+        Screen.userKeyboard[Screen.userKeyMap.indexOf(e.key)] = false;
+    }
+});
+
 // Socket Event Listeners
 window.addEventListener("doSocketConnect", function () {
     Screen.socket = io();
 
     Screen.socket.on('connected', function () {
-        Screen.currentScreen = titleScreen;
-        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         Screen.socket.emit('set player info', (Screen.mobile) ? 'phone' : 'computer', (callback) => {
             if(callback.status === 200){
-
+                Screen.alert.add_Data('connected', 'Connected to server!', 5);
             }else{
                 Screen.alert.add_Data('error', 'error', 5);
             }
         })
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('page')){
+            const page = urlParams.get('page');
+            if(page === 'setting'){
+                Screen.currentScreen = settingScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page === 'howToPlay'){
+                Screen.currentScreen = howToPlayScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page === 'credit'){
+                Screen.currentScreen = creditScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page === 'serverList'){
+                Screen.currentScreen = viewServerListScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page.length === 12 && page.startsWith('room')){
+                Screen.currentScreen = joinRoomWithIdScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+        }else{
+            Screen.currentScreen = titleScreen;
+            Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+        }
     });
 
     Screen.socket.on('server full', function () {
@@ -216,6 +259,9 @@ window.addEventListener("doSocketConnect", function () {
                 waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
             }
             Screen.alert.add_Data("player joined", `${data.name} joined!`, 5);
+            if(waitingRoomScreen.Client_owner){
+                waitingRoomScreen.checkUIList[13].clickable = 2 * Screen.Settings.Display.fps;
+            }
         }
     })
 
@@ -235,6 +281,9 @@ window.addEventListener("doSocketConnect", function () {
                 for(let i = 0; i < waitingRoomScreen.playerInfos.length; i++) {
                     waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
                 }
+            }
+            if(waitingRoomScreen.Client_owner){
+                waitingRoomScreen.checkUIList[13].clickable = 2 * Screen.Settings.Display.fps;
             }
         }
     })
@@ -285,6 +334,14 @@ window.addEventListener("doSocketConnect", function () {
                     player.skill = skill;
                 }
             })
+        }
+    })
+
+    Screen.socket.on('room map changed', function (mapIndex, mapName) {
+        if(Screen.join_room){
+            waitingRoomScreen.gameroomInfo.mapIndex = mapIndex;
+            waitingRoomScreen.gameroomInfo.mapName = mapName;
+            Screen.alert.add_Data("map changed", `Map changed to ${mapName}!`, 5);
         }
     })
 });

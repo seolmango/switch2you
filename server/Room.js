@@ -72,7 +72,7 @@ class Room {
 
     changeMap(mapIndex) {
         if (this.playing) return 'already play game';
-        let mapName = this.mapFactory.mapNames[mapIndex];
+        let mapName = this.mapDirector.mapNames[mapIndex];
         if (mapName === undefined) return 'wrong map';
 
         this.#_mapIndex = mapIndex;
