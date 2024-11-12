@@ -1,4 +1,5 @@
 const MapObjectFactory = require('./MapObjectFactory.js');
+const { randomInt } = require('../Uilts/random.js');
 const { Vector2, Circle, OBB, RigidBody, World } = require('./Physics/index.js');
 
 // to do
@@ -17,7 +18,6 @@ class MapLoader {
     constructor() {
         this.#mapDataDir = './Maps/';
         this.#mapObjectFactory = new MapObjectFactory();
-        optimization();
     }
 
     /**
@@ -33,7 +33,6 @@ class MapLoader {
         let mapData = this.#cache[name];
 
         // 자기장
-        /**
         let mf = mapData.magneticField;
         map.magneticField = {
             maxWidth: mf.size[0],
@@ -43,16 +42,16 @@ class MapLoader {
             minWidth: mf.minSize[0],
             minHeight: mf.minSize[1],
             speed: mf.speed
-        }*/
+        }
+        map.magneticField = map.megneticField;
 
         // 플레이어 스폰
-        let pop = '01234567'
+        let pop = [0,1,2,3,4,5,6,7]
         for (let i = 0; i < playerCount; i++) {
-            pop.pop()
-            mapData.spawns[]
-            this.#mapObjectFactory.create({name: `player${i + 1}`, pos: mapData.spawns.pos[i]})
+            let index = pop.splice(randomInt(0, pop.length), 1);
+            let mapObject = this.#mapObjectFactory.create({name: 'player', pos: mapData.spawns[index]});
+            mapObject.name += `${i + 1}`;
         }
-        mapData.spawns[]
         
         // 맵 오브젝트
         for (let objData of mapData.objects) {

@@ -13,10 +13,11 @@ const { Vector2, Circle, OBB, RigidBody, World } = require('./Physics/index.js')
 class MapObjectFactory {
     create(data) { // 팩토리 메서드 (패턴)
         let mapObject;
-        if (data.name == "player") {
-            mapObject = new RigidBody(new Circle(40), new Vector2(data.pos[0], data.pos[1]), {'name':})
-        } else if (data.name == "wall") {
-            mapObject = new RigidBody(shape)
+        let pos = new Vector2(data.pos[0], data.pos[1]);
+        if (data.name == 'player') {
+            mapObject = new RigidBody(new Circle(40), pos, {name: data.name, collisionType: 'player'});
+        } else if (data.name == 'wall') {
+            mapObject = new RigidBody(new OBB(), pos, {name: data.name, collisionType: 'static'});
         }
         return mapObject;
     }
