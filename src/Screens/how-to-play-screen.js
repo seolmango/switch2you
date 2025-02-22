@@ -5,8 +5,9 @@ import {checkTouch} from "./tools/checkTouch";
 import {drawCircle} from "./tools/drawCircle";
 import {Color_list} from "../data/color_list"
 import {image} from "../data/image";
-
 import {titleScreen} from "./title-screen";
+import {clearCtx} from "./tools/clearCtx";
+import {drawImage} from "./tools/drawImage";
 
 let red_1 = `rgba(${Color_list.button_red_1_rgb[0]}, ${Color_list.button_red_1_rgb[1]}, ${Color_list.button_red_1_rgb[2]}, 0.5)`;
 let red_2 = `rgba(${Color_list.button_red_2_rgb[0]}, ${Color_list.button_red_2_rgb[1]}, ${Color_list.button_red_2_rgb[2]}, 0.5)`;
@@ -44,7 +45,7 @@ howToPlayScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         history.pushState(null, null, url);
     }
     howToPlayScreen.redrawBackground(Background_ctx);
-    UI_ctx.clearRect(0,0,1920,1080);
+    clearCtx(UI_ctx);
     howToPlayScreen.checkUIList = [];
     howToPlayScreen.checkUIList.push({
         tag: 'how-to-play-screen-back',
@@ -98,8 +99,8 @@ howToPlayScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
 };
 
 howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
-    UI_ctx.clearRect(0,0,1920,1080);
-    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 180, 72, 240, 96)){
+    clearCtx(UI_ctx);
+    if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 180, 72, 240, 96, UI_ctx.displayDPI)){
         drawRoundBox(UI_ctx, 180,72, 240*1.05, 96*1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10*1.05, 25*1.05);
         drawText(UI_ctx, 180,72, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Back", "center", "GmarketSansMedium");
     }else{
@@ -111,7 +112,7 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
         drawRoundBox(UI_ctx, 650,990, 96, 96, red_1, red_2, 10, 25);
         drawText(UI_ctx, 650,990, 60, 0, red_text, undefined, undefined, "<", "center", "GmarketSansMedium");
     }else{
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 650, 990, 96, 96)){
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 650, 990, 96, 96, UI_ctx.displayDPI)){
             drawRoundBox(UI_ctx, 650,990, 96*1.05, 96*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
             drawText(UI_ctx, 650,990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "<", "center", "GmarketSansMedium");
         }else{
@@ -123,7 +124,7 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
         drawRoundBox(UI_ctx, 1270,990, 96, 96, red_1, red_2, 10, 25);
         drawText(UI_ctx, 1270,990, 60, 0, red_text, undefined, undefined, ">", "center", "GmarketSansMedium");
     }else{
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1270, 990, 96, 96)) {
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1270, 990, 96, 96, UI_ctx.displayDPI)) {
             drawRoundBox(UI_ctx, 1270, 990, 96 * 1.05, 96 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
             drawText(UI_ctx, 1270, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
         }else{
@@ -171,7 +172,7 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     }
     if(activate === 3){
         drawText(UI_ctx, 1510-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "3. Skill-switch", "center", "GmarketSansMedium");
-        UI_ctx.drawImage(image.skill_switch, 1510-howToPlayScreen.dragScreen_delta + 300, 80, 180, 180);
+        drawImage(UI_ctx, image.skill_switch, 1900-howToPlayScreen.dragScreen_delta, 170, 180, 180);
         drawText(UI_ctx, 1510-howToPlayScreen.dragScreen_delta - 420, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "On the verge of being tagged?\nWhen your distance from\nthe tagger is close enough, tap\nanother player's number to\nchange the tagger.", "left", "GmarketSansMedium");
         let animation_frame = Date.now() % 3000;
         if(animation_frame >= 0 && animation_frame < 1000){
@@ -201,7 +202,7 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     }
     if(activate === 4){
         drawText(UI_ctx, 2060-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "4. Skill-dash", "center", "GmarketSansMedium");
-        UI_ctx.drawImage(image.skill_dash, 2060-howToPlayScreen.dragScreen_delta + 300, 80, 180, 180);
+        drawImage(UI_ctx, image.skill_dash, 2450-howToPlayScreen.dragScreen_delta, 170, 180, 180);
         drawText(UI_ctx, 2060-howToPlayScreen.dragScreen_delta - 420, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "Is it moving too slowly? Then\npress the space bar and\nrush quickly! All other players\ncan see footsteps that\nyou made a long time ago!", "left", "GmarketSansMedium")
         let animation_frame = Date.now() % 1500;
         if(animation_frame >= 0 && animation_frame < 500) {
@@ -234,7 +235,7 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
     }
     if(activate === 5){
         drawText(UI_ctx, 2610-howToPlayScreen.dragScreen_delta, 200, 70, 0, Color_list.text_default_hex, undefined, undefined, "5. Skill-teleport", "center", "GmarketSansMedium");
-        UI_ctx.drawImage(image.skill_teleport, 2610-howToPlayScreen.dragScreen_delta + 300, 80, 180, 180);
+        drawImage(UI_ctx, image.skill_teleport, 3000-howToPlayScreen.dragScreen_delta, 170, 180, 180);
         drawText(UI_ctx, 2610-howToPlayScreen.dragScreen_delta - 410, 280, 50, 0, Color_list.text_onmouse_hex, undefined, undefined, "Is dash skill too slow? Then\ntry changing the dash skill\nto teleport. The distance is\nshort than dash, but it\ncan go over the wall.", "left", "GmarketSansMedium");
     }else{
         drawText(UI_ctx, 520, -(2610-howToPlayScreen.dragScreen_delta+((250-(500 * ((activate % 1 >= 0.5) ? 1-(activate % 1) : activate % 1))))),80, 90, Color_list.text_default_hex, undefined, undefined, "5. Skill-teleport", "center", "GmarketSansMedium");
@@ -242,21 +243,21 @@ howToPlayScreen.draw = function (Background_ctx, UI_ctx, Screen) {
 };
 
 howToPlayScreen.redrawBackground = function (Background_ctx) {
-    Background_ctx.clearRect(0, 0, 1920, 1080);
+    clearCtx(Background_ctx);
     drawText(Background_ctx, 960, 72, 80, 0, Color_list.text_default_hex, undefined, undefined, "How To Play", "center", "GmarketSansMedium");
 };
 
-howToPlayScreen.check = function (userMouse, userKeyboard, checkUIList) {
+howToPlayScreen.check = function (userMouse, userKeyboard, checkUIList, DPI) {
     if(userMouse.click === true) {
         for (let i = 0; i < checkUIList.length; i++) {
-            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height)) {
+            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height, DPI)) {
                 checkUIList[i].clicked();
             }
         }
         userMouse.click = false;
     }
     if(userMouse.press === true) {
-        if(checkTouch(userMouse.x, userMouse.y, 960, 520, 1920, 760)) {
+        if(checkTouch(userMouse.x, userMouse.y, 960, 520, 1920, 760, DPI)) {
             if(howToPlayScreen.dragScreen_start === false) {
                 howToPlayScreen.dragScreen_delta_before = howToPlayScreen.dragScreen_delta;
                 howToPlayScreen.dragScreen_start_x = userMouse.x;
