@@ -1,6 +1,6 @@
 const MapObjectFactory = require('./MapObjectFactory.js');
-const { randomInt } = require('../Uilts/random.js');
-const { Vector2, Circle, OBB, RigidBody, World } = require('./Physics/index.js');
+const { randomInt } = require('../Utils/random.js');
+const { Vector2, Circle, OBB, RigidBody, World } = require('../Physics/index.js');
 
 // to do
 // mapbuilder, director 다 없애고 factory+loader로 전환, 맵 json으로 불러오기
