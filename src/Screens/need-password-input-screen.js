@@ -57,6 +57,7 @@ needPasswordInputScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         width: 720,
         height: 120,
         clicked: function () {
+            needPasswordInputScreen.password_input.hide(Screen.activatedHtmlElement);
             Screen.currentScreen = viewServerListScreen;
             Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         },

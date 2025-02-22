@@ -1,6 +1,19 @@
 import {Color_list} from "../../data/color_list";
 
+/**
+ * Class representing a checkbox html element
+ */
 class checkboxElement {
+    /**
+     * Create a checkbox class
+     * @param {string} DOM_ID - id of the checkbox element in the HTML file
+     * @param {number} x - x coordinate of the center of the checkbox
+     * @param {number} y - y coordinate of the center of the checkbox
+     * @param {number} width - width of the checkbox
+     * @param {number} height - height of the checkbox
+     * @param {string} background - background color of the checkbox
+     * @param {function} onclick - function to be called when the checkbox is clicked
+     */
     constructor(DOM_ID, x, y, width, height, background,onclick) {
         this.DOM = document.getElementById(DOM_ID);
         this.x = x;
@@ -14,6 +27,12 @@ class checkboxElement {
         this.DOM.style.borderColor = Color_list.button_gray_3_hex;
     }
 
+    /**
+     * Resize the checkbox element
+     * @param {number} scale - scale of the window size compared to the original size {1920, 1080)
+     * @param {number} innerWidth - window.innerWidth
+     * @param {number} innerHeight - window.innerHeight
+     */
     resize(scale, innerWidth, innerHeight, DPI) {
         this.DOM.style.width = this.width * scale * DPI + 'px';
         this.DOM.style.height = this.height * scale * DPI + 'px';
@@ -22,6 +41,10 @@ class checkboxElement {
         this.DOM.style.transform = 'translate(-50%, -50%)';
     }
 
+    /**
+     * Show the checkbox element
+     * @param {Array} active_list - list of active html class
+     */
     show(active_list) {
         this.DOM.style.display = 'block';
         active_list.push(this);
@@ -29,6 +52,10 @@ class checkboxElement {
         this.DOM.addEventListener('click', this.onclick);
     }
 
+    /**
+     * Hide the checkbox element
+     * @param {Array} active_list - list of active html class
+     */
     hide(active_list) {
         this.DOM.style.display = 'none';
         active_list.splice(active_list.indexOf(this), 1);
@@ -36,14 +63,24 @@ class checkboxElement {
         this.DOM.removeEventListener('click', this.onclick);
     }
 
+    /**
+     * Get the value of the checkbox
+     * @returns {boolean} - value of the checkbox
+     */
     get_value() {
         return this.DOM.checked;
     }
 
+    /**
+     * Lock the checkbox
+     */
     lock() {
         this.DOM.disabled = true;
     }
 
+    /**
+     * Unlock the checkbox
+     */
     unlock() {
         this.DOM.disabled = false;
     }

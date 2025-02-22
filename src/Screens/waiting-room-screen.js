@@ -11,10 +11,19 @@ import {drawImage} from "./tools/drawImage";
 let blue_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let blue_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
 let blue_text = `rgba(${Color_list.text_default_rgb[0]}, ${Color_list.text_default_rgb[1]}, ${Color_list.text_default_rgb[2]}, 0.5)`;
+let red_1 = `rgba(${Color_list.button_red_1_rgb[0]}, ${Color_list.button_red_1_rgb[1]}, ${Color_list.button_red_1_rgb[2]}, 0.5)`;
+let red_2 = `rgba(${Color_list.button_red_2_rgb[0]}, ${Color_list.button_red_2_rgb[1]}, ${Color_list.button_red_2_rgb[2]}, 0.5)`;
+let red_text = `rgba(${Color_list.text_default_rgb[0]}, ${Color_list.text_default_rgb[1]}, ${Color_list.text_default_rgb[2]}, 0.5)`;
 
 waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     Screen.join_room = true;
     waitingRoomScreen.gameroomInfo = Screen.gameroomInfo;
+    if(typeof(history.pushState) != 'undefined'){
+        let url = new URL(window.location.href);
+        let urlParams = url.searchParams;
+        urlParams.set('page', `room${Screen.gameroomInfo.id}`);
+        history.pushState(null, null, url);
+    }
     waitingRoomScreen.playerInfos = Screen.playerInfos;
     waitingRoomScreen.Client_room_id = Screen.Client_room_id;
     waitingRoomScreen.temp_player_skill = Screen.playerInfos[waitingRoomScreen.Client_room_id-1].skill;
@@ -28,6 +37,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     }
     clearCtx(UI_ctx);
     waitingRoomScreen.checkUIList = [];
+    waitingRoomScreen.active_slot = 0;
     waitingRoomScreen.checkUIList.push({
         tag: 'waiting-room-screen-back',
         center_x: 180,
@@ -62,7 +72,6 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
             Screen.alert.add_Data('copied', 'Copied room ID to clipboard', 5);
         }
     });
-    waitingRoomScreen.active_slot = 0;
     waitingRoomScreen.checkUIList.push({
         tag: 'waiting-room-screen-slot-1',
         center_x: 360,
@@ -238,9 +247,24 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
         height: 120,
         clicked: function () {
             if(waitingRoomScreen.Client_owner && waitingRoomScreen.active_slot === 0){
-                console.log('start game');
+                if(waitingRoomScreen.checkUIList[13].clickable === 0){
+                    Screen.socket.emit('start game', (callback) => {
+                        if(callback.status === 200){
+                            console.log('start game success');
+                        }else{
+                            if(callback.message === 'not enough player'){
+                                Screen.alert.add_Data('not enough player', 'Need 3 or more players', 5);
+                            }else{
+                                Screen.alert.add_Data('server error', 'Something went wrong', 5);
+                            }
+                        }
+                    })
+                }else{
+                    Screen.alert.add_Data('cooldown', 'Please wait for cooldown', 5);
+                }
             }
-        }
+        },
+        clickable: 5 * Screen.Settings.Display.fps
     })
     waitingRoomScreen.checkUIList.push({
         tag: 'waiting-room-screen-skill-dash',
@@ -301,6 +325,96 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
             }
         }
     })
+    waitingRoomScreen.checkUIList.push({
+        tag: 'waiting-room-screen-ready',
+        center_x: 1440,
+        center_y: 990,
+        width: 720,
+        height: 120,
+        clicked: function () {
+            // if(waitingRoomScreen.active_slot === 0){
+            //     if(!waitingRoomScreen.client_player.ready){
+            //         if(waitingRoomScreen.checkUIList[18].clickable === 0){
+            //             waitingRoomScreen.checkUIList[18].clickable = 10 * Screen.Settings.Display.fps;
+            //             waitingRoomScreen.checkUIList[19].clickable = 10 * Screen.Settings.Display.fps;
+            //             Screen.socket.emit('change player ready', true, (callback) => {
+            //                 if(callback.status === 200){
+            //                     console.log('ready success');
+            //                 }else{
+            //                     Screen.alert.add_Data('server error', 'Something went wrong', 5);
+            //                 }
+            //             })
+            //         }else{
+            //             Screen.alert.add_Data('cooldown', 'Please wait for cooldown', 5);
+            //         }
+            //     }
+            // }
+        },
+        clickable: 5 * Screen.Settings.Display.fps
+    })
+    waitingRoomScreen.checkUIList.push({
+        tag: 'waiting-room-screen-ready-cancel',
+        center_x: 1440,
+        center_y: 990,
+        width: 720,
+        height: 120,
+        clicked: function () {
+            // if(waitingRoomScreen.active_slot === 0){
+            //     if(waitingRoomScreen.client_player.ready){
+            //         if(waitingRoomScreen.checkUIList[19].clickable === 0){
+            //             waitingRoomScreen.checkUIList[18].clickable = 10 * Screen.Settings.Display.fps;
+            //             waitingRoomScreen.checkUIList[19].clickable = 10 * Screen.Settings.Display.fps;
+            //             Screen.socket.emit('change player ready', false, (callback) => {
+            //                 if(callback.status === 200){
+            //                     console.log('cancel ready success');
+            //                 }else{
+            //                     Screen.alert.add_Data('server error', 'Something went wrong', 5);
+            //                 }
+            //             })
+            //         }else{
+            //             Screen.alert.add_Data('cooldown', 'Please wait for cooldown', 5);
+            //         }
+            //     }
+            // }
+        },
+        clickable: 5 * Screen.Settings.Display.fps
+    })
+    waitingRoomScreen.checkUIList.push({
+        tag: 'waiting-room-screen-map-change',
+        center_x: 920,
+        center_y: 990,
+        width: 80,
+        height: 80,
+        clicked: function () {
+            if(waitingRoomScreen.active_slot === 0 && waitingRoomScreen.Client_owner){
+                if (waitingRoomScreen.checkUIList[20].clickable > 0) {
+                    Screen.alert.add_Data('cooldown', 'Please wait for cooldown', 5);
+                }else{
+                    Screen.socket.emit('change room map', waitingRoomScreen.gameroomInfo.mapIndex+1, (callback) => {
+                        if(callback.status === 200){
+                            waitingRoomScreen.checkUIList[20].clickable = 2 * Screen.Settings.Display.fps;
+                            waitingRoomScreen.checkUIList[13].clickable = 5 * Screen.Settings.Display.fps;
+                        }else{
+                            if(callback.message === 'wrong map'){
+                                Screen.socket.emit('change room map', 0, (callback) => {
+                                    if(callback.status === 200){
+                                        waitingRoomScreen.checkUIList[20].clickable = 2 * Screen.Settings.Display.fps;
+                                        waitingRoomScreen.checkUIList[13].clickable = 5 * Screen.Settings.Display.fps;
+                                    }else{
+                                        Screen.alert.add_Data('server error', 'Something went wrong', 5);
+                                    }
+                                })
+                            }else{
+                                Screen.alert.add_Data('server error', 'Something went wrong', 5);
+                            }
+                        }
+                    })
+                }
+            }
+        },
+        clickable: 2 * Screen.Settings.Display.fps
+    })
+    console.log(waitingRoomScreen.gameroomInfo);
     waitingRoomScreen.redrawBackground(Background_ctx);
 }
 
@@ -320,6 +434,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         drawRoundBox(UI_ctx, 1740, 72, 300, 96, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
         drawText(UI_ctx, 1740, 72, 60, 0, Color_list.text_default_hex, undefined, undefined, "Copy ID", "center", "GmarketSansMedium");
     }
+    // 플레이어 슬롯 그리기
     for(let i = 0; i < waitingRoomScreen.playerInfos.length; i++){
         let index = waitingRoomScreen.playerInfos[i].number;
         let center_x = ((index > 4) ? index - 4 : index) * 400 - 40;
@@ -352,6 +467,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             }
         }
     }
+    // 빈 슬롯 그리기
     for(let i = 1; i < 9; i++){
         let center_x = ((i > 4) ? i - 4 : i) * 400 - 40;
         let center_y = (i > 4) ? 710 : 330;
@@ -365,14 +481,34 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             }
         }
     }
+    // UI 그리기
     if(waitingRoomScreen.Client_owner){
+        //방장 일때(게임 시작, 권한 넘기기, 킥, 자리 바꾸기, 맵 변경)
         if(waitingRoomScreen.active_slot === 0){
-            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120, UI_ctx.displayDPI)) {
-                drawRoundBox(UI_ctx, 1440, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
-                drawText(UI_ctx, 1440, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Start Game", "center", "GmarketSansMedium");
+            if(waitingRoomScreen.checkUIList[13].clickable === 0) {
+                if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120, UI_ctx.displayDPI)) {
+                    drawRoundBox(UI_ctx, 1440, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
+                    drawText(UI_ctx, 1440, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Start Game", "center", "GmarketSansMedium");
+                }else{
+                    drawRoundBox(UI_ctx, 1440, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+                    drawText(UI_ctx, 1440, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Start Game", "center", "GmarketSansMedium");
+                }
             }else{
-                drawRoundBox(UI_ctx, 1440, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
-                drawText(UI_ctx, 1440, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Start Game", "center", "GmarketSansMedium");
+                drawRoundBox(UI_ctx, 1440, 990, 720, 120, blue_1, blue_2, 10, 25);
+                drawText(UI_ctx, 1440, 990, 60, 0, blue_text, undefined, undefined, "Start Game", "center", "GmarketSansMedium");
+            }
+            drawText(UI_ctx, 185, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, `Map > ${waitingRoomScreen.gameroomInfo.mapName}`, "left", "GmarketSansMedium");
+            if(waitingRoomScreen.checkUIList[20].clickable === 0) {
+                if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 920, 990, 80, 80, UI_ctx.displayDPI)) {
+                    drawRoundBox(UI_ctx, 920, 990, 80 * 1.05, 80 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
+                    drawText(UI_ctx, 920, 990, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
+                } else {
+                    drawRoundBox(UI_ctx, 920, 990, 80, 80, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+                    drawText(UI_ctx, 920, 990, 40, 0, Color_list.text_default_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
+                }
+            }else{
+                drawRoundBox(UI_ctx, 920, 990, 80, 80, blue_1, blue_2, 10, 25);
+                drawText(UI_ctx, 920, 990, 40, 0, blue_text, undefined, undefined, ">", "center", "GmarketSansMedium");
             }
         }else if(waitingRoomScreen.user_slot[waitingRoomScreen.active_slot] && waitingRoomScreen.active_slot !== waitingRoomScreen.Client_room_id){
             if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 480, 990, 720, 120, UI_ctx.displayDPI)) {
@@ -404,8 +540,37 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             }
         }
     }else{
+        //방장이 아닐때(레디 버튼, 자리 바꾸기, 맵 표시)
         if(waitingRoomScreen.active_slot === 0){
-
+            // Ready 버튼 (삭제된 기능)
+            // if(waitingRoomScreen.client_player.ready){
+            //     if(waitingRoomScreen.checkUIList[19].clickable > 0){
+            //         drawRoundBox(UI_ctx, 1440, 990, 720, 120, red_1, red_2, 10, 25);
+            //         drawText(UI_ctx, 1440, 990, 60, 0, red_text, undefined, undefined, "Cancel", "center", "GmarketSansMedium");
+            //     }else{
+            //         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120)) {
+            //             drawRoundBox(UI_ctx, 1440, 990, 720 * 1.05, 120 * 1.05, red_1, red_2, 10 * 1.05, 25 * 1.05);
+            //             drawText(UI_ctx, 1440, 990, 60 * 1.05, 0, red_text, undefined, undefined, "Cancel", "center", "GmarketSansMedium");
+            //         } else {
+            //             drawRoundBox(UI_ctx, 1440, 990, 720, 120, red_1, red_2, 10, 25);
+            //             drawText(UI_ctx, 1440, 990, 60, 0, red_text, undefined, undefined, "Cancel", "center", "GmarketSansMedium");
+            //         }
+            //     }
+            // }else{
+            //     if(waitingRoomScreen.checkUIList[18].clickable > 0){
+            //         drawRoundBox(UI_ctx, 1440, 990, 720, 120, blue_1, blue_2, 10, 25);
+            //         drawText(UI_ctx, 1440, 990, 60, 0, blue_text, undefined, undefined, "Ready", "center", "GmarketSansMedium");
+            //     } else{
+            //         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120)){
+            //             drawRoundBox(UI_ctx, 1440, 990, 720*1.05, 120*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
+            //             drawText(UI_ctx, 1440, 990, 60*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Ready", "center", "GmarketSansMedium");
+            //         }else{
+            //             drawRoundBox(UI_ctx, 1440, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
+            //             drawText(UI_ctx, 1440, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Ready", "center", "GmarketSansMedium");
+            //         }
+            //     }
+            // }
+            drawText(UI_ctx, 185, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, `Map > ${waitingRoomScreen.gameroomInfo.mapName}`, "left", "GmarketSansMedium");
         }else if(waitingRoomScreen.active_slot !== waitingRoomScreen.Client_room_id){
             if(waitingRoomScreen.checkUIList[12].clickable > 0) {
                 drawRoundBox(UI_ctx, 960, 990, 720, 120, blue_1, blue_2, 10, 25);
@@ -421,6 +586,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             }
         }
     }
+    // 스킬 셋 변경 UI
     if(waitingRoomScreen.active_slot === waitingRoomScreen.Client_room_id){
         drawText(UI_ctx, 185, 990, 60, 0, (waitingRoomScreen.temp_player_skill !== waitingRoomScreen.client_player.skill) ? Color_list.button_blue_2_hex : Color_list.text_default_hex, undefined, undefined, `Skill > ${waitingRoomScreen.temp_player_skill}`, "left", "GmarketSansMedium");
         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1100, 990, 120, 120, UI_ctx.displayDPI)){
@@ -471,6 +637,12 @@ waitingRoomScreen.check = function (userMouse, userKeyboard, checkUIList, DPI){
     }
     if(waitingRoomScreen.checkUIList[12].clickable > 0){
         waitingRoomScreen.checkUIList[12].clickable -= 1;
+    }
+    if(waitingRoomScreen.checkUIList[20].clickable > 0){
+        waitingRoomScreen.checkUIList[20].clickable -= 1;
+    }
+    if(waitingRoomScreen.checkUIList[13].clickable > 0){
+        waitingRoomScreen.checkUIList[13].clickable -= 1;
     }
 }
 
