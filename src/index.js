@@ -113,7 +113,8 @@ Screen.Settings = {
     },
     Display: {
         fps: 60,
-    }
+    },
+    KeyBind: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd', ' ', 'Shift', 'temp', '1', '2', '3', '4', '5', '6', '7', '8', 'temp', 'temp', '!', '@', '#', '$', '%', '^', '&', '*']
 }
 
 Screen.join_room = false;
