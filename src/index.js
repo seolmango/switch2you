@@ -1,6 +1,4 @@
-// css load
 import {drawRoundBox} from "./Screens/tools/drawRoundBox";
-
 require('./main.css');
 
 // js load
@@ -14,6 +12,10 @@ import {waitingRoomScreen} from "./Screens/waiting-room-screen";
 import {viewServerListScreen} from "./Screens/view-server-list-screen";
 import {JoystickController} from "./joystick/joystick";
 import {checkMobile} from "./Screens/tools/checkMobile";
+import {settingScreen} from "./Screens/setting-screen";
+import {howToPlayScreen} from "./Screens/how-to-play-screen";
+import {creditScreen} from "./Screens/credit-screen";
+import {joinRoomWithIdScreen} from "./Screens/join-room-with-id-screen";
 
 // load html DOM elements
 const Background_canvas = document.getElementById('background');
@@ -23,19 +25,47 @@ const UI_ctx = UI_canvas.getContext('2d');
 
 // Set Data
 const Screen = {};
+
+/**
+ * information of user's mouse
+ * @type {{x: number, y: number, press: boolean, click: boolean}}
+ */
 Screen.userMouse = {
     x: 0,
     y: 0,
     click: false,
     press: false,
 };
-Screen.userKeyboard = new Array(100).fill(false);
+
+// [w, s, a, d, up, down, left, right, space, shift, 1, 2, 3, 4, 5, 6, 7, 8, !, @, #, $, %, ^, &, *]
+Screen.userKeyMap = ['w', 's', 'a', 'd', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Shift', '1', '2', '3', '4', '5', '6', '7', '8', '!', '@', '#', '$', '%', '^', '&', '*'];
+Screen.userKeyboard = Array(26).fill(false);
+/**
+ * scale of the window size compared to the original size (1920, 1080)
+ * @type {number}
+ */
 Screen.scale = 1;
+
 Screen.currentScreen = {};
 Screen.currentScreen.draw = function () {};
 Screen.currentScreen.checkUIList = [];
+
+/**
+ * the gap between the client's screen and canvas width
+ * @type {number}
+ */
 Screen.X0real = 0;
+
+/**
+ * the gap between the client's screen and canvas height
+ * @type {number}
+ */
 Screen.Y0real = 0;
+
+/**
+ * the data of the alert message
+ * @type {{data: {tag: string, text: string, time: number}[], draw: function, add_Data: function}}
+ */
 Screen.alert = {};
 Screen.alert.data = [];
 Screen.alert.draw = function() {
@@ -69,7 +99,17 @@ Screen.alert.add_Data = function (tag, text, time){
         });
     }
 }
+
+/**
+ * the list of activated html elements
+ * @type {Array}
+ */
 Screen.activatedHtmlElement = [];
+
+/**
+ * the data of user setting
+ * @type {{Sound: {BGM: number}, Display: {fps: number}}}
+ */
 Screen.Settings = {
     Sound: {
         BGM: 0,
@@ -78,6 +118,7 @@ Screen.Settings = {
         fps: 60,
     }
 }
+
 Screen.join_room = false;
 Screen.joyStickCanvas = document.getElementById('joystick');
 Screen.joyStickController = new JoystickController('joystick');
@@ -93,7 +134,8 @@ window.onload = function () {
         }
         Screen.currentScreen.draw(Background_ctx, UI_ctx, Screen);
         Screen.alert.draw();
-        Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList)
+        Screen.currentScreen.check(Screen.userMouse, Screen.userKeyboard, Screen.currentScreen.checkUIList);
+        Screen.userMouse.click = false;
     }, (1000 / Screen.Settings.Display.fps));
     if(Screen.mobile){
         Screen.alert.add_Data("mobile", `The screen automatically fits!`, 5);
@@ -150,20 +192,57 @@ UI_canvas.addEventListener('touchend', function(e) {
     Screen.userMouse.press = false;
 })
 
+window.addEventListener('keydown', function(e) {
+    if (Screen.userKeyMap.includes(e.key)) {
+        Screen.userKeyboard[Screen.userKeyMap.indexOf(e.key)] = true;
+    }
+});
+
+window.addEventListener('keyup', function(e) {
+    if (Screen.userKeyMap.includes(e.key)) {
+        Screen.userKeyboard[Screen.userKeyMap.indexOf(e.key)] = false;
+    }
+});
+
 // Socket Event Listeners
 window.addEventListener("doSocketConnect", function () {
     Screen.socket = io();
 
     Screen.socket.on('connected', function () {
-        Screen.currentScreen = titleScreen;
-        Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
         Screen.socket.emit('set player info', (Screen.mobile) ? 'phone' : 'computer', (callback) => {
             if(callback.status === 200){
-
+                Screen.alert.add_Data('connected', 'Connected to server!', 5);
             }else{
                 Screen.alert.add_Data('error', 'error', 5);
             }
         })
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('page')){
+            const page = urlParams.get('page');
+            if(page === 'setting'){
+                Screen.currentScreen = settingScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page === 'howToPlay'){
+                Screen.currentScreen = howToPlayScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page === 'credit'){
+                Screen.currentScreen = creditScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page === 'serverList'){
+                Screen.currentScreen = viewServerListScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+            if(page.length === 12 && page.startsWith('room')){
+                Screen.currentScreen = joinRoomWithIdScreen;
+                Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+            }
+        }else{
+            Screen.currentScreen = titleScreen;
+            Screen.currentScreen.initialize(Background_ctx, UI_ctx, Screen);
+        }
     });
 
     Screen.socket.on('server full', function () {
@@ -180,6 +259,9 @@ window.addEventListener("doSocketConnect", function () {
                 waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
             }
             Screen.alert.add_Data("player joined", `${data.name} joined!`, 5);
+            if(waitingRoomScreen.Client_owner){
+                waitingRoomScreen.checkUIList[13].clickable = 2 * Screen.Settings.Display.fps;
+            }
         }
     })
 
@@ -200,6 +282,9 @@ window.addEventListener("doSocketConnect", function () {
                     waitingRoomScreen.user_slot[waitingRoomScreen.playerInfos[i].number] = true;
                 }
             }
+            if(waitingRoomScreen.Client_owner){
+                waitingRoomScreen.checkUIList[13].clickable = 2 * Screen.Settings.Display.fps;
+            }
         }
     })
 
@@ -212,11 +297,7 @@ window.addEventListener("doSocketConnect", function () {
                     player.role = 'user';
                 }
                 if(player.number === waitingRoomScreen.Client_room_id){
-                    if(player.role === 'owner'){
-                        waitingRoomScreen.Client_owner = true;
-                    }else{
-                        waitingRoomScreen.Client_owner = false;
-                    }
+                    waitingRoomScreen.Client_owner = player.role === 'owner';
                 }
             })
         }
@@ -253,6 +334,14 @@ window.addEventListener("doSocketConnect", function () {
                     player.skill = skill;
                 }
             })
+        }
+    })
+
+    Screen.socket.on('room map changed', function (mapIndex, mapName) {
+        if(Screen.join_room){
+            waitingRoomScreen.gameroomInfo.mapIndex = mapIndex;
+            waitingRoomScreen.gameroomInfo.mapName = mapName;
+            Screen.alert.add_Data("map changed", `Map changed to ${mapName}!`, 5);
         }
     })
 });

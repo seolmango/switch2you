@@ -1,3 +1,13 @@
+/**
+ * Draw a circle on the canvas
+ * @param {CanvasRenderingContext2D} ctx - canvas context object to draw on
+ * @param {number} x - x coordinate of the center of the circle
+ * @param {number} y - y coordinate of the center of the circle
+ * @param {number} radius - radius of the circle
+ * @param {string | null | undefined} fillColor - inside color of the circle
+ * @param {string | null | undefined} strokeColor - color of the stroke
+ * @param {number | null | undefined} strokeWidth - width of the stroke
+ */
 const drawCircle = function (ctx, x, y, radius, fillColor, strokeColor, strokeWidth) {
     ctx.save();
     ctx.beginPath();

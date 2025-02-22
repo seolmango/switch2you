@@ -10,6 +10,14 @@ import {howToPlayScreen} from "./how-to-play-screen";
 import {settingScreen} from "./setting-screen";
 
 titleScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
+    if(typeof(history.pushState) != 'undefined'){
+        let url = new URL(window.location.href);
+        let urlParams = url.searchParams;
+        if(urlParams.has('page')){
+            urlParams.delete('page');
+        }
+        history.pushState(null, null, url);
+    }
     titleScreen.redrawBackground(Background_ctx);
     UI_ctx.clearRect(0,0,1920,1080);
     titleScreen.checkUIList = [];

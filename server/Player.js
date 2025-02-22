@@ -135,6 +135,15 @@ class Player {
         this.ready = ready;
     }
 
+    // 방에서 플레이 할 월드 변경
+    changeRoomMap(mapIndex) {
+        if (!this.room) return 'must join room';
+        if (this.role !== 'owner') return 'no permission';
+
+        const result = this.room.changeMap(mapIndex);
+        if (result) return result;
+    }
+
     // 게임 시작
     startGame() {
         if (!this.room) return 'must join room';

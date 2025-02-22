@@ -37,6 +37,12 @@ function getActivate(delta = howToPlayScreen.dragScreen_delta) {
 }
 
 howToPlayScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
+    if(typeof(history.pushState) != 'undefined'){
+        let url = new URL(window.location.href);
+        let urlParams = url.searchParams;
+        urlParams.set('page', 'howToPlay');
+        history.pushState(null, null, url);
+    }
     howToPlayScreen.redrawBackground(Background_ctx);
     UI_ctx.clearRect(0,0,1920,1080);
     howToPlayScreen.checkUIList = [];
