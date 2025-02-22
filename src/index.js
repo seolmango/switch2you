@@ -32,8 +32,7 @@ Screen.userMouse = {
 Screen.DPI = 1;
 UI_ctx.displayDPI = Screen.DPI;
 Background_ctx.displayDPI = Screen.DPI;
-// 0~7: 이동키 2개, 8: 이동기 사용키, 9: 이모티콘 사용키, 10: 임시 빈칸, 11~18: switch 키, 19~20: 임시 빈칸, 21~28: 이모지키
-Screen.userKeyboard = new Array(29).fill(false);
+Screen.userKeyboard = new Array(100).fill(false);
 Screen.scale = 1;
 Screen.currentScreen = {};
 Screen.currentScreen.draw = function () {};
@@ -80,8 +79,7 @@ Screen.Settings = {
     },
     Display: {
         fps: 60,
-    },
-    KeyBind: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd', ' ', 'Shift', 'temp', '1', '2', '3', '4', '5', '6', '7', '8', 'temp', 'temp', '!', '@', '#', '$', '%', '^', '&', '*']
+    }
 }
 Screen.join_room = false;
 Screen.joyStickCanvas = document.getElementById('joystick');
@@ -153,28 +151,6 @@ UI_canvas.addEventListener('touchmove', function(e) {
 
 UI_canvas.addEventListener('touchend', function(e) {
     Screen.userMouse.press = false;
-})
-
-window.addEventListener('keydown', function (e){
-    if(Screen.Settings.KeyBind.indexOf(e.key) !== -1){
-        Screen.userKeyboard[Screen.Settings.KeyBind.indexOf(e.key)] = true;
-    }
-})
-
-window.addEventListener('keyup', function (e){
-    if(Screen.Settings.KeyBind.indexOf(e.key) !== -1){
-        Screen.userKeyboard[Screen.Settings.KeyBind.indexOf(e.key)] = false;
-    }
-})
-
-document.addEventListener("visibilitychange", function() {
-    if (document.hidden){
-        Screen.userKeyboard = new Array(29).fill(false);
-    }
-})
-
-window.addEventListener("blur", function() {
-    Screen.userKeyboard = new Array(29).fill(false);
 })
 
 // Socket Event Listeners
