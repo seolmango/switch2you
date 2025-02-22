@@ -12,6 +12,14 @@ import {clearCtx} from "./tools/clearCtx";
 import {drawImage} from "./tools/drawImage";
 
 titleScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
+    if(typeof(history.pushState) != 'undefined'){
+        let url = new URL(window.location.href);
+        let urlParams = url.searchParams;
+        if(urlParams.has('page')){
+            urlParams.delete('page');
+        }
+        history.pushState(null, null, url);
+    }
     titleScreen.redrawBackground(Background_ctx);
     clearCtx(UI_ctx);
     titleScreen.checkUIList = [];

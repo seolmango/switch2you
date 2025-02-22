@@ -1,3 +1,5 @@
+import {settingScreen} from "./setting-screen";
+
 const joinRoomWithIdScreen = {};
 import {drawText} from "./tools/drawText";
 import {drawRoundBox} from "./tools/drawRoundBox";
@@ -110,7 +112,21 @@ joinRoomWithIdScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
     });
     joinRoomWithIdScreen.room_id_input.show(Screen.activatedHtmlElement);
     joinRoomWithIdScreen.room_id_input.resize(Screen.scale, window.innerWidth, window.innerHeight, UI_ctx.displayDPI);
-    joinRoomWithIdScreen.room_id_input.set_value('');
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.has('page')) {
+        const page = urlParams.get('page');
+        if (page.length === 12 && page.startsWith('room')) {
+            joinRoomWithIdScreen.room_id_input.set_value(page.slice(4));
+            if(typeof(history.pushState) != 'undefined'){
+                let url = new URL(window.location.href);
+                let urlParams = url.searchParams;
+                urlParams.set('page', 'serverList');
+                history.pushState(null, null, url);
+            }
+        }else{
+            joinRoomWithIdScreen.room_id_input.set_value('');
+        }
+    }
 }
 
 joinRoomWithIdScreen.draw = function (Background_ctx, UI_ctx, Screen) {

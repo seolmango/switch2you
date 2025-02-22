@@ -9,6 +9,12 @@ import {drawCircleImage} from "./tools/drawCircleImage";
 import {clearCtx} from "./tools/clearCtx";
 
 creditScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
+    if(typeof(history.pushState) != 'undefined'){
+        let url = new URL(window.location.href);
+        let urlParams = url.searchParams;
+        urlParams.set('page', 'credit');
+        history.pushState(null, null, url);
+    }
     creditScreen.redrawBackground(Background_ctx);
     clearCtx(UI_ctx);
     creditScreen.checkUIList = [];
