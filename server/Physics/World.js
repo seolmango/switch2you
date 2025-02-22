@@ -5,8 +5,13 @@ class World {
     rigidBodies = [];
 
     constructor(magneticField = null) {
-        if (magneticField)
+        if (magneticField) {
             this.magneticField = magneticField;
+            if (magneticField.maxWidth == undefined) {
+                this.magneticField.maxWidth = magneticField.width;
+                this.magneticField.maxHeight = magneticField.height;
+            }
+        }
     }
 
     update(fps, repetition) {
