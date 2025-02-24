@@ -1,4 +1,5 @@
-const MapDirector = require('./MapDirector');
+const MapLoader = require('./Map/MapLoader');
+const { randomString } = require('./Utils/random.js')
 
 
 class Room {
@@ -25,7 +26,7 @@ class Room {
         return Room.#_Playings;
     }
 
-    mapDirector = new MapDirector();
+    mapLoader = new MapLoader();
     map;
 
     constructor(owner, roomName = false, public_ = true, password = false) {
@@ -93,24 +94,13 @@ class Room {
 
         Room.#_Playings[this.id] = this;
         this.playing = true;
-        this.map = mapDirector(this.mapName, this.players.length);
+        this.map = mapLoader.load(this.mapName, this.players.length);
     }
 
     endGame() {
         delete Room.#_Playings[this.id];
         this.playing = false;
     }
-}
-
-function randomNumber(min, max) {
-    return Math.floor((Math.random()) * (max - min)) + min;
-}
-
-function randomString(length) {
-    value = ''
-    for (let i = 0; i < length; i++)
-        value += '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_'[randomNumber(0, 64)];
-    return value;
 }
 
 module.exports = Room;

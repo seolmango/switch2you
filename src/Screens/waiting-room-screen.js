@@ -5,6 +5,8 @@ import {drawRoundBox} from "./tools/drawRoundBox";
 import {checkTouch} from "./tools/checkTouch";
 import {viewServerListScreen} from "./view-server-list-screen";
 import {image} from "../data/image";
+import {clearCtx} from "./tools/clearCtx";
+import {drawImage} from "./tools/drawImage";
 
 let blue_1 = `rgba(${Color_list.button_blue_1_rgb[0]}, ${Color_list.button_blue_1_rgb[1]}, ${Color_list.button_blue_1_rgb[2]}, 0.5)`;
 let blue_2 = `rgba(${Color_list.button_blue_2_rgb[0]}, ${Color_list.button_blue_2_rgb[1]}, ${Color_list.button_blue_2_rgb[2]}, 0.5)`;
@@ -33,7 +35,7 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
             waitingRoomScreen.client_player = waitingRoomScreen.playerInfos[i];
         }
     }
-    UI_ctx.clearRect(0, 0, 1920, 1080);
+    clearCtx(UI_ctx);
     waitingRoomScreen.checkUIList = [];
     waitingRoomScreen.active_slot = 0;
     waitingRoomScreen.checkUIList.push({
@@ -417,17 +419,15 @@ waitingRoomScreen.initialize = function (Background_ctx, UI_ctx, Screen) {
 }
 
 waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
-    UI_ctx.clearRect(0, 0, 1920, 1080);
-    // 뒤로 가기 버튼
-    if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 180, 72, 240, 96)) {
+    clearCtx(UI_ctx);
+    if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 180, 72, 240, 96, UI_ctx.displayDPI)) {
         drawRoundBox(UI_ctx, 180, 72, 240 * 1.05, 96 * 1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10 * 1.05, 25 * 1.05);
         drawText(UI_ctx, 180, 72, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Back", "center", "GmarketSansMedium");
     } else {
         drawRoundBox(UI_ctx, 180, 72, 240, 96, Color_list.button_gray_1_hex, Color_list.button_gray_2_hex, 10, 25);
         drawText(UI_ctx, 180, 72, 60, 0, Color_list.text_default_hex, undefined, undefined, "Back", "center", "GmarketSansMedium");
     }
-    // 방 ID 복사 버튼
-    if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1740, 72, 300, 96)) {
+    if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1740, 72, 300, 96, UI_ctx.displayDPI)) {
         drawRoundBox(UI_ctx, 1740, 72, 300 * 1.05, 96 * 1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10 * 1.05, 25 * 1.05);
         drawText(UI_ctx, 1740, 72, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Copy ID", "center", "GmarketSansMedium");
     }else{
@@ -439,13 +439,13 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         let index = waitingRoomScreen.playerInfos[i].number;
         let center_x = ((index > 4) ? index - 4 : index) * 400 - 40;
         let center_y = (index > 4) ? 710 : 330;
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, center_x, center_y, 350, 350) && (waitingRoomScreen.Client_owner || index === waitingRoomScreen.Client_room_id)){
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, center_x, center_y, 350, 350, UI_ctx.displayDPI) && (waitingRoomScreen.Client_owner || index === waitingRoomScreen.Client_room_id)){
             drawRoundBox(UI_ctx, center_x, center_y, 350 * 1.05, 350 * 1.05, Color_list.player_inside_colors[index-1], Color_list.player_outside_colors[index-1], 10 * 1.05, 25 * 1.05);
             drawText(UI_ctx, center_x-150, center_y-100, 100*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${index}`, "left", "GmarketSansMedium");
-            UI_ctx.drawImage((waitingRoomScreen.playerInfos[i].skill === 'dash') ? image.skill_dash : image.skill_teleport, center_x, center_y-150*1.05, 150*1.05, 150*1.05);
+            drawImage(UI_ctx, (waitingRoomScreen.playerInfos[i].skill === 'dash') ? image.skill_dash : image.skill_teleport, center_x+75*1.05, center_y-75*1.05, 150*1.05, 150*1.05)
             drawText(UI_ctx, center_x, center_y+50, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `${waitingRoomScreen.playerInfos[i].name}`, "center", "GmarketSansMedium");
             if(waitingRoomScreen.playerInfos[i].device !== 'unknown'){
-                UI_ctx.drawImage((waitingRoomScreen.playerInfos[i].device === 'phone') ? image.mobile_icon : image.pc_icon, center_x-20*1.05, center_y+115*1.05, 40*1.05, 40*1.05);
+                drawImage(UI_ctx, (waitingRoomScreen.playerInfos[i].device === 'phone') ? image.mobile_icon : image.pc_icon, center_x, center_y+135*1.05, 40*1.05, 40*1.05)
             }
             if(waitingRoomScreen.playerInfos[i].role === 'owner'){
                 drawText(UI_ctx, center_x, center_y+90, 30 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, `(Owner)`, "center", "GmarketSansMedium");
@@ -456,9 +456,9 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             drawRoundBox(UI_ctx, center_x, center_y, 350, 350, Color_list.player_inside_colors[index-1], Color_list.player_outside_colors[index-1], 10, 25);
             drawText(UI_ctx, center_x-150, center_y-100, 100, 0, Color_list.text_default_hex, undefined, undefined, `${index}`, "left", "GmarketSansMedium");
             drawText(UI_ctx, center_x, center_y+50, 40, 0, Color_list.text_default_hex, undefined, undefined, `${waitingRoomScreen.playerInfos[i].name}`, "center", "GmarketSansMedium");
-            UI_ctx.drawImage((waitingRoomScreen.playerInfos[i].skill === 'dash') ? image.skill_dash : image.skill_teleport, center_x, center_y-150, 150, 150);
+            drawImage(UI_ctx, (waitingRoomScreen.playerInfos[i].skill === 'dash') ? image.skill_dash : image.skill_teleport, center_x+75, center_y-75, 150, 150);
             if(waitingRoomScreen.playerInfos[i].device !== 'unknown'){
-                UI_ctx.drawImage((waitingRoomScreen.playerInfos[i].device === 'phone') ? image.mobile_icon : image.pc_icon, center_x-20, center_y+115, 40, 40);
+                drawImage(UI_ctx, (waitingRoomScreen.playerInfos[i].device === 'phone') ? image.mobile_icon : image.pc_icon, center_x, center_y+135, 40, 40)
             }
             if(waitingRoomScreen.playerInfos[i].role === 'owner'){
                 drawText(UI_ctx, center_x, center_y+90, 30, 0, Color_list.text_default_hex, undefined, undefined, `(Owner)`, "center", "GmarketSansMedium");
@@ -472,7 +472,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         let center_x = ((i > 4) ? i - 4 : i) * 400 - 40;
         let center_y = (i > 4) ? 710 : 330;
         if(waitingRoomScreen.user_slot[i] === false){
-            if((checkTouch(Screen.userMouse.x, Screen.userMouse.y, center_x, center_y, 350, 350) && waitingRoomScreen.Client_room_id !== i) || waitingRoomScreen.active_slot === i) {
+            if((checkTouch(Screen.userMouse.x, Screen.userMouse.y, center_x, center_y, 350, 350, UI_ctx.displayDPI) && waitingRoomScreen.Client_room_id !== i) || waitingRoomScreen.active_slot === i) {
                 drawRoundBox(UI_ctx, center_x, center_y, 350 * 1.05, 350 * 1.05, Color_list.button_gray_2_hex, Color_list.button_gray_3_hex, 10 * 1.05, 25 * 1.05);
                 drawText(UI_ctx, center_x-150, center_y-100, 100*1.05, 0, Color_list.player_inside_colors[i-1], Color_list.player_outside_colors[i-1], 5, `${i}`, "left", "GmarketSansMedium");
             }else{
@@ -486,7 +486,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
         //방장 일때(게임 시작, 권한 넘기기, 킥, 자리 바꾸기, 맵 변경)
         if(waitingRoomScreen.active_slot === 0){
             if(waitingRoomScreen.checkUIList[13].clickable === 0) {
-                if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120)) {
+                if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120, UI_ctx.displayDPI)) {
                     drawRoundBox(UI_ctx, 1440, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
                     drawText(UI_ctx, 1440, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Start Game", "center", "GmarketSansMedium");
                 }else{
@@ -499,7 +499,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
             }
             drawText(UI_ctx, 185, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, `Map > ${waitingRoomScreen.gameroomInfo.mapName}`, "left", "GmarketSansMedium");
             if(waitingRoomScreen.checkUIList[20].clickable === 0) {
-                if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 920, 990, 80, 80)) {
+                if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 920, 990, 80, 80, UI_ctx.displayDPI)) {
                     drawRoundBox(UI_ctx, 920, 990, 80 * 1.05, 80 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
                     drawText(UI_ctx, 920, 990, 40 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, ">", "center", "GmarketSansMedium");
                 } else {
@@ -511,14 +511,14 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
                 drawText(UI_ctx, 920, 990, 40, 0, blue_text, undefined, undefined, ">", "center", "GmarketSansMedium");
             }
         }else if(waitingRoomScreen.user_slot[waitingRoomScreen.active_slot] && waitingRoomScreen.active_slot !== waitingRoomScreen.Client_room_id){
-            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 480, 990, 720, 120)) {
+            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 480, 990, 720, 120, UI_ctx.displayDPI)) {
                 drawRoundBox(UI_ctx, 480, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
                 drawText(UI_ctx, 480, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Pass Owner", "center", "GmarketSansMedium");
             }else{
                 drawRoundBox(UI_ctx, 480, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
                 drawText(UI_ctx, 480, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Pass Owner", "center", "GmarketSansMedium");
             }
-            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120)) {
+            if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1440, 990, 720, 120, UI_ctx.displayDPI)) {
                 drawRoundBox(UI_ctx, 1440, 990, 720 * 1.05, 120 * 1.05, Color_list.button_red_2_hex, Color_list.button_red_3_hex, 10 * 1.05, 25 * 1.05);
                 drawText(UI_ctx, 1440, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Kick", "center", "GmarketSansMedium");
             }else{
@@ -530,7 +530,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
                 drawRoundBox(UI_ctx, 960, 990, 720, 120, blue_1, blue_2, 10, 25);
                 drawText(UI_ctx, 960, 990, 60, 0, blue_text, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
             }else {
-                if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 720, 120)) {
+                if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 720, 120, UI_ctx.displayDPI)) {
                     drawRoundBox(UI_ctx, 960, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
                     drawText(UI_ctx, 960, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
                 } else {
@@ -576,7 +576,7 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
                 drawRoundBox(UI_ctx, 960, 990, 720, 120, blue_1, blue_2, 10, 25);
                 drawText(UI_ctx, 960, 990, 60, 0, blue_text, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
             }else{
-                if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 720, 120)) {
+                if (checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 990, 720, 120, UI_ctx.displayDPI)) {
                     drawRoundBox(UI_ctx, 960, 990, 720 * 1.05, 120 * 1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10 * 1.05, 25 * 1.05);
                     drawText(UI_ctx, 960, 990, 60 * 1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "Change Position", "center", "GmarketSansMedium");
                 } else {
@@ -589,24 +589,24 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
     // 스킬 셋 변경 UI
     if(waitingRoomScreen.active_slot === waitingRoomScreen.Client_room_id){
         drawText(UI_ctx, 185, 990, 60, 0, (waitingRoomScreen.temp_player_skill !== waitingRoomScreen.client_player.skill) ? Color_list.button_blue_2_hex : Color_list.text_default_hex, undefined, undefined, `Skill > ${waitingRoomScreen.temp_player_skill}`, "left", "GmarketSansMedium");
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1100, 990, 120, 120)){
-            UI_ctx.drawImage(image.skill_dash, 1037, 927, 126, 126);
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1100, 990, 120, 120, UI_ctx.displayDPI)){
+            drawImage(UI_ctx, image.skill_dash, 1100, 990, 126, 126);
         }else{
-            UI_ctx.drawImage(image.skill_dash, 1040, 930, 120, 120);
+            drawImage(UI_ctx, image.skill_dash, 1100, 990, 120, 120)
         }
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1250, 990, 120, 120)){
-            UI_ctx.drawImage(image.skill_teleport, 1187, 927, 126, 126);
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1250, 990, 120, 120, UI_ctx.displayDPI)){
+            drawImage(UI_ctx, image.skill_teleport, 1250, 990, 126, 126);
         }else{
-            UI_ctx.drawImage(image.skill_teleport, 1190, 930, 120, 120);
+            drawImage(UI_ctx, image.skill_teleport, 1250, 990, 120, 120)
         }
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1550, 990, 80, 80)){
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1550, 990, 80, 80, UI_ctx.displayDPI)){
             drawRoundBox(UI_ctx, 1550, 990, 80*1.05, 80*1.05, Color_list.button_blue_2_hex, Color_list.button_blue_3_hex, 10*1.05, 25*1.05);
             drawText(UI_ctx, 1550, 990, 50*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "✔", "center", "GmarketSansMedium");
         }else{
             drawRoundBox(UI_ctx, 1550, 990, 80, 80, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
             drawText(UI_ctx, 1550, 990, 50, 0, Color_list.text_default_hex, undefined, undefined, "✔", "center", "GmarketSansMedium");
         }
-        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1660, 990, 80, 80)){
+        if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 1660, 990, 80, 80, UI_ctx.displayDPI)){
             drawRoundBox(UI_ctx, 1660, 990, 80*1.05, 80*1.05, Color_list.button_red_2_hex, Color_list.button_red_3_hex, 10*1.05, 25*1.05);
             drawText(UI_ctx, 1660, 990, 50*1.05, 0, Color_list.text_onmouse_hex, undefined, undefined, "↺", "center", "GmarketSansMedium");
         }else{
@@ -617,16 +617,16 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
 }
 
 waitingRoomScreen.redrawBackground = function (Background_ctx) {
-    Background_ctx.clearRect(0, 0, 1920, 1080);
+    clearCtx(Background_ctx);
     drawText(Background_ctx, 960, 72, 80, 0, Color_list.text_default_hex, undefined, undefined, `${waitingRoomScreen.gameroomInfo.name}`, "center", "GmarketSansMedium");
 }
 
-waitingRoomScreen.check = function (userMouse, userKeyboard, checkUIList){
+waitingRoomScreen.check = function (userMouse, userKeyboard, checkUIList, DPI){
     waitingRoomScreen.touch_any_slot = true;
     if(userMouse.click === true) {
         waitingRoomScreen.touch_any_slot = false;
         for (let i = 0; i < checkUIList.length; i++) {
-            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height)) {
+            if (checkTouch(userMouse.x, userMouse.y, checkUIList[i].center_x, checkUIList[i].center_y, checkUIList[i].width, checkUIList[i].height, DPI)) {
                 checkUIList[i].clicked();
             }
         }
