@@ -4,7 +4,7 @@
  */
 
 
-const { Vector2, Circle, OBB, RigidBody, World } = require('./Physics/index.js');
+const { Vector2, Circle, OBB, RigidBody, World } = require('../Physics/index.js');
 
 
 /**

@@ -1,4 +1,4 @@
-const MapLoader = require('./MapLoader');
+const MapLoader = require('./Map/MapLoader');
 const { randomString } = require('./Utils/random.js')
 
 

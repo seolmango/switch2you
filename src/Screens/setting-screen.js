@@ -344,9 +344,9 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
         drawText(UI_ctx, 960, 600, 60, 0, (settingScreen.before[1] === settingScreen.new[1]) ? Color_list.text_default_hex : Color_list.button_blue_2_hex, undefined, undefined, `Resolution : ${settingScreen.new[1]}`, "center", "GmarketSansMedium");
         if(checkTouch(Screen.userMouse.x, Screen.userMouse.y, 960, 700, 1400, 100, UI_ctx.displayDPI)){
             drawRangeSlider(UI_ctx, 960, 700, {
-                lenght: 1200,
+                width: 1200,
                 color: Color_list.button_gray_2_hex,
-                width: 10,
+                stroke_width: 10,
             }, {
                 radius: 40,
                 color: Color_list.button_gray_2_hex,
@@ -355,9 +355,9 @@ settingScreen.draw = function (Background_ctx, UI_ctx, Screen) {
             }, 0.5, 2, settingScreen.new[1]);
         }else {
             drawRangeSlider(UI_ctx, 960, 700, {
-                lenght: 1200,
+                width: 1200,
                 color: Color_list.button_gray_2_hex,
-                width: 10,
+                stroke_width: 10,
             }, {
                 radius: 30,
                 color: Color_list.button_gray_2_hex,

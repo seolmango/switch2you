@@ -493,6 +493,9 @@ waitingRoomScreen.draw = function(Background_ctx, UI_ctx, Screen) {
                     drawRoundBox(UI_ctx, 1440, 990, 720, 120, Color_list.button_blue_1_hex, Color_list.button_blue_2_hex, 10, 25);
                     drawText(UI_ctx, 1440, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, "Start Game", "center", "GmarketSansMedium");
                 }
+            }else{
+                drawRoundBox(UI_ctx, 1440, 990, 720, 120, blue_1, blue_2, 10, 25);
+                drawText(UI_ctx, 1440, 990, 60, 0, blue_text, undefined, undefined, "Start Game", "center", "GmarketSansMedium");
             }
             drawText(UI_ctx, 185, 990, 60, 0, Color_list.text_default_hex, undefined, undefined, `Map > ${waitingRoomScreen.gameroomInfo.mapName}`, "left", "GmarketSansMedium");
             if(waitingRoomScreen.checkUIList[20].clickable === 0) {
